@@ -1,12 +1,13 @@
 #!/bin/bash
 #SBATCH --job-name=rcc-rest2
-#SBATCH --partition=defq
+#SBATCH --partition=a100
+#SBATCH --qos=a100-1day
 #SBATCH -N 1
 #SBATCH --ntasks=6
 #SBATCH --cpus-per-task=2
-#SBATCH --gres=gpu:3
+#SBATCH --gres=gpu:a100:3
 #SBATCH --mem=64G
-#SBATCH --time=12:00:00
+#SBATCH --time=1-00:00:00
 #SBATCH --output=/scicore/home/lill0000/popa0002/thesis/REST2-conformers-complex/logs/rest2-%x-%j.out
 # One complex REST2 run (min, eq_1..3, 6-replica production) inside its Slurm GPU allocation.
 #   sbatch -J rcc-4ibi scripts/rest2.sbatch 4ibi/REST2-run1

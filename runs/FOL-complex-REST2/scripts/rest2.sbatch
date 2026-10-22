@@ -1,17 +1,18 @@
 #!/bin/bash
 #SBATCH --job-name=folc-rest2
-#SBATCH --partition=defq
+#SBATCH --partition=a100
+#SBATCH --qos=a100-1day
 #SBATCH -N 1
 #SBATCH --ntasks=10
 #SBATCH --cpus-per-task=2
-#SBATCH --gres=gpu:5
+#SBATCH --gres=gpu:a100:4
 #SBATCH --mem=64G
-#SBATCH --time=12:00:00
+#SBATCH --time=1-00:00:00
 #SBATCH --output=/scicore/home/lill0000/popa0002/thesis/FOL-complex-REST2/logs/rest2-%x-%j.out
 # One complex REST2 run (min, eq_1..3, 10-replica production) inside its Slurm GPU allocation.
 #   sbatch -J folc-4LRH scripts/rest2.sbatch 4LRH/REST2-run1
 #
-# 10 replicas on 5 GPUs = 2 ranks per GPU, which md-tools allows only under NVIDIA MPS. The MPS
+# 10 replicas on 4 GPUs (sciCORE a100 nodes have 4) = 3/3/2/2 ranks per GPU, which md-tools allows only under NVIDIA MPS. The MPS
 # daemon is private to this job (pipe dir keyed by job id) and is started on exactly the GPUs Slurm
 # allocated; clients then see them as 0..n-1. It is stopped when the job ends.
 # run.sh resumes an interrupted stage from its checkpoint, so resubmitting after a crash is safe.

@@ -18,6 +18,30 @@ Rerun only what the user asks for (new replicates, extensions, new molecules).
 
 ---
 
+## 0. Current machine: sciCORE (Uni Basel), set up 2026-10-22
+
+Steps 1–3 and the §6 GPU test are done here. What differs from the generic text below:
+
+- **Paths.** `THESIS=/scicore/home/lill0000/popa0002/thesis`, `SOFT=/scicore/home/lill0000/popa0002/software`,
+  `MD_DATA=/scicore/home/lill0000/popa0002/md-data`. `/scratch` is node-local here, so nothing lives there.
+- **Slurm.** On PATH, no module load. GPU: `--partition=a100 --qos=a100-1day --gres=gpu:a100:N`
+  (4 GPUs per node, 24 GPUs per user on a100-1day; switch with `-p h200 --qos=h200-1day --gres=gpu:h200:N`,
+  but h200-1day allows only 4 GPUs per user). CPU: `--partition=scicore --qos=1day`. QOS wall limits
+  30min / 6hours / 1day / 1week. The 10-replica folate layouts now use 4 GPUs (3/3/2/2 ranks).
+- **Driver** 580.126.20 = CUDA 13.0, which meets the `cuda-version=13.0` pin exactly. MPS works.
+- **Network.** Compute nodes reach conda-forge but not github.com or the micromamba download (403):
+  clone MD-tools and fetch micromamba on the login node; env builds run as jobs.
+- **Scripts.** `envs/install_*.sbatch` (installs), `envs/verify_envs.sbatch` (§1.3 + user.config),
+  `envs/gpu_test_para.sbatch` (§6 test: PARA-REST2-v4, 300 exchanges; job 28226867 passed: CUDA,
+  906 ns/day per replica on A100 at 2 ranks per GPU, acceptance 0.27/0.13/0.26).
+- **Rebuilding a committed run.** Two traps, both handled in `gpu_test_para.sbatch`:
+  1. `build/ligands/` in git is a partial build output (no `parameters.ffxml`); build-top refuses it
+     ("not a ligand package"). Move it aside before building.
+  2. Committed `build/<RES>.sdf` is a build output too; build-top needs `--overwrite` to replace it.
+     The rebuilt one differs only by the missing `MDT_ATOM_NAMES` tag.
+  Also: `scripts/build.sbatch` of the v4/mace/conformers-v4 runs starts with `build-top --parameterize`.
+  Skip that line and build from the committed package (see §4.1).
+
 ## 1. Software
 
 ### 1.1 MD-tools (Shu-Yu's package, the MD and analysis engine)

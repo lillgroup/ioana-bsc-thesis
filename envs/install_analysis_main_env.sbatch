@@ -1,24 +1,25 @@
 #!/bin/bash
 #SBATCH --job-name=env-analysis-main
-#SBATCH --partition=defq
-#SBATCH --exclude=sbrinz,sbrinz1
+#SBATCH --partition=scicore
+#SBATCH --qos=6hours
 #SBATCH -N 1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=4
-#SBATCH --mem=8G
-#SBATCH --time=01:00:00
+#SBATCH --cpus-per-task=8
+#SBATCH --mem=16G
+#SBATCH --time=02:00:00
 #SBATCH --output=/scicore/home/lill0000/popa0002/software/logs/%x-%j.out
-# Shu-Yu's latest main (symmetry-first t_hdbscan, density_peak, align_all) for ANALYSIS only:
-# env analysis-env-main = clone of analysis-env + md-tools from the MD-tools-main worktree (pinned,
-# non-editable). analysis-env (md-tools 0.6.4) is left untouched.
+# Analysis env (SETUP.md §1.2): the MD-tools stack + md-tools main 69c262b (pinned, non-editable)
+# + scikit-learn/networkx/matplotlib. Needs the clone/worktrees from install_protonation_env.sbatch.
 set -euo pipefail
-export MAMBA_ROOT_PREFIX=/scicore/home/lill0000/popa0002/software/md-stack
-eval "$(/scicore/home/lill0000/popa0002/software/md-stack/bin/micromamba shell hook -s bash)"
-SRC=/scicore/home/lill0000/popa0002/software/MD-tools-main
+SOFT=/scicore/home/lill0000/popa0002/software
+export MAMBA_ROOT_PREFIX=$SOFT/md-stack
+eval "$($SOFT/md-stack/bin/micromamba shell hook -s bash)"
+SRC=$SOFT/MD-tools-main
 echo "== $(git -C $SRC log --oneline -1)  on $(hostname)  $(date)"
-micromamba create -y -n analysis-env-main --clone analysis-env
+micromamba create -y -n analysis-env-main -f "$SRC/environment.yml"
 micromamba activate analysis-env-main
-pip install "$SRC[analysis]"
+micromamba install -y -c conda-forge scikit-learn networkx matplotlib
+pip install --no-deps "$SRC"
 python - <<'PY'
 import md_tools, importlib.metadata as m, os
 from md_tools.analysis import t_hdbscan, THDBSCAN, TorsionDefinitions

@@ -1,12 +1,13 @@
 #!/bin/bash
 #SBATCH --job-name=rc4-rest2
-#SBATCH --partition=defq
+#SBATCH --partition=a100
+#SBATCH --qos=a100-1day
 #SBATCH -N 1
 #SBATCH --ntasks=6
 #SBATCH --cpus-per-task=2
-#SBATCH --gres=gpu:3
+#SBATCH --gres=gpu:a100:3
 #SBATCH --mem=48G
-#SBATCH --time=12:00:00
+#SBATCH --time=1-00:00:00
 #SBATCH --output=/scicore/home/lill0000/popa0002/thesis/REST2-conformers-v4/logs/rest2-%x-%j.out
 # One small-molecule REST2 v4 run (min, eq_1..3, 6-replica production) inside its Slurm GPU allocation.
 #   sbatch -J rc4-4ibi-water scripts/rest2.sbatch 4ibi-water/REST2-run1

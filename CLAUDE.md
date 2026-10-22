@@ -11,6 +11,6 @@ torsion clustering. Moved from the sbrinz cluster on 2026-10-21.
 - Envs by exact name: `openmm-env-protonation` (simulation, MD-tools b3603e0), `analysis-env-main`
   (analysis, MD-tools c30c1c0 = 0.6.5.2; was 69c262b).
 - Reuse the committed ligand packages; never re-parameterise. Never edit MD-tools source.
-- Paths in scripts may still be sbrinz's `/scratch/ipopa/...` until ported (SETUP.md §2).
+- Now on sciCORE (since 2026-10-22): paths and Slurm headers are ported; see SETUP.md §0.
 - Ask before deleting run data or overwriting results; don't touch `REST2-conformers/extend_all.sh`.
 - Commits end with the Co-Authored-By line; push to github.com:ioapopa04/bsc-thesis.

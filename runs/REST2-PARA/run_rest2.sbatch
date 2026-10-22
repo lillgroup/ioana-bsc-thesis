@@ -1,12 +1,13 @@
 #!/bin/bash
 #SBATCH --job-name=para-rest2
-#SBATCH --partition=defq
+#SBATCH --partition=a100
+#SBATCH --qos=a100-1day
 #SBATCH -N 1
 #SBATCH --ntasks=4
 #SBATCH --cpus-per-task=2
-#SBATCH --gres=gpu:2
+#SBATCH --gres=gpu:a100:2
 #SBATCH --mem=64G
-#SBATCH --time=06:00:00
+#SBATCH --time=1-00:00:00
 #SBATCH --output=/scicore/home/lill0000/popa0002/thesis/REST2-PARA/logs/rest2-%x-%j.out
 # Paracetamol REST2 (4 replicas) inside a Slurm GPU allocation; resumes an interrupted run.
 #   sbatch run_rest2.sbatch REST2-run1

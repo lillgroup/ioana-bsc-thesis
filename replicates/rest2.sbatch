@@ -1,18 +1,19 @@
 #!/bin/bash
 #SBATCH --job-name=rep-rest2
-#SBATCH --partition=defq
+#SBATCH --partition=a100
+#SBATCH --qos=a100-1day
 #SBATCH -N 1
 #SBATCH --ntasks=10
 #SBATCH --cpus-per-task=2
-#SBATCH --gres=gpu:5
+#SBATCH --gres=gpu:a100:4
 #SBATCH --mem=64G
-#SBATCH --time=12:00:00
+#SBATCH --time=1-00:00:00
 #SBATCH --output=/scicore/home/lill0000/popa0002/thesis/REST2-replicates/logs/rest2-%x-%j.out
 # One REST2 replicate run (min, eq_1..3, production) inside its Slurm GPU allocation; copy of FOL-REST2-v4/scripts/rest2.sbatch.
-#   folate (8 replicas):    sbatch -J rep-FOL1 --ntasks=8 --gres=gpu:4 replicates/rest2.sbatch FOL/rep1/REST2-run1
-#   paracetamol (4):        sbatch -J rep-PARA1 --ntasks=4 --gres=gpu:2 replicates/rest2.sbatch PARA/rep1/REST2-run1
+#   folate (8 replicas):    sbatch -J rep-FOL1 --ntasks=8 --gres=gpu:a100:4 replicates/rest2.sbatch FOL/rep1/REST2-run1
+#   paracetamol (4):        sbatch -J rep-PARA1 --ntasks=4 --gres=gpu:a100:2 replicates/rest2.sbatch PARA/rep1/REST2-run1
 #
-# 10 replicas on 5 GPUs = 2 ranks per GPU, which md-tools allows only under NVIDIA MPS. The MPS
+# 10 replicas on 4 GPUs (sciCORE a100 nodes have 4) = 3/3/2/2 ranks per GPU, which md-tools allows only under NVIDIA MPS. The MPS
 # daemon is private to this job (pipe dir keyed by job id) and is started on exactly the GPUs Slurm
 # allocated; clients then see them as 0..n-1. It is stopped when the job ends.
 # run.sh resumes an interrupted stage from its checkpoint, so resubmitting after a crash is safe.

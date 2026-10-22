@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #SBATCH --job-name=small-symfirst
-#SBATCH --partition=defq
-#SBATCH --exclude=sbrinz,sbrinz1
+#SBATCH --partition=scicore
+#SBATCH --qos=1day
 #SBATCH -N 1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8

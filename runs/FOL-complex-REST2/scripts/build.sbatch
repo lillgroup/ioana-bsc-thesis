@@ -1,6 +1,8 @@
 #!/bin/bash
 #SBATCH --job-name=folc-build
-#SBATCH --partition=defq
+#SBATCH --partition=scicore
+#SBATCH --qos=1day
+#SBATCH --time=1-00:00:00
 #SBATCH -N 1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8

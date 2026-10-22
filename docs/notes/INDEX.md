@@ -13,3 +13,4 @@
 - [Small molecules REST2 v4](rest2-conformers-v4.md) — 4ibi/4ibk/4j7d re-protonated (−2/−2/+1) → new runs in thesis/REST2-conformers-v4; 5mwh/5ov8 unchanged → only new clustering
 - [Folate REST2 MACE](fol-rest2-mace.md) — Shu-Yu's bespoke System XML transplanted into builds; 3H tautomer ≠ earlier runs; water 11621/11625 done; complexes resubmitted 12614-12617 (11622/11623 died exit 53)
 - [REST2 start-conformer replicates](rest2-replicates.md) — pick_starts.py; PARA rep1 + FOL rep1-3 in thesis/REST2-replicates; jobs 12622-12626; compared (folate agrees, paracetamol 46 vs 57 %)
+- [sciCORE setup](scicore-setup.md) — 2026-10-22 move to sciCORE: paths, a100/scicore partitions+QOS, compute nodes cannot reach GitHub, rebuild traps (build/ligands, --overwrite, skip --parameterize)

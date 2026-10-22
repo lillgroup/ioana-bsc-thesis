@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Re-run bsc-thesis/shuyu_clustering/cluster_prune.py (new horizontal clusters_overview layout) for
 # folic acid in water, paracetamol, and the 4LRH / 3QL3 complexes, with the SAME arguments as their
-# previous runs. Run through Slurm:  srun -p defq -x sbrinz,sbrinz1 -c 8 --mem=32G bash rerun_overviews.sh
+# previous runs. Run through Slurm:  srun -p scicore --qos=1day -c 8 --mem=32G bash rerun_overviews.sh
 set -uo pipefail
 export MAMBA_ROOT_PREFIX=/scicore/home/lill0000/popa0002/software/md-stack
 eval "$(/scicore/home/lill0000/popa0002/software/md-stack/bin/micromamba shell hook -s bash)"
