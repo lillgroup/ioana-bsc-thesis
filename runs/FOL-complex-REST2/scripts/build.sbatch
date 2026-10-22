@@ -5,15 +5,15 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=32G
-#SBATCH --output=/scratch/ipopa/thesis/FOL-complex-REST2/logs/build-%j.out
+#SBATCH --output=/scicore/home/lill0000/popa0002/thesis/FOL-complex-REST2/logs/build-%j.out
 # CPU-only: build-top (complex), REST2 scaler and build-md for every system named on the command line.
 #   sbatch scripts/build.sbatch 4LRH 3QL3
 set -uo pipefail
-ROOT=/scratch/ipopa/thesis/FOL-complex-REST2
-export MAMBA_ROOT_PREFIX=/scratch/ipopa/software/md-stack
-eval "$(/scratch/ipopa/software/md-stack/bin/micromamba shell hook -s bash)"
+ROOT=/scicore/home/lill0000/popa0002/thesis/FOL-complex-REST2
+export MAMBA_ROOT_PREFIX=/scicore/home/lill0000/popa0002/software/md-stack
+eval "$(/scicore/home/lill0000/popa0002/software/md-stack/bin/micromamba shell hook -s bash)"
 micromamba activate openmm-env
-export MD_DATA=/scratch/ipopa/md-data
+export MD_DATA=/scicore/home/lill0000/popa0002/md-data
 echo "host $(hostname)  job ${SLURM_JOB_ID:-none}  $(date)"
 declare -A IDX=([4LRH]=208 [3QL3]=160)
 rc_all=0

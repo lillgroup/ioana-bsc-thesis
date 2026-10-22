@@ -7,20 +7,20 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=32G
 #SBATCH --time=02:00:00
-#SBATCH --output=/scratch/ipopa/thesis/FOL-REST2-mace/logs/build-%j.out
+#SBATCH --output=/scicore/home/lill0000/popa0002/thesis/FOL-REST2-mace/logs/build-%j.out
 # Folate REST2 v4 (env openmm-env-protonation, as FOL-REST2-v4) with Shu-Yu's MACE-OMOL bespoke
 # folate parameters (thesis/folic_acid_mace_omol/ligand_sage_mace_system.xml). build-top cannot read
 # a finished System, so: package from Shu-Yu's molecule (3H-pterin, -2), build as v4, then
 # scripts/transplant.py replaces every folate term with the MACE System's, BEFORE the REST2 scaler.
 set -uo pipefail
-ROOT=/scratch/ipopa/thesis/FOL-REST2-mace
-MACE=/scratch/ipopa/thesis/folic_acid_mace_omol
-export MAMBA_ROOT_PREFIX=/scratch/ipopa/software/md-stack
-eval "$(/scratch/ipopa/software/md-stack/bin/micromamba shell hook -s bash)"
+ROOT=/scicore/home/lill0000/popa0002/thesis/FOL-REST2-mace
+MACE=/scicore/home/lill0000/popa0002/thesis/folic_acid_mace_omol
+export MAMBA_ROOT_PREFIX=/scicore/home/lill0000/popa0002/software/md-stack
+eval "$(/scicore/home/lill0000/popa0002/software/md-stack/bin/micromamba shell hook -s bash)"
 micromamba activate openmm-env-protonation
-export MD_DATA=/scratch/ipopa/md-data
+export MD_DATA=/scicore/home/lill0000/popa0002/md-data
 echo "== md-tools $(python -c 'import importlib.metadata as m; print(m.version("md-tools"))') from $(python -c 'import md_tools,os;print(os.path.dirname(md_tools.__file__))')"
-echo "   branch $(git -C /scratch/ipopa/software/MD-tools-protonation log --oneline -1)  on $(hostname)  $(date)"
+echo "   branch $(git -C /scicore/home/lill0000/popa0002/software/MD-tools-protonation log --oneline -1)  on $(hostname)  $(date)"
 fail() { echo "FAILED: $1"; exit 1; }
 
 echo "== 1. parameterise folate"

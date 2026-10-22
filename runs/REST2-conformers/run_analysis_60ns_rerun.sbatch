@@ -7,7 +7,7 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=32G
 #SBATCH --array=0-4
-#SBATCH --output=/scratch/ipopa/thesis/REST2-conformers/slurm-%x-%A_%a.out
+#SBATCH --output=/scicore/home/lill0000/popa0002/thesis/REST2-conformers/slurm-%x-%A_%a.out
 # Re-run of the Shu-Yu analysis on 0-60 ns state 0 for all five compounds with the CURRENT
 # bsc-thesis/shuyu_clustering scripts (the old run_analysis_60ns.sbatch and
 # 4ibi/analysis-0-60ns/run_analysis.sbatch point at bsc-thesis/shuyu/, since renamed).
@@ -20,14 +20,14 @@ MAXMATCH=(200000 200000 8000000 8000000 8000000)   # automorphism cap, as before
 i=${SLURM_ARRAY_TASK_ID}
 NAME=${NAMES[$i]}; RES=${RESNAMES[$i]}
 
-export MAMBA_ROOT_PREFIX=/scratch/ipopa/software/md-stack
-eval "$(/scratch/ipopa/software/md-stack/bin/micromamba shell hook -s bash)"
+export MAMBA_ROOT_PREFIX=/scicore/home/lill0000/popa0002/software/md-stack
+eval "$(/scicore/home/lill0000/popa0002/software/md-stack/bin/micromamba shell hook -s bash)"
 micromamba activate analysis-env
 export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK:-8}
 
-SHUYU=/scratch/ipopa/thesis/bsc-thesis/shuyu_clustering
-CRYSTAL=/scratch/ipopa/thesis/bsc-thesis/crystal
-cd "/scratch/ipopa/thesis/REST2-conformers/$NAME/analysis-0-60ns"
+SHUYU=/scicore/home/lill0000/popa0002/thesis/bsc-thesis/shuyu_clustering
+CRYSTAL=/scicore/home/lill0000/popa0002/thesis/bsc-thesis/crystal
+cd "/scicore/home/lill0000/popa0002/thesis/REST2-conformers/$NAME/analysis-0-60ns"
 
 REFS=()
 for f in "$CRYSTAL/${NAME}"_*.sdf; do REFS+=(--ref-sdf "$f"); done

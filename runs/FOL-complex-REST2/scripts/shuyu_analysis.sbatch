@@ -7,7 +7,7 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=48G
 #SBATCH --array=0-1
-#SBATCH --output=/scratch/ipopa/thesis/FOL-complex-REST2/logs/%x-%A_%a.out
+#SBATCH --output=/scicore/home/lill0000/popa0002/thesis/FOL-complex-REST2/logs/%x-%A_%a.out
 # Shu-Yu analysis (bsc-thesis/shuyu_clustering: cluster_prune.py + cluster_convergence.py) of the
 # bound-folate REST2 runs, with EXACTLY the settings of the water run (bsc-thesis/results/
 # run_fol_para.sbatch, task 0): state 0, stride 5, --no-single-cluster, 5 ns windows, plateau 3,
@@ -21,15 +21,15 @@ set -euo pipefail
 
 SYSTEMS=(4LRH 3QL3)
 SYS=${SYSTEMS[$SLURM_ARRAY_TASK_ID]}
-ROOT=/scratch/ipopa/thesis/FOL-complex-REST2/$SYS
-WATER=/scratch/ipopa/thesis/FOLn-REST2-50ns
-SHUYU=/scratch/ipopa/thesis/bsc-thesis/shuyu_clustering
-CRYSTAL=/scratch/ipopa/thesis/bsc-thesis/crystal
+ROOT=/scicore/home/lill0000/popa0002/thesis/FOL-complex-REST2/$SYS
+WATER=/scicore/home/lill0000/popa0002/thesis/FOLn-REST2-50ns
+SHUYU=/scicore/home/lill0000/popa0002/thesis/bsc-thesis/shuyu_clustering
+CRYSTAL=/scicore/home/lill0000/popa0002/thesis/bsc-thesis/crystal
 OUT=$ROOT/analysis-shuyu
 NAME="folic-acid-$SYS-complex"
 
-export MAMBA_ROOT_PREFIX=/scratch/ipopa/software/md-stack
-eval "$(/scratch/ipopa/software/md-stack/bin/micromamba shell hook -s bash)"
+export MAMBA_ROOT_PREFIX=/scicore/home/lill0000/popa0002/software/md-stack
+eval "$(/scicore/home/lill0000/popa0002/software/md-stack/bin/micromamba shell hook -s bash)"
 micromamba activate analysis-env
 export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK:-8}
 echo "== $SYS on $(hostname)  $(date)"

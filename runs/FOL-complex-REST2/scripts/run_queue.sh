@@ -27,10 +27,10 @@ MPS="${MPS:-0}"
 
 say() { printf '[%s] %s\n' "$(date '+%F %T')" "$*"; }
 
-export MAMBA_ROOT_PREFIX=/scratch/ipopa/software/md-stack
-eval "$(/scratch/ipopa/software/md-stack/bin/micromamba shell hook -s bash)"
+export MAMBA_ROOT_PREFIX=/scicore/home/lill0000/popa0002/software/md-stack
+eval "$(/scicore/home/lill0000/popa0002/software/md-stack/bin/micromamba shell hook -s bash)"
 micromamba activate openmm-env
-export MD_DATA="${MD_DATA:-/scratch/ipopa/md-data}"
+export MD_DATA="${MD_DATA:-/scicore/home/lill0000/popa0002/md-data}"
 
 pool_idle() {
   local g u m

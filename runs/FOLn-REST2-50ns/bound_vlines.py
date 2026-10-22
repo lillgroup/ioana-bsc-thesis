@@ -15,13 +15,13 @@ import matplotlib.pyplot as plt
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-ROOT = "/scratch/ipopa/thesis/FOLn-REST2-50ns"
+ROOT = "/scicore/home/lill0000/popa0002/thesis/FOLn-REST2-50ns"
 HERE = f"{ROOT}/REST2-run1"
 SDF = f"{ROOT}/build/FOL.sdf"
 TOP = f"{ROOT}/build/built.solute.pdb"
 TRAJ = f"{HERE}/solute_state0_prod1.nc"
 TORSFILE = f"{HERE}/ioana_torsions.txt"
-BOUND = "/scratch/ipopa/thesis/FOLn-REST2/REST2-run1/bound_check"
+BOUND = "/scicore/home/lill0000/popa0002/thesis/FOLn-REST2/REST2-run1/bound_check"
 STRIDE = 5
 KEEP = [1, 2, 3, 4, 6, 7]          # torsion indices --drop-free kept (for the title)
 

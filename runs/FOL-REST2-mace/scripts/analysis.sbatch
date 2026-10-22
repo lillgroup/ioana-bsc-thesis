@@ -7,7 +7,7 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=48G
 #SBATCH --time=03:00:00
-#SBATCH --output=/scratch/ipopa/thesis/FOL-REST2-mace/logs/%x-%j.out
+#SBATCH --output=/scicore/home/lill0000/popa0002/thesis/FOL-REST2-mace/logs/%x-%j.out
 # Analysis of the MACE folate runs (Shu-Yu's MACE-OMOL bespoke folate, 3H tautomer, -2, REST2 v4),
 # same protocol as FOL-REST2-v4 but with the symmetry-first clustering (env analysis-env-main):
 #   per system:  check_run.py (acceptance + binding), fragments.py (complex: per-fragment drift and
@@ -18,11 +18,11 @@
 # with shuyu_clustering/select_torsions.py exactly as for the old water run; the complexes reuse
 # the water files on a folate-only trajectory (same atom order, asserted).
 set -uo pipefail
-ROOT=/scratch/ipopa/thesis/FOL-REST2-mace
-SHUYU=/scratch/ipopa/thesis/bsc-thesis/shuyu_clustering
-CRYSTAL=/scratch/ipopa/thesis/bsc-thesis/crystal
-export MAMBA_ROOT_PREFIX=/scratch/ipopa/software/md-stack
-eval "$(/scratch/ipopa/software/md-stack/bin/micromamba shell hook -s bash)"
+ROOT=/scicore/home/lill0000/popa0002/thesis/FOL-REST2-mace
+SHUYU=/scicore/home/lill0000/popa0002/thesis/bsc-thesis/shuyu_clustering
+CRYSTAL=/scicore/home/lill0000/popa0002/thesis/bsc-thesis/crystal
+export MAMBA_ROOT_PREFIX=/scicore/home/lill0000/popa0002/software/md-stack
+eval "$(/scicore/home/lill0000/popa0002/software/md-stack/bin/micromamba shell hook -s bash)"
 export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK:-8}
 cd "$ROOT"
 echo "== $* on $(hostname)  $(date)"

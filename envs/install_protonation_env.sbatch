@@ -7,14 +7,14 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=16G
 #SBATCH --time=02:00:00
-#SBATCH --output=/scratch/ipopa/software/logs/%x-%j.out
+#SBATCH --output=/scicore/home/lill0000/popa0002/software/logs/%x-%j.out
 # Shu-Yu's feature/ligand-protonation-and-ligand-amides (ligand pH model + REST2 v4 amide scaling),
 # installed side by side: env openmm-env-protonation, editable from the worktree MD-tools-protonation.
 # The original openmm-env (md-tools 0.6.2) and the MD-tools checkout on main are left untouched.
 set -euo pipefail
-export MAMBA_ROOT_PREFIX=/scratch/ipopa/software/md-stack
-eval "$(/scratch/ipopa/software/md-stack/bin/micromamba shell hook -s bash)"
-SRC=/scratch/ipopa/software/MD-tools-protonation
+export MAMBA_ROOT_PREFIX=/scicore/home/lill0000/popa0002/software/md-stack
+eval "$(/scicore/home/lill0000/popa0002/software/md-stack/bin/micromamba shell hook -s bash)"
+SRC=/scicore/home/lill0000/popa0002/software/MD-tools-protonation
 echo "== $(git -C $SRC log --oneline -1)  on $(hostname)  $(date)"
 micromamba create -y -n openmm-env-protonation -f "$SRC/environment.yml"
 micromamba activate openmm-env-protonation

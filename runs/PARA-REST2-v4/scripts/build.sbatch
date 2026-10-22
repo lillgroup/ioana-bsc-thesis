@@ -7,14 +7,14 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=16G
 #SBATCH --time=01:00:00
-#SBATCH --output=/scratch/ipopa/thesis/PARA-REST2-v4/logs/build-%j.out
+#SBATCH --output=/scicore/home/lill0000/popa0002/thesis/PARA-REST2-v4/logs/build-%j.out
 # Paracetamol with Shu-Yu's branch (env openmm-env-protonation): parameterise, solvate, scale, build-md.
 set -euo pipefail
-ROOT=/scratch/ipopa/thesis/PARA-REST2-v4
-export MAMBA_ROOT_PREFIX=/scratch/ipopa/software/md-stack
-eval "$(/scratch/ipopa/software/md-stack/bin/micromamba shell hook -s bash)"
+ROOT=/scicore/home/lill0000/popa0002/thesis/PARA-REST2-v4
+export MAMBA_ROOT_PREFIX=/scicore/home/lill0000/popa0002/software/md-stack
+eval "$(/scicore/home/lill0000/popa0002/software/md-stack/bin/micromamba shell hook -s bash)"
 micromamba activate openmm-env-protonation
-export MD_DATA=/scratch/ipopa/md-data
+export MD_DATA=/scicore/home/lill0000/popa0002/md-data
 echo "== md-tools from $(python -c 'import md_tools,os;print(os.path.dirname(md_tools.__file__))')  on $(hostname)  $(date)"
 cd "$ROOT/build"
 md-openmm build-top --parameterize -i paracetamol.sdf --resname TYL --config parameterize.config \

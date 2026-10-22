@@ -46,10 +46,10 @@ from rdkit import Chem
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from cluster_prune import load_torsions, reference_torsions, molecule_png, simulated_ns
 
-WATER = "/scratch/ipopa/thesis/FOLn-REST2-50ns"
-COMPLEX = "/scratch/ipopa/thesis/FOL-complex-REST2"
-CRYSTAL = "/scratch/ipopa/thesis/bsc-thesis/crystal"
-RESULTS = "/scratch/ipopa/thesis/bsc-thesis/results/folic-acid"
+WATER = "/scicore/home/lill0000/popa0002/thesis/FOLn-REST2-50ns"
+COMPLEX = "/scicore/home/lill0000/popa0002/thesis/FOL-complex-REST2"
+CRYSTAL = "/scicore/home/lill0000/popa0002/thesis/bsc-thesis/crystal"
+RESULTS = "/scicore/home/lill0000/popa0002/thesis/bsc-thesis/results/folic-acid"
 
 
 def systems(water, cplx):

@@ -7,7 +7,7 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=48G
 #SBATCH --time=12:00:00
-#SBATCH --output=/scratch/ipopa/thesis/bsc-thesis/results/logs/%x-%A_%a.out
+#SBATCH --output=/scicore/home/lill0000/popa0002/thesis/bsc-thesis/results/logs/%x-%A_%a.out
 # Shu-Yu's symmetry-first clustering (cluster_prune.py + cluster_convergence.py, env
 # analysis-env-main) for the five small molecules, water and complex:
 #   array 0-4  water    4ibi 4ibk 4j7d 5mwh 5ov8
@@ -24,12 +24,12 @@ NAMES=(4ibi 4ibk 4j7d 5mwh 5ov8); RESS=(L01 L02 L03 L04 L05); LIGS=(1D8 1DE I31 
 MAXMATCH=(200000 200000 8000000 8000000 8000000)   # automorphism cap, as in the earlier analyses
 i=$(( SLURM_ARRAY_TASK_ID % 5 )); KIND=$([ "$SLURM_ARRAY_TASK_ID" -lt 5 ] && echo water || echo complex)
 n=${NAMES[$i]}; res=${RESS[$i]}; lig=${LIGS[$i]}; SET=${SET:-orig}
-export MAMBA_ROOT_PREFIX=/scratch/ipopa/software/md-stack
-eval "$(/scratch/ipopa/software/md-stack/bin/micromamba shell hook -s bash)"
+export MAMBA_ROOT_PREFIX=/scicore/home/lill0000/popa0002/software/md-stack
+eval "$(/scicore/home/lill0000/popa0002/software/md-stack/bin/micromamba shell hook -s bash)"
 export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK:-8}
-SHUYU=/scratch/ipopa/thesis/bsc-thesis/shuyu_clustering
-CRYSTAL=/scratch/ipopa/thesis/bsc-thesis/crystal
-T=/scratch/ipopa/thesis
+SHUYU=/scicore/home/lill0000/popa0002/thesis/bsc-thesis/shuyu_clustering
+CRYSTAL=/scicore/home/lill0000/popa0002/thesis/bsc-thesis/crystal
+T=/scicore/home/lill0000/popa0002/thesis
 
 if [ "$SET" = orig ]; then
   W=$T/REST2-conformers/$n; WTRAJ=$W/analysis-0-60ns/solute_state0_0-60ns.nc; TORS=$W/analysis-0-60ns

@@ -3,12 +3,12 @@
 # folic acid in water, paracetamol, and the 4LRH / 3QL3 complexes, with the SAME arguments as their
 # previous runs. Run through Slurm:  srun -p defq -x sbrinz,sbrinz1 -c 8 --mem=32G bash rerun_overviews.sh
 set -uo pipefail
-export MAMBA_ROOT_PREFIX=/scratch/ipopa/software/md-stack
-eval "$(/scratch/ipopa/software/md-stack/bin/micromamba shell hook -s bash)"
+export MAMBA_ROOT_PREFIX=/scicore/home/lill0000/popa0002/software/md-stack
+eval "$(/scicore/home/lill0000/popa0002/software/md-stack/bin/micromamba shell hook -s bash)"
 micromamba activate analysis-env
 export OMP_NUM_THREADS=8
-SHUYU=/scratch/ipopa/thesis/bsc-thesis/shuyu_clustering
-CRYSTAL=/scratch/ipopa/thesis/bsc-thesis/crystal
+SHUYU=/scicore/home/lill0000/popa0002/thesis/bsc-thesis/shuyu_clustering
+CRYSTAL=/scicore/home/lill0000/popa0002/thesis/bsc-thesis/crystal
 run() {  # run <dir> <out> <args...>
   local dir=$1 out=$2; shift 2
   cd "$dir" || return 1
@@ -19,19 +19,19 @@ run() {  # run <dir> <out> <args...>
   echo "$(basename "$dir")/$out rc=$rc  $same"
 }
 # folic acid in water (bsc-thesis/results/run_fol_para.sbatch task 0)
-run /scratch/ipopa/thesis/FOLn-REST2-50ns folic-acid-clustering-shuyu-nosingle-ref \
+run /scicore/home/lill0000/popa0002/thesis/FOLn-REST2-50ns folic-acid-clustering-shuyu-nosingle-ref \
   --traj REST2-run1/solute_state0_prod1.nc --top build/built.solute.pdb --sdf build/FOL.sdf \
   --torsions-file REST2-run1/torsions.txt --torsions-file REST2-run1/torsions_rigid.txt \
   --torsions-file REST2-run1/torsions_polarH.txt --stride 5 --no-single-cluster \
   --name folic-acid --rest2-config REST2.config \
   --ref-sdf $CRYSTAL/fol_4LRH_A.sdf --ref-sdf $CRYSTAL/fol_3QL3_A.sdf
 # paracetamol (task 1)
-run /scratch/ipopa/thesis/REST2-PARA paracetamol-clustering-shuyu-nosingle-ref \
+run /scicore/home/lill0000/popa0002/thesis/REST2-PARA paracetamol-clustering-shuyu-nosingle-ref \
   --traj REST2-run1/solute_state0_prod1.nc --top build/built.solute.pdb --sdf build/TYL.sdf \
   --stride 1 --no-single-cluster --name paracetamol --rest2-config REST2.config
 # complexes (FOL-complex-REST2/scripts/shuyu_analysis.sbatch), own crystal only
 for s in 4LRH 3QL3; do
-  run /scratch/ipopa/thesis/FOL-complex-REST2/$s/analysis-shuyu folic-acid-$s-complex-clustering-shuyu-nosingle-ref \
+  run /scicore/home/lill0000/popa0002/thesis/FOL-complex-REST2/$s/analysis-shuyu folic-acid-$s-complex-clustering-shuyu-nosingle-ref \
     --traj FOL_state0_prod1.nc --top FOL.solute.pdb --sdf FOL.sdf \
     --torsions-file torsions.txt --torsions-file torsions_rigid.txt --torsions-file torsions_polarH.txt \
     --stride 5 --no-single-cluster --name folic-acid-$s-complex --rest2-config ../REST2.config \

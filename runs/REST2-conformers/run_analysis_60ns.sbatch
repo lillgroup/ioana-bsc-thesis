@@ -7,7 +7,7 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=32G
 #SBATCH --array=0-3
-#SBATCH --output=/scratch/ipopa/thesis/REST2-conformers/slurm-%x-%A_%a.out
+#SBATCH --output=/scicore/home/lill0000/popa0002/thesis/REST2-conformers/slurm-%x-%A_%a.out
 # Shu-Yu clustering (crystal reference + overview figure) and the 5 ns convergence scan on
 # 0-60 ns state 0 (REST2-run1 + REST2-run1-ext1), same settings as 4ibi/analysis-0-60ns.
 #   sbatch run_analysis_60ns.sbatch                 all four
@@ -21,14 +21,14 @@ MAXMATCH=(200000 8000000 8000000 8000000)
 i=${SLURM_ARRAY_TASK_ID}
 NAME=${NAMES[$i]}; RES=${RESNAMES[$i]}
 
-export MAMBA_ROOT_PREFIX=/scratch/ipopa/software/md-stack
-eval "$(/scratch/ipopa/software/md-stack/bin/micromamba shell hook -s bash)"
+export MAMBA_ROOT_PREFIX=/scicore/home/lill0000/popa0002/software/md-stack
+eval "$(/scicore/home/lill0000/popa0002/software/md-stack/bin/micromamba shell hook -s bash)"
 micromamba activate analysis-env
 export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK:-8}
 
-SHUYU=/scratch/ipopa/thesis/bsc-thesis/shuyu
-CRYSTAL=/scratch/ipopa/thesis/bsc-thesis/crystal
-ROOT=/scratch/ipopa/thesis/REST2-conformers/$NAME
+SHUYU=/scicore/home/lill0000/popa0002/thesis/bsc-thesis/shuyu
+CRYSTAL=/scicore/home/lill0000/popa0002/thesis/bsc-thesis/crystal
+ROOT=/scicore/home/lill0000/popa0002/thesis/REST2-conformers/$NAME
 OUT=$ROOT/analysis-0-60ns
 mkdir -p "$OUT"
 cd "$OUT"

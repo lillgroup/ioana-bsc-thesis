@@ -4,7 +4,7 @@ import sys
 from rdkit import Chem
 from md_tools.openmm.ligand_protonation import protonate_molecule, protonation_summary
 
-PKG = "/scratch/ipopa/thesis/REST2-conformers-complex/packages"
+PKG = "/scicore/home/lill0000/popa0002/thesis/REST2-conformers-complex/packages"
 for name, res in zip(["4ibi", "4ibk", "4j7d", "5mwh", "5ov8"], ["L01", "L02", "L03", "L04", "L05"]):
     mol = Chem.MolFromMolFile(f"{PKG}/{name}-water/molecule.sdf", removeHs=False)
     print(f"{name} ({res}) {Chem.MolToSmiles(Chem.RemoveHs(mol))}  net {Chem.GetFormalCharge(mol):+d}")

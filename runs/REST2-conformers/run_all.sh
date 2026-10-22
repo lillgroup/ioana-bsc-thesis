@@ -41,8 +41,8 @@
 #   ./run_all.sh --detach        build, then launch the runs detached (setsid)
 #
 # ENV KNOBS (all optional)
-#   CONF_DIR=/scratch/ipopa/thesis/bsc-thesis/conformers
-#   BASE=/scratch/ipopa/thesis/REST2-conformers
+#   CONF_DIR=/scicore/home/lill0000/popa0002/thesis/bsc-thesis/conformers
+#   BASE=/scicore/home/lill0000/popa0002/thesis/REST2-conformers
 #   N_REPLICAS=6  TAU_MAX=0.4  NS=30  EXCHANGE_INTERVAL=1000  TIMESTEP_FS=2
 #   PARALLEL=1                   compounds to run at once (default: sequentially)
 #   GPUS=0,1,2,3,4,5             GPU pool the runs are spread over
@@ -54,8 +54,8 @@
 # ============================================================================
 set -uo pipefail
 
-CONF_DIR="${CONF_DIR:-/scratch/ipopa/thesis/bsc-thesis/conformers}"
-BASE="${BASE:-/scratch/ipopa/thesis/REST2-conformers}"
+CONF_DIR="${CONF_DIR:-/scicore/home/lill0000/popa0002/thesis/bsc-thesis/conformers}"
+BASE="${BASE:-/scicore/home/lill0000/popa0002/thesis/REST2-conformers}"
 
 N_REPLICAS="${N_REPLICAS:-6}"          # 8 replicas gave 0.42-0.45 for folic acid;
 TAU_MAX="${TAU_MAX:-0.4}"              # 6 is steeper - check the neighbour
@@ -94,11 +94,11 @@ say() { printf '[%s] %s\n' "$(date +%H:%M:%S)" "$*"; }
 die() { printf 'run_all.sh: %s\n' "$*" >&2; exit 1; }
 
 activate_env() {
-  export MAMBA_ROOT_PREFIX=/scratch/ipopa/software/md-stack
+  export MAMBA_ROOT_PREFIX=/scicore/home/lill0000/popa0002/software/md-stack
   # shellcheck disable=SC1091
-  eval "$(/scratch/ipopa/software/md-stack/bin/micromamba shell hook -s bash)"
+  eval "$(/scicore/home/lill0000/popa0002/software/md-stack/bin/micromamba shell hook -s bash)"
   micromamba activate openmm-env || die "could not activate openmm-env"
-  export MD_DATA="${MD_DATA:-/scratch/ipopa/md-data}"
+  export MD_DATA="${MD_DATA:-/scicore/home/lill0000/popa0002/md-data}"
   command -v md-openmm >/dev/null || die "md-openmm not on PATH"
 }
 

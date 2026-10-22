@@ -27,9 +27,9 @@ import numpy as np
 from rdkit import Chem
 
 OUT = sys.argv[1]
-WATER = "/scratch/ipopa/thesis/FOLn-REST2-50ns"
-CPLX = "/scratch/ipopa/thesis/FOL-complex-REST2"
-CRYSTAL = "/scratch/ipopa/thesis/bsc-thesis/crystal"
+WATER = "/scicore/home/lill0000/popa0002/thesis/FOLn-REST2-50ns"
+CPLX = "/scicore/home/lill0000/popa0002/thesis/FOL-complex-REST2"
+CRYSTAL = "/scicore/home/lill0000/popa0002/thesis/bsc-thesis/crystal"
 
 RUNS = {   # label: (trajectory, topology)
     "water": (f"{WATER}/REST2-run1/solute_state0_prod1.nc", f"{WATER}/build/built.solute.pdb"),

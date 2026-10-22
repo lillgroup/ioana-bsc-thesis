@@ -7,14 +7,14 @@
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=8G
 #SBATCH --time=01:00:00
-#SBATCH --output=/scratch/ipopa/software/logs/%x-%j.out
+#SBATCH --output=/scicore/home/lill0000/popa0002/software/logs/%x-%j.out
 # Shu-Yu's latest main (symmetry-first t_hdbscan, density_peak, align_all) for ANALYSIS only:
 # env analysis-env-main = clone of analysis-env + md-tools from the MD-tools-main worktree (pinned,
 # non-editable). analysis-env (md-tools 0.6.4) is left untouched.
 set -euo pipefail
-export MAMBA_ROOT_PREFIX=/scratch/ipopa/software/md-stack
-eval "$(/scratch/ipopa/software/md-stack/bin/micromamba shell hook -s bash)"
-SRC=/scratch/ipopa/software/MD-tools-main
+export MAMBA_ROOT_PREFIX=/scicore/home/lill0000/popa0002/software/md-stack
+eval "$(/scicore/home/lill0000/popa0002/software/md-stack/bin/micromamba shell hook -s bash)"
+SRC=/scicore/home/lill0000/popa0002/software/MD-tools-main
 echo "== $(git -C $SRC log --oneline -1)  on $(hostname)  $(date)"
 micromamba create -y -n analysis-env-main --clone analysis-env
 micromamba activate analysis-env-main

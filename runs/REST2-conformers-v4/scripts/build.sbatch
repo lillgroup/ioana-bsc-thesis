@@ -8,7 +8,7 @@
 #SBATCH --mem=32G
 #SBATCH --time=02:00:00
 #SBATCH --array=0-2
-#SBATCH --output=/scratch/ipopa/thesis/REST2-conformers-v4/logs/build-%A_%a.out
+#SBATCH --output=/scicore/home/lill0000/popa0002/thesis/REST2-conformers-v4/logs/build-%A_%a.out
 # REST2 v4 (Shu-Yu's protonation branch, env openmm-env-protonation) for the three small molecules
 # whose protomer Open Babel changes at pH 7.4 (REST2-conformers-complex/protonation-check):
 #   0 4ibi (L01, -2)   1 4ibk (L02, -2)   2 4j7d (L03, +1)
@@ -16,17 +16,17 @@
 # the original runs: water = REST2-conformers/<n> (6 replicas, tau 0.4, now 60 ns in one run),
 # complex = REST2-conformers-complex/<n> (6 replicas, tau 0.4, ligand-only hot region, 40 ns).
 set -uo pipefail
-ROOT=/scratch/ipopa/thesis/REST2-conformers-v4
-OLDW=/scratch/ipopa/thesis/REST2-conformers
-OLDC=/scratch/ipopa/thesis/REST2-conformers-complex
+ROOT=/scicore/home/lill0000/popa0002/thesis/REST2-conformers-v4
+OLDW=/scicore/home/lill0000/popa0002/thesis/REST2-conformers
+OLDC=/scicore/home/lill0000/popa0002/thesis/REST2-conformers-complex
 NAMES=(4ibi 4ibk 4j7d); RESS=(L01 L02 L03); LIGS=(1D8 1DE I31)
 n=${NAMES[$SLURM_ARRAY_TASK_ID]}; res=${RESS[$SLURM_ARRAY_TASK_ID]}; lig=${LIGS[$SLURM_ARRAY_TASK_ID]}
-export MAMBA_ROOT_PREFIX=/scratch/ipopa/software/md-stack
-eval "$(/scratch/ipopa/software/md-stack/bin/micromamba shell hook -s bash)"
+export MAMBA_ROOT_PREFIX=/scicore/home/lill0000/popa0002/software/md-stack
+eval "$(/scicore/home/lill0000/popa0002/software/md-stack/bin/micromamba shell hook -s bash)"
 micromamba activate openmm-env-protonation
-export MD_DATA=/scratch/ipopa/md-data
+export MD_DATA=/scicore/home/lill0000/popa0002/md-data
 echo "== $n ($res) md-tools $(python -c 'import importlib.metadata as m; print(m.version("md-tools"))')" \
-     "$(git -C /scratch/ipopa/software/MD-tools-protonation log --oneline -1)  on $(hostname)  $(date)"
+     "$(git -C /scicore/home/lill0000/popa0002/software/MD-tools-protonation log --oneline -1)  on $(hostname)  $(date)"
 fail() { echo "FAILED: $1"; exit 1; }
 
 echo "== 1. parameterise at pH 7.4"

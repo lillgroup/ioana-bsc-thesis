@@ -3,13 +3,13 @@
 # legend (cluster_prune.py label change). Same command/settings as the series.
 set -uo pipefail
 
-ROOT=/scratch/ipopa/thesis/FOLn-REST2-50ns
+ROOT=/scicore/home/lill0000/popa0002/thesis/FOLn-REST2-50ns
 cd "$ROOT" || exit 1
 
-source /scratch/ipopa/thesis/folenv.sh
+source /scicore/home/lill0000/popa0002/thesis/folenv.sh
 micromamba activate analysis-env
 
-SC=/scratch/ipopa/thesis/bsc-thesis/shuyu/cluster_prune.py
+SC=/scicore/home/lill0000/popa0002/thesis/bsc-thesis/shuyu/cluster_prune.py
 OUT=fol-clustering-shuyu-nosingle
 
 for ns in 10 20 30 40 50 60 70 80 90 100; do

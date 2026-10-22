@@ -7,7 +7,7 @@
 #SBATCH --gres=gpu:3
 #SBATCH --mem=48G
 #SBATCH --time=12:00:00
-#SBATCH --output=/scratch/ipopa/thesis/REST2-conformers-v4/logs/rest2-%x-%j.out
+#SBATCH --output=/scicore/home/lill0000/popa0002/thesis/REST2-conformers-v4/logs/rest2-%x-%j.out
 # One small-molecule REST2 v4 run (min, eq_1..3, 6-replica production) inside its Slurm GPU allocation.
 #   sbatch -J rc4-4ibi-water scripts/rest2.sbatch 4ibi-water/REST2-run1
 #
@@ -16,14 +16,14 @@
 # allocated; clients then see them as 0..n-1. It is stopped when the job ends.
 # run.sh resumes an interrupted stage from its checkpoint, so resubmitting after a crash is safe.
 set -uo pipefail
-ROOT=/scratch/ipopa/thesis/REST2-conformers-v4
+ROOT=/scicore/home/lill0000/popa0002/thesis/REST2-conformers-v4
 RUN="$ROOT/$1"
 [ -x "$RUN/run.sh" ] || { echo "no $RUN/run.sh"; exit 2; }
 
-export MAMBA_ROOT_PREFIX=/scratch/ipopa/software/md-stack
-eval "$(/scratch/ipopa/software/md-stack/bin/micromamba shell hook -s bash)"
+export MAMBA_ROOT_PREFIX=/scicore/home/lill0000/popa0002/software/md-stack
+eval "$(/scicore/home/lill0000/popa0002/software/md-stack/bin/micromamba shell hook -s bash)"
 micromamba activate openmm-env-protonation   # Shu-Yu branch b3603e0 (ligand pH model, REST2 v4)
-export MD_DATA=/scratch/ipopa/md-data
+export MD_DATA=/scicore/home/lill0000/popa0002/md-data
 
 ALLOC="${CUDA_VISIBLE_DEVICES:?Slurm set no CUDA_VISIBLE_DEVICES}"
 NG=$(awk -F, '{print NF}' <<<"$ALLOC")

@@ -11,14 +11,14 @@
 # for 4ibi, 0-60 ns state 0. Submit from analysis-0-60ns/:  sbatch run_analysis.sbatch
 set -euo pipefail
 
-export MAMBA_ROOT_PREFIX=/scratch/ipopa/software/md-stack
-eval "$(/scratch/ipopa/software/md-stack/bin/micromamba shell hook -s bash)"
+export MAMBA_ROOT_PREFIX=/scicore/home/lill0000/popa0002/software/md-stack
+eval "$(/scicore/home/lill0000/popa0002/software/md-stack/bin/micromamba shell hook -s bash)"
 micromamba activate analysis-env
 export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK:-8}
 
-SHUYU=/scratch/ipopa/thesis/bsc-thesis/shuyu
-CRYSTAL=/scratch/ipopa/thesis/bsc-thesis/crystal
-cd /scratch/ipopa/thesis/REST2-conformers/4ibi/analysis-0-60ns
+SHUYU=/scicore/home/lill0000/popa0002/thesis/bsc-thesis/shuyu
+CRYSTAL=/scicore/home/lill0000/popa0002/thesis/bsc-thesis/crystal
+cd /scicore/home/lill0000/popa0002/thesis/REST2-conformers/4ibi/analysis-0-60ns
 
 COMMON=(--traj solute_state0_0-60ns.nc --top ../build/built.solute.pdb --sdf ../build/L01.sdf
         --torsions-file torsions.txt --torsions-file torsions_rigid.txt

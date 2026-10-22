@@ -9,7 +9,7 @@ from openmm import unit
 from openmm.app import PDBFile
 from rdkit import Chem
 
-T = "/scratch/ipopa/thesis"
+T = "/scicore/home/lill0000/popa0002/thesis"
 mace_sys = mm.XmlSerializer.deserialize(open(f"{T}/folic_acid_mace_omol/ligand_sage_mace_system.xml").read())
 mace_mol = Chem.MolFromMolFile(f"{T}/folic_acid_mace_omol/molecule.sdf", removeHs=False)
 v4_sys = mm.XmlSerializer.deserialize(open(f"{T}/FOL-REST2-v4/water/build/built.xml").read())

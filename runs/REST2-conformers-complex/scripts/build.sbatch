@@ -7,14 +7,14 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=32G
 #SBATCH --array=0-4
-#SBATCH --output=/scratch/ipopa/thesis/REST2-conformers-complex/logs/build-%A_%a.out
+#SBATCH --output=/scicore/home/lill0000/popa0002/thesis/REST2-conformers-complex/logs/build-%A_%a.out
 # CPU only, one compound per array task: build-top (complex, water-run ligand package reused),
 # REST2 scaler (ligand only), build-md for the 40 ns production (REST2-run1) and for a short
 # 300-exchange test (test/REST2-test, sharing build/).
 #   sbatch scripts/build.sbatch                 all five
 #   sbatch --array=2 scripts/build.sbatch       only 4j7d
 set -uo pipefail
-ROOT=/scratch/ipopa/thesis/REST2-conformers-complex
+ROOT=/scicore/home/lill0000/popa0002/thesis/REST2-conformers-complex
 NAMES=(4ibi 4ibk 4j7d 5mwh 5ov8)
 LIGS=(1D8 1DE I31 UWX AXN)
 N_REPLICAS=6            # as the water runs
@@ -25,10 +25,10 @@ N_TEST=300
 
 name=${NAMES[$SLURM_ARRAY_TASK_ID]}; lig=${LIGS[$SLURM_ARRAY_TASK_ID]}
 b=$ROOT/$name/build
-export MAMBA_ROOT_PREFIX=/scratch/ipopa/software/md-stack
-eval "$(/scratch/ipopa/software/md-stack/bin/micromamba shell hook -s bash)"
+export MAMBA_ROOT_PREFIX=/scicore/home/lill0000/popa0002/software/md-stack
+eval "$(/scicore/home/lill0000/popa0002/software/md-stack/bin/micromamba shell hook -s bash)"
 micromamba activate openmm-env
-export MD_DATA=/scratch/ipopa/md-data
+export MD_DATA=/scicore/home/lill0000/popa0002/md-data
 echo "== $name ($lig) on $(hostname)  job ${SLURM_JOB_ID}  $(date)"
 
 echo "== build-top"

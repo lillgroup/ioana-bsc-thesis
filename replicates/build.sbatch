@@ -7,15 +7,15 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=32G
 #SBATCH --time=02:00:00
-#SBATCH --output=/scratch/ipopa/thesis/REST2-replicates/logs/build-%A_%a.out
+#SBATCH --output=/scicore/home/lill0000/popa0002/thesis/REST2-replicates/logs/build-%A_%a.out
 # Build one REST2 replicate from a start chosen by pick_starts.py (env openmm-env-protonation, as v4).
 # Everything is the v4 water run's except the starting coordinates and the velocity seed:
 #   same parameter package (reused, so no charges are recomputed), same scaler, same REST2.config.
 #   sbatch --array=0-3 replicates/build.sbatch
 #   0 paracetamol rep1     1-3 folate water rep1..rep3
-# Output: /scratch/ipopa/thesis/REST2-replicates/<MOL>/rep<k>/{build,REST2.config,REST2-run1}
+# Output: /scicore/home/lill0000/popa0002/thesis/REST2-replicates/<MOL>/rep<k>/{build,REST2.config,REST2-run1}
 set -uo pipefail
-TH=/scratch/ipopa/thesis
+TH=/scicore/home/lill0000/popa0002/thesis
 PICK=$TH/bsc-thesis/replicates
 case ${SLURM_ARRAY_TASK_ID} in
 0) MOL=PARA; K=1; V4=$TH/PARA-REST2-v4; RES=TYL; PKG=$V4/build/parameter
@@ -28,13 +28,13 @@ D=$TH/REST2-replicates/$MOL/rep$K
 B=$D/build
 fail() { echo "FAILED: $1"; exit 1; }
 
-export MAMBA_ROOT_PREFIX=/scratch/ipopa/software/md-stack
-eval "$(/scratch/ipopa/software/md-stack/bin/micromamba shell hook -s bash)"
+export MAMBA_ROOT_PREFIX=/scicore/home/lill0000/popa0002/software/md-stack
+eval "$(/scicore/home/lill0000/popa0002/software/md-stack/bin/micromamba shell hook -s bash)"
 micromamba activate openmm-env-protonation
-export MD_DATA=/scratch/ipopa/md-data
+export MD_DATA=/scicore/home/lill0000/popa0002/md-data
 echo "== $MOL rep$K (seed $SEED) on $(hostname)  $(date)"
 echo "   md-tools $(python -c 'import importlib.metadata as m; print(m.version("md-tools"))')," \
-     "branch $(git -C /scratch/ipopa/software/MD-tools-protonation log --oneline -1)"
+     "branch $(git -C /scicore/home/lill0000/popa0002/software/MD-tools-protonation log --oneline -1)"
 [ -e "$D/REST2-run1/run.sh" ] && fail "$D already built (remove it to rebuild)"
 
 echo "== 0. set up $D"
