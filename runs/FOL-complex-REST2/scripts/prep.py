@@ -1,7 +1,7 @@
 """SUPERSEDED (2026-10-26): this drops the crystal waters, which md-tools keeps; without them the
 pocket is refilled with bulk water (3QL3 folate drifted out). New complexes:
-runs/REST2-complex-xtalwater (scripts/add_crystal_waters.py adds the chain-A waters to this
-script's output). Kept unchanged as the record of how the earlier complex runs were prepared.
+runs/REST2-complex-xtalwater/scripts/prep.py (same protein and ligand records, plus the chain-A
+crystal waters). Kept unchanged as the record of how the earlier complex runs were prepared.
 
 Prepare the inputs of the folate complex REST2 runs from the deposited crystal structures.
 

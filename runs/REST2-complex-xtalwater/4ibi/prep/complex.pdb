@@ -1,5 +1,4 @@
-REMARK   1 4IBI chain A + 1D8; additives, chain B, HOH dropped
-REMARK   1 + 135 chain-A crystal waters from 4IBI.pdb (add_crystal_waters.py)
+REMARK   1 4IBI chain A + 1D8 + 135 crystal waters; left out: nothing (prep.py)
 ATOM      1  N   ASP A 218      -9.935  21.998 -15.742  1.00 33.55           N  
 ATOM      2  CA  ASP A 218      -9.240  23.057 -15.013  1.00 25.79           C  
 ATOM      3  C   ASP A 218      -7.882  22.587 -14.502  1.00 27.19           C  

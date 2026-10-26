@@ -19,5 +19,6 @@ Inputs not included, approved by Shu-Yu on 2026-10-26:
 
 Also: chain A only (biological assembly 1 is the chain-A monomer for all seven entries), altloc A.
 
-Scripts: `scripts/add_crystal_waters.py`, `scripts/build.sbatch` (array 0-6), `scripts/rest2.sbatch`,
+Scripts: `scripts/prep.py` (crystal -> prep/complex.pdb with waters; every left-out group is listed
+there with its reason), `scripts/build.sbatch` (array 0-6), `scripts/rest2.sbatch`,
 `scripts/check_run.py`. Test jobs (300 exchanges) are listed in `logs/test-jobs.txt`.

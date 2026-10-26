@@ -1,5 +1,4 @@
-REMARK   1 4J7D chain A + I31; additives, chain B, HOH dropped
-REMARK   1 + 125 chain-A crystal waters from 4J7D.pdb (add_crystal_waters.py)
+REMARK   1 4J7D chain A + I31 + 125 crystal waters; left out: SO4 (prep.py)
 ATOM      1  N   MET A  20       3.615  -4.079 -19.822  1.00 27.49           N  
 ATOM      2  CA  MET A  20       2.719  -3.542 -18.770  1.00 27.72           C  
 ATOM      3  C   MET A  20       2.330  -4.651 -17.803  1.00 28.47           C  

@@ -1,5 +1,4 @@
-REMARK   1 4IBK chain A + 1DE; additives, chain B, HOH dropped
-REMARK   1 + 112 chain-A crystal waters from 4IBK.pdb (add_crystal_waters.py)
+REMARK   1 4IBK chain A + 1DE + 112 crystal waters; left out: DMS, GOL (prep.py)
 ATOM      1  N   ASP A 218      -9.980  21.734 -15.599  1.00 31.52           N  
 ATOM      2  CA  ASP A 218      -9.180  22.877 -15.162  1.00 25.45           C  
 ATOM      3  C   ASP A 218      -7.858  22.417 -14.583  1.00 25.18           C  

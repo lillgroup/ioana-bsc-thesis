@@ -12,7 +12,7 @@
 # Complex REST2 rebuilt WITH the deposited crystal waters (md-tools' protocol: they are kept, moved
 # after the solute, and the box is filled around them). Everything else is the run it replaces,
 # copied unchanged: package (reused, never re-parameterised), build-top.config, scaler.config,
-# REST2.config, protein + ligand coordinates (prep/complex.nowater.pdb).
+# REST2.config, protein + ligand coordinates (scripts/prep.py writes the same records as the old prep.py, plus the waters).
 #   0 FOL-4LRH  <- FOL-REST2-v4/4LRH            3 4ibk <- REST2-conformers-v4/4ibk-complex
 #   1 FOL-3QL3  <- FOL-REST2-v4/3QL3            4 4j7d <- REST2-conformers-v4/4j7d-complex
 #   2 4ibi      <- REST2-conformers-v4/4ibi-complex  5 5mwh <- REST2-conformers-complex/5mwh
@@ -21,7 +21,6 @@
 set -uo pipefail
 ROOT=/scicore/home/lill0000/popa0002/thesis/REST2-complex-xtalwater
 NAMES=(FOL-4LRH FOL-3QL3 4ibi 4ibk 4j7d 5mwh 5ov8)
-PDBS=(4LRH 3QL3 4IBI 4IBK 4J7D 5MWH 5OV8)
 PKGS=(FOL FOL 4ibi 4ibk 4j7d 5mwh-water 5ov8-water)
 LIGS=(FOL FOL 1D8 1DE I31 UWX AXN)
 i=$SLURM_ARRAY_TASK_ID; n=${NAMES[$i]}; pkg=$ROOT/packages/${PKGS[$i]}; S=$ROOT/$n
@@ -32,8 +31,8 @@ export MD_DATA=/scicore/home/lill0000/popa0002/md-data
 echo "== $n  $(md-openmm --version)  $(git -C /scicore/home/lill0000/popa0002/software/MD-tools-protonation log --oneline -1)  on $(hostname)  $(date)"
 fail() { echo "FAILED: $1"; exit 1; }
 
-echo "== 1. prep: add crystal waters"
-python -I "$ROOT/scripts/add_crystal_waters.py" "$S" "$ROOT/crystal/${PDBS[$i]}.pdb" || fail prep
+echo "== 1. prep: chain A + ligand(s) + crystal waters"
+python -I "$ROOT/scripts/prep.py" "$ROOT" "$n" || fail prep
 
 echo "== 2. build-top"
 b=$S/build

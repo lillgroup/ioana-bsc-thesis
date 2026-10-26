@@ -1,5 +1,4 @@
-REMARK   1 5MWH chain A + UWX; additives, chain B, HOH dropped
-REMARK   1 + 124 chain-A crystal waters from 5MWH.pdb (add_crystal_waters.py)
+REMARK   1 5MWH chain A + UWX + 124 crystal waters; left out: nothing (prep.py)
 ATOM      1  N   MET A 628       8.473  -7.860 -21.163  1.00 75.18           N  
 ATOM      2  CA  MET A 628       8.266  -6.474 -20.765  1.00 75.11           C  
 ATOM      3  C   MET A 628       7.030  -5.883 -21.439  1.00 74.72           C  

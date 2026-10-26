@@ -1,5 +1,4 @@
-REMARK   1 4LRH chain A, FOL; NAG/HOH dropped
-REMARK   1 + 46 chain-A crystal waters from 4LRH.pdb (add_crystal_waters.py)
+REMARK   1 4LRH chain A + FOL + 46 crystal waters; left out: NAG (prep.py)
 ATOM      1  N   ARG A   8      13.627  30.635  23.590  1.00114.19           N  
 ATOM      2  CA  ARG A   8      12.138  30.509  23.586  1.00114.32           C  
 ATOM      3  C   ARG A   8      11.586  30.378  25.003  1.00114.41           C  

@@ -1,5 +1,4 @@
-REMARK   1 5OV8 chain A + AXN; additives, chain B, HOH dropped
-REMARK   1 + 135 chain-A crystal waters from 5OV8.pdb (add_crystal_waters.py)
+REMARK   1 5OV8 chain A + AXN + 135 crystal waters; left out: NO3 (prep.py)
 ATOM      1  N   GLN A 629       1.273  -7.167 -14.629  1.00 57.85           N  
 ATOM      2  CA  GLN A 629       2.494  -6.612 -14.057  1.00 56.04           C  
 ATOM      3  C   GLN A 629       2.271  -5.201 -13.502  1.00 58.35           C  
