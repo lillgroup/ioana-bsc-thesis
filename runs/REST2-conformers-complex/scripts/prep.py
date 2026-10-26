@@ -1,4 +1,9 @@
-"""Complex inputs for the five REST2-conformers ligands, from the deposited crystal structures.
+"""SUPERSEDED (2026-10-26): this drops the crystal waters, which md-tools keeps; without them the
+pocket is refilled with bulk water (3QL3 folate drifted out). New complexes:
+runs/REST2-complex-xtalwater (scripts/add_crystal_waters.py adds the chain-A waters to this
+script's output). Kept unchanged as the record of how the earlier complex runs were prepared.
+
+Complex inputs for the five REST2-conformers ligands, from the deposited crystal structures.
 
   python -I scripts/prep.py <root>
 
