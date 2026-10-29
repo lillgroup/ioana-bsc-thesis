@@ -7,7 +7,7 @@
 #SBATCH --mem=16G
 #SBATCH --output=/scicore/home/lill0000/popa0002/thesis/REST2-complex-xtalwater/logs/rmsd-vs-crystal-%j.out
 # Folate RMSD to the crystal conformation (folate superposed on folate) for FOL-4LRH and FOL-3QL3 with
-# crystal waters, and the density plot against the earlier v4 runs without them (read from the CSV
+# crystal waters, and the density plot against folic acid in water (v4, read from the CSV
 # in results/symfirst-2026-10-15/1_v4-new-rest2/). See scripts/rmsd_vs_crystal.py.
 #   sbatch scripts/rmsd_vs_crystal.sbatch      (from REST2-complex-xtalwater/)
 export MAMBA_ROOT_PREFIX=/scicore/home/lill0000/popa0002/software/md-stack

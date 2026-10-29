@@ -1,5 +1,5 @@
 """Folate RMSD to the crystal conformation for the complex runs WITH crystal waters, and the density
-plot against the earlier runs WITHOUT them.
+plot against folic acid in water.
 
 Same measure as FOL-REST2-v4/scripts/rmsd_vs_crystal.py: every frame's folate heavy atoms are
 superposed onto the crystal folate (Kabsch) and the lowest RMSD over the symmetry-equivalent atom
@@ -10,13 +10,13 @@ REST2 state 0, every saved frame, heavy atoms only.
 New runs (computed here): REST2-complex-xtalwater/FOL-4LRH and FOL-3QL3, folate cut out of the
 state-0 solute trajectory. They use the unchanged v4 folate package, so the atom order is the one of
 the earlier v4 runs (checked on the elements against packages/FOL/FOL.sdf).
-Earlier runs (read, not recomputed; their trajectories are not on sciCORE): the per-frame values in
+Folic acid in water (read, not recomputed; the trajectory is not on sciCORE): the per-frame values in
 results/symfirst-2026-10-15/1_v4-new-rest2/folic-acid-v4_rmsd_vs_crystal.csv (v4 water vs both
-crystals, v4 4LRH and 3QL3 complexes without crystal waters).
+crystals). The complexes without crystal waters in that file are no longer plotted.
 
   python -I rmsd_vs_crystal.py [--thesis DIR] [--repo DIR] --out <prefix>
 writes <prefix>.csv (new runs, columns run,crystal,time_ns,rmsd_A as the earlier file),
-<prefix>.png (new runs over time) and <prefix>_hist.png (density, all six curves).
+<prefix>.png (new runs over time) and <prefix>_hist.png (density, the four curves).
 """
 import argparse
 import csv
@@ -37,8 +37,6 @@ NEW = {"4LRH": "4LRH complex, crystal waters", "3QL3": "3QL3 complex, crystal wa
 CURVES = [
     ("water", "4LRH", "#f4a3a3", "-", "folic acid in water vs 4LRH crystal"),
     ("water", "3QL3", "#9ecae1", "-", "folic acid in water vs 3QL3 crystal"),
-    ("4LRH complex", "4LRH", "#d62728", "--", "4LRH complex, no crystal waters"),
-    ("3QL3 complex", "3QL3", "#1f77b4", "--", "3QL3 complex, no crystal waters"),
     (NEW["4LRH"], "4LRH", "#7f0000", "-", "4LRH complex, crystal waters"),
     (NEW["3QL3"], "3QL3", "#08306b", "-", "3QL3 complex, crystal waters"),
 ]
@@ -140,13 +138,13 @@ def main():
     leg = ax.legend(loc="upper right", fontsize=9, markerscale=6)
     for h in leg.legend_handles:
         h.set_alpha(1)
-    ax.set_title("Folic acid (v4) in its complexes, with and without crystal waters: RMSD of the ligand "
+    ax.set_title("Folic acid (v4) in its complexes with crystal waters: RMSD of the ligand "
                  "conformation to the crystal over time\nREST2 state 0; folate superposed on folate, best over "
                  "symmetry-equivalent atoms; one point per saved frame", fontsize=10)
     fig.savefig(f"{args.out}.png", dpi=150)
     plt.close(fig)
 
-    # density: all six curves, same bins, each normalised to area 1
+    # density: the four curves, same bins, each normalised to area 1
     top_val = max(r.max() for _, r in data.values())
     edges = np.arange(0.0, np.ceil(top_val / 0.05) * 0.05 + 0.05, 0.05)
     fig, ax = plt.subplots(figsize=(9.5, 5.2), layout="constrained")
@@ -162,7 +160,7 @@ def main():
     ax.grid(alpha=0.3)
     ax.legend(fontsize=8.5, loc="upper right")
     ax.set_title("Folic acid (v4): distribution of the ligand-conformation RMSD to the crystal\n"
-                 "dashed: complexes without crystal waters; solid dark: with crystal waters; light: in water. "
+                 "dark: complexes with crystal waters; light: in water. "
                  "State 0, bins 0.05 Å, area 1", fontsize=10)
     fig.savefig(f"{args.out}_hist.png", dpi=150)
     plt.close(fig)
