@@ -28,7 +28,7 @@ Two pinned commits are used:
 | role | commit | where it came from | env |
 |---|---|---|---|
 | **simulation** (build-top, scaler, build-md, REST2 runs) | `b3603e0` (2026-10-13) | branch `feature/ligand-protonation-and-ligand-amides`; now also in `main` | `openmm-env-protonation` |
-| **analysis** (symmetry-first `t_hdbscan`, `align_all`, `predict`) | `69c262b` (2026-10-15) | `main` | `analysis-env-main` |
+| **analysis** (symmetry-first `t_hdbscan`, `align_all`, `predict`; 0.6.5.1 folding, crystal assignment, symmetric RMSD; 0.6.5.2 gauge) | `c30c1c0` (0.6.5.2, 2026-10-26; was `69c262b`) | `main` | `analysis-env-main` |
 
 **Keep the environment names exactly as written.** Every sbatch script activates them by name.
 
@@ -55,7 +55,7 @@ eval "$($SOFT/md-stack/bin/micromamba shell hook -s bash)"
 
 git clone https://github.com/csy0000/MD-tools.git $SOFT/MD-tools
 git -C $SOFT/MD-tools worktree add $SOFT/MD-tools-protonation b3603e0
-git -C $SOFT/MD-tools worktree add $SOFT/MD-tools-main        69c262b
+git -C $SOFT/MD-tools worktree add $SOFT/MD-tools-main        c30c1c0   # 0.6.5.2; shuyu_clustering needs >= 0.6.5.2 for --gauge
 
 # simulation env
 micromamba create -y -n openmm-env-protonation -f $SOFT/MD-tools-protonation/environment.yml

@@ -1,15 +1,31 @@
 #!/usr/bin/env python
 """
-Shu-Yu's SYMMETRY-FIRST torsion clustering (MD-tools main, 69c262b; tutorial
-docs/tutorial/paracetamol/analysis/symmetry-alignment.ipynb), run on YOUR trajectory, with this
-thesis' figures (clusters_overview, group_torsions, 2-D torsion plots, representatives).
+Shu-Yu's SYMMETRY-FIRST torsion clustering (MD-tools 0.6.5.1, main 2e9e205; tutorials
+docs/tutorial/paracetamol/analysis/symmetry-alignment.ipynb and rgdfv/analysis/clustering.ipynb),
+run on YOUR trajectory, with this thesis' figures (clusters_overview, 2-D torsion
+plots, representatives, crystal assignment, inter-cluster RMSD).
 
-Three parts, all MD-tools calls as in the tutorial:
+Four parts, all MD-tools calls as in the tutorials:
   1. Clustering   t_hdbscan(tors, molecule, torsion_definitions, coordinates, atom_mapping):
                   the molecular symmetry is enumerated FIRST and built into the distance
                   (min over relabellings), then HDBSCAN on that dense matrix, then every frame
                   classified by an 18-of-20 neighbour vote. No merge step: a cluster is final.
                   Labels: -2 density noise, -1 ambiguous vote.
+                  Since 0.6.5.1 the molecule is CANONICALISED first (torsional folding): resonance-
+                  equivalent atoms (the two O of a carboxylate, the N of a guanidinium) are one
+                  atom, so a torsion to one O is folded onto the torsion to the other. Default in
+                  t_hdbscan, nothing to pass. allow_single_cluster now defaults to False (sklearn's).
+     Gauge        --gauge <torsion> (MD-tools 0.6.5.2, tutorial section 10): for a symmetry that moves
+                  several torsions together (a ring flip shifts both ring torsions by pi), the figures
+                  write that ONE torsion in a half-turn window centred on the density peak and the others
+                  follow it: align_all(per_cluster=True, gauge=(torsion, pi)). Drawing only; the
+                  clustering distance is the minimum over every operation and is not touched.
+  4. Crystal      reference_assignments(crystal, molecule, descriptor.quads) + fit.assign_reference():
+     + RMSD       per cluster the crystal labelling nearest its density peak (one line per cluster,
+                  not one per assignment) and which cluster the crystal resembles, or none when the
+                  crystal's columns cannot tell two clusters apart. intercluster_rmsd(): mean +- std
+                  heavy-atom RMSD between and within clusters, minimised over the symmetry
+                  operations (and, for comparison, by atom index).
   2. Alignment    fit.align_all(per_cluster=True): every frame written in one labelling for the
                   figures (each cluster aligned to its own density peak, each peak to the density
                   peak of cluster A). Changes no label and no population.
@@ -42,9 +58,13 @@ Labelling and the bioactive reference (all optional):
   --rest2-config REST2.config     number of replicas and tau_max for the overview title
   --ref-sdf crystal/4ibi_1D8_A.sdf  crystal ligand (repeatable, e.g. one per chain); its torsions
                                   are drawn as vertical lines. Matched to --sdf on heavy atoms by
-                                  element + connectivity only, so torsions through a hydrogen get
-                                  no line, and atoms the crystal cannot tell apart (the two O of a
-                                  carboxylate) give one line per possible assignment.
+                                  element + connectivity only (reference_assignments), so torsions
+                                  through a hydrogen get no line. Top row (all frames, as stored):
+                                  every assignment; cluster rows: the assignment nearest that
+                                  cluster's density peak (fit.assign_reference), as in the tutorial.
+  -> crystal_assignment.csv/.json which cluster each crystal resembles, per cluster the distance to
+                                  its density peak and nearest frame, and the peak percentile
+  -> intercluster_rmsd.csv/.json/.png  symmetry-corrected heavy-atom RMSD between/within clusters
   -> clusters_overview_unaligned.png  the same layout with each cluster's torsions AS STORED (not
                                   relabelled): one conformer in two labellings shows both images
   -> clusters_overview.png        molecule on the left; to its right one column per torsion: top row
@@ -68,13 +88,15 @@ import mdtraj as md
 try:
     import md_tools
     from md_tools.analysis import (t_hdbscan, TorsionDefinitions, verify_atom_mapping, group_name,
-                                   strip_nonpolar_hydrogens, draw_representative_structures)
+                                   strip_nonpolar_hydrogens, draw_representative_structures,
+                                   reference_assignments, enumerate_symmetry, heavy_atoms,
+                                   operations_on_atoms, intercluster_rmsd)
     from md_tools.analysis import THDBSCAN
-    if not hasattr(THDBSCAN, "align_all"):
-        raise ImportError("this md_tools has no symmetry-first THDBSCAN.align_all")
+    if not hasattr(THDBSCAN, "assign_reference"):
+        raise ImportError("this md_tools has no THDBSCAN.assign_reference (needs 0.6.5.1)")
 except ImportError as e:
     sys.exit(f"md_tools.analysis not available ({e}).\n"
-             "Needs Shu-Yu's MD-tools main (symmetry-first t_hdbscan): env analysis-env-main.")
+             "Needs Shu-Yu's MD-tools 0.6.5.1 (main 2e9e205): env analysis-env-main.")
 from rdkit import Chem
 import pandas as pd
 
@@ -239,12 +261,29 @@ def _dihedral(p):
     return float(np.arctan2(np.dot(np.cross(b1, v), w), np.dot(v, w)))
 
 
-def draw_reference_lines(axis, refs, column, with_label=False):
-    """Vertical lines at the crystal value(s) of torsion `column`, one line style per file."""
+def draw_reference_lines(axis, refs, column, with_label=False, colour="black"):
+    """Vertical lines at the crystal value(s) of torsion `column`, one line style per file. A value
+    at the seam (|v| > 3.0 rad) shows at both ends, as in Shu-Yu's tutorial."""
     for k, (label, values) in enumerate(refs.items()):
-        for n, v in enumerate(values[column]):
-            axis.axvline(v, color="black", lw=1.3, ls=REF_STYLES[k % len(REF_STYLES)],
-                         label=(f"crystal {label}" if with_label and n == 0 else None))
+        first = with_label
+        for v in values[column]:
+            for x in ((v, v - 2 * np.pi * np.sign(v)) if abs(v) > 3.0 else (v,)):
+                axis.axvline(x, color=colour, lw=1.3, ls=REF_STYLES[k % len(REF_STYLES)],
+                             label=(f"crystal {label}" if first else None))
+                first = False
+
+
+def crystal_rows_to_refs(rows, n_selected):
+    """reference_assignments rows -> {torsion column: distinct finite values} for the selected
+    torsions (every assignment of the crystal, as the tutorial's 'as stored' row draws them)."""
+    out = []
+    for t in range(n_selected):
+        values = []
+        for v in rows[:, t]:
+            if np.isfinite(v) and all(abs(np.angle(np.exp(1j * (v - w)))) > np.deg2rad(2) for w in values):
+                values.append(float(v))
+        out.append(values)
+    return out
 
 
 def molecule_png(mol, quads, colours, size=(900, 900)):
@@ -295,14 +334,23 @@ def molecule_png(mol, quads, colours, size=(900, 900)):
     return drawer.GetDrawingText()
 
 
+BEST_MATCH_COLOUR = "#e6a100"   # frame around the group the crystal is assigned to
+
+
 def draw_overview(path, *, mol, names, quads, tors, aligned, masses, noise, refs, title,
-                  row_labels=None):
+                  row_labels=None, cluster_refs=None, top_refs=None, top_label="all frames",
+                  best=None, log_floor=None):
     """One figure for the whole clustering: molecule on the left; to its right one column per
     torsion and one row per population -- the full distribution first, then each merged group --
     all in the torsion's colour, crystal lines on top. The grid is wrapped to keep the whole
     figure near 16:9: many torsions with few groups -> the torsions wrap into 1-3 bands stacked
     vertically (each band repeats the population rows); many groups with few torsions -> the
-    populations wrap into 1-3 blocks side by side (each block repeats the torsion columns)."""
+    populations wrap into 1-3 blocks side by side (each block repeats the torsion columns).
+    `cluster_refs` (group -> refs) gives each cluster row its own crystal lines (the labelling
+    nearest that cluster's density peak); without it every row shows `refs`. `tors` is what the
+    top row draws (stored or aligned angles) and `top_refs` its crystal lines (default `refs`).
+    `best` (group -> crystal labels) frames the group each crystal is assigned to
+    (fit.assign_reference's best_cluster) and names the crystal in that row's label."""
     import io
     import matplotlib.image as mpimg
 
@@ -354,8 +402,10 @@ def draw_overview(path, *, mol, names, quads, tors, aligned, masses, noise, refs
     cells = outer[1].subgridspec(nband, nblock, hspace=gap / (panel_h * rows),
                                  wspace=gap / (1.3 + panel_w * ncol))
     grids = [[cells[b, k].subgridspec(rows, ncol) for k in range(nblock)] for b in range(nband)]
-    labels = [f"all frames\n(noise {100 * noise:.1f}%)"] + (list(row_labels) if row_labels else [
-        f"group {g}\n({100 * float(masses[i]):.1f}%)" for i, g in enumerate(groups)])
+    best = best or {}
+    labels = [f"{top_label}\n(noise {100 * noise:.1f}%)"] + (list(row_labels) if row_labels else [
+        f"group {g}\n({100 * float(masses[i]):.1f}%)"
+        + "".join(f"\n◆ crystal {c}" for c in best.get(g, [])) for i, g in enumerate(groups)])
 
     edges = np.linspace(-np.pi, np.pi, 49)
     for t, (name, colour) in enumerate(zip(names, colours)):
@@ -364,20 +414,41 @@ def draw_overview(path, *, mol, names, quads, tors, aligned, masses, noise, refs
             block, row = divmod(pop, rows)
             ax = fig.add_subplot(grids[band][block][row, col])
             values = tors[:, t] if pop == 0 else aligned[groups[pop - 1]][:, t]
-            ax.hist(values, bins=edges, density=True, color=colour,
-                    alpha=0.9 if pop == 0 else 0.75,
-                    histtype="stepfilled", edgecolor=colour)
-            draw_reference_lines(ax, refs, t, with_label=(pop == 0 and t == 0))
+            if log_floor:   # fraction of the row's frames per bin, log axis cut at log_floor
+                ax.hist(values, bins=edges, weights=np.full(len(values), 1.0 / max(len(values), 1)),
+                        color=colour, alpha=0.9 if pop == 0 else 0.75, histtype="stepfilled",
+                        edgecolor=colour, bottom=log_floor)
+                ax.set_yscale("log")
+                ax.set_ylim(log_floor, 1.0)
+            else:
+                ax.hist(values, bins=edges, density=True, color=colour,
+                        alpha=0.9 if pop == 0 else 0.75,
+                        histtype="stepfilled", edgecolor=colour)
+            if pop == 0:
+                row_refs = refs if top_refs is None else top_refs
+            else:
+                row_refs = cluster_refs[groups[pop - 1]] if cluster_refs else refs
+            draw_reference_lines(ax, row_refs, t, with_label=(pop == 0 and t == 0))
             ax.set_xlim(-np.pi, np.pi)
             ax.set_xticks([-np.pi, 0, np.pi], ["-π", "0", "π"])
-            ax.set_yticks([])
+            if log_floor and col == 0:
+                ax.set_yticks([log_floor, 1e-3, 1e-1], [f"{log_floor:.0e}", "1e-3", "1e-1"])
+                ax.minorticks_off()
+            else:
+                ax.set_yticks([])
+                ax.minorticks_off()
             ax.tick_params(labelsize=7 * fs)
             if row == 0:
                 ax.set_title(f"t{t}\n{name}", color=colour, fontsize=8 * fs)
             if pop == 0:
                 ax.set_facecolor("#f4f4f4")
+            elif best.get(groups[pop - 1]):
+                for spine in ax.spines.values():
+                    spine.set_edgecolor(BEST_MATCH_COLOUR)
+                    spine.set_linewidth(3.0)
             if col == 0:
-                ax.set_ylabel(labels[pop], fontsize=8 * fs, rotation=0, ha="right", va="center")
+                ax.set_ylabel(labels[pop], fontsize=8 * fs, rotation=0, ha="right", va="center",
+                              color="#8a6000" if pop and best.get(groups[pop - 1]) else "black")
             if pop == 0 and t == 0 and refs:
                 ax.legend(fontsize=6 * fs, loc="upper left", frameon=False)
     fig.suptitle(title, fontsize=12 * fs)
@@ -385,8 +456,8 @@ def draw_overview(path, *, mol, names, quads, tors, aligned, masses, noise, refs
     plt.close(fig)
 
 
-def build_fit(tors, cmd, mol, torsions, *, allow_single_cluster=True, max_frames=None,
-              max_matches=None):
+def build_fit(tors, cmd, mol, torsions, *, allow_single_cluster=False, max_frames=None,
+              max_matches=None, mass_floor=None, k=None, min_vote_fraction=None):
     """Shu-Yu's symmetry-first t_hdbscan (MD-tools main, docs/tutorial/paracetamol/analysis/
     symmetry-alignment.ipynb): TorsionDefinitions on the build SDF, the atom mapping checked
     against the trajectory topology, and the trajectory itself so the symmetry images of the
@@ -400,9 +471,130 @@ def build_fit(tors, cmd, mol, torsions, *, allow_single_cluster=True, max_frames
     extra = {} if max_frames is None else {"max_precomputed_frames": int(max_frames)}
     if max_matches is not None:
         extra["max_matches"] = int(max_matches)
+    if mass_floor is not None:          # HDBSCAN min_cluster_size as a fraction of the frames
+        extra["mass_floor"] = float(mass_floor)
+    if k is not None:                   # voters: nearest clustered training frames per frame
+        extra["k"] = int(k)
+    if min_vote_fraction is not None:   # share of the k voters that must agree on the label
+        extra["min_vote_fraction"] = float(min_vote_fraction)
     fit = t_hdbscan(tors, molecule=mol, torsion_definitions=definitions, coordinates=cmd,
                     atom_mapping=mapping, allow_single_cluster=allow_single_cluster, **extra).fit()
     return fit, mapping, why
+
+
+def gauge_of(args, names):
+    """The `gauge=` for align_all from --gauge (a torsion name or 0-based position) and
+    --gauge-width (radians, a half-turn by default, centred on the reference), or None."""
+    if not args.gauge:
+        return None
+    column = names[int(args.gauge)] if args.gauge.isdigit() else args.gauge
+    if column not in names:
+        sys.exit(f"--gauge {args.gauge!r}: not one of the torsions {names}")
+    return (column, float(args.gauge_width))
+
+
+def gauge_crystal(rows, reference_row, al, desc, fallback):
+    """Crystal line in the gauge's convention (drawing only): of the crystal's atom assignments
+    (`rows`, from reference_assignments), those that put the gauge column inside al's window, and
+    of these the one nearest `reference_row`. `fallback` (the labelling chosen without a gauge) is
+    kept when there is no gauge or no assignment lands in the window (a crystal on the cut)."""
+    if "gauge_window" not in al:
+        return fallback
+    col, lo, hi = al["gauge_window"]
+    offset = np.mod(rows[:, col] - lo, 2.0 * np.pi)
+    inside = rows[np.isfinite(rows[:, col]) & (offset < hi - lo)]
+    if not len(inside):
+        return fallback
+    return desc.nearest_labelling(inside, reference_row)["angles"]
+
+
+def report_gauge(al, fit, tors_col, label=""):
+    """Shu-Yu's checks: frames outside the window (on the cut), frames near it, flips used."""
+    ok = al["gauge_satisfied"]
+    near = al["gauge_edge_distance"] < 0.1
+    col, lo, hi = al["gauge_window"]
+    flipped = np.abs(np.angle(np.exp(1j * (al["angles"][:, col] - fit.closed_theta_[:, col])))) > 1.0
+    print(f"{label}gauge window [{np.rad2deg(lo):.0f}, {np.rad2deg(hi):.0f}) deg on column {col}: "
+          f"{100 * ok.mean():.2f}% in the window ({int((~ok).sum())} frames on the cut), "
+          f"{100 * near.mean():.2f}% within 0.1 rad of a cut, flip applied to {100 * flipped.mean():.1f}%")
+    for c in range(fit.n_clusters_):
+        m = fit.labels_ == c
+        print(f"{label}  cluster {group_name(c)}: flip applied {100 * flipped[m].mean():.1f}%, "
+              f"not in window {int((~ok[m]).sum())}, within 0.1 rad of a cut {100 * near[m].mean():.1f}%")
+
+
+def recursive_split(top_fit, tors, cmd, mol, torsions, X, operations, args):
+    """Re-cluster every cluster whose internal (within-cluster, symmetry-corrected heavy-atom) RMSD
+    is above args.recursive_max_rmsd on its own frames, until none is or a cluster cannot be split
+    (no cluster / one sub-cluster) or args.recursive_max_depth is reached. Same fit as the top level
+    (build_fit, same vote); the mass floor is a fraction of the frames re-clustered, raised to at
+    least k / n so the vote cannot empty a cluster. Frames a re-clustering leaves unassigned are
+    unassigned in the result. Names follow the tree: A, A.A, A.B, ...
+
+    Returns {"nodes": name -> {fit, al, idx, children}, "leaves": [(leaf, node, local cluster)]
+    sorted by size, "labels": final leaf index per frame (-1 unassigned), "tree": rows}."""
+    cap = args.rmsd_max_per_cluster or None
+
+    def internal(fit, idx):
+        r = intercluster_rmsd(X[idx], fit.labels_, operations, max_per_cluster=cap, workers=args.rmsd_workers)
+        return {c: float(r["mean"][i, i]) for i, c in enumerate(r["clusters"])}
+
+    def refit(idx):
+        floor = max(args.mass_floor or 0.01, (args.k or 20) / len(idx))
+        for _ in range(4):
+            try:
+                sub, _, _ = build_fit(tors[idx], cmd[idx], mol, torsions, max_frames=args.max_frames,
+                                      max_matches=args.max_matches, mass_floor=floor, k=args.k,
+                                      min_vote_fraction=args.min_vote_fraction)
+                return sub, sub.align_all(per_cluster=True, gauge=gauge_of(args, list(torsions))), floor
+            except RuntimeError as e:
+                if "no draw produced a cluster" in str(e):
+                    return None, None, floor
+                raise
+            except ValueError as e:            # the vote emptied a cluster: raise the floor
+                if "has no members" not in str(e):
+                    raise
+                floor *= 2
+        return None, None, floor
+
+    n = len(tors)
+    nodes, leaves, tree = {}, [], []
+    queue = [("", top_fit, top_fit.align_all(per_cluster=True, gauge=gauge_of(args, list(torsions))),
+              np.arange(n), 0)]
+    while queue:
+        name, fit, al, idx, depth = queue.pop(0)
+        within = internal(fit, idx)
+        nodes[name] = {"fit": fit, "al": al, "idx": idx, "children": {}}
+        for c in range(fit.n_clusters_):
+            child = (name + "." if name else "") + group_name(c)
+            members = idx[fit.labels_ == c]
+            nodes[name]["children"][c] = child
+            row = {"cluster": child, "parent": name, "depth": depth + 1, "frames": len(members),
+                   "mass_of_ensemble": round(len(members) / n, 5), "internal_rmsd_A": round(within[c], 3)}
+            outcome = "leaf"
+            if within[c] > args.recursive_max_rmsd:
+                if depth + 1 >= args.recursive_max_depth:
+                    outcome = "leaf (max depth)"
+                else:
+                    sub, sub_al, floor = refit(members)
+                    if sub is not None and sub.n_clusters_ >= 2:
+                        queue.append((child, sub, sub_al, members, depth + 1))
+                        outcome = f"split (mass floor {floor:.4f})"
+                    else:
+                        outcome = "leaf (cannot split: " + ("one state)" if sub is None else "one sub-cluster)")
+            row["outcome"] = outcome
+            tree.append(row)
+            print(f"{'  ' * depth}{child}: {100 * len(members) / n:5.1f}% of the frames, internal RMSD "
+                  f"{within[c]:.2f} A -> {outcome}")
+            if not outcome.startswith("split"):
+                leaves.append((child, name, c))
+    size = lambda leaf: int(np.sum(nodes[leaf[1]]["fit"].labels_ == leaf[2]))
+    leaves.sort(key=lambda leaf: -size(leaf))
+    labels = np.full(n, -1)
+    for i, (leaf, node, c) in enumerate(leaves):
+        nd = nodes[node]
+        labels[nd["idx"][nd["fit"].labels_ == c]] = i
+    return {"nodes": nodes, "leaves": leaves, "labels": labels, "tree": tree}
 
 
 def main():
@@ -417,12 +609,27 @@ def main():
     ap.add_argument("--use-torsions", default=None,
                     help="comma-separated positions in the final torsion list to keep")
     ap.add_argument("--stride", type=int, default=1)
+    ap.add_argument("--frames-file", default=None,
+                    help="re-cluster a SUBSET: text file of frame indices (one per line, the 'frame' "
+                         "column of a previous run's labels.csv, i.e. indices after --stride), e.g. the "
+                         "frames of one group; use the same --traj and --stride as that run")
+    ap.add_argument("--allow-single-cluster", action="store_true",
+                    help="allow_single_cluster=True: opt-in for an ensemble that may be ONE state "
+                         "(MD-tools' default, and this script's, is False since 0.6.5.1)")
     ap.add_argument("--no-single-cluster", action="store_true",
-                    help="allow_single_cluster=False (Shu-Yu's default, and this script's, is True)")
+                    help="allow_single_cluster=False; now the default, kept so old commands still run")
     ap.add_argument("--max-matches", type=int, default=None,
                     help="cap on the symmetry (automorphism) enumeration (MD-tools default 200000); "
                          "molecules with several methyl/CF3 groups exceed it and the fit refuses an "
                          "incomplete search -- raise it, e.g. 8000000")
+    ap.add_argument("--mass-floor", type=float, default=None,
+                    help="smallest cluster as a fraction of the fitted frames (HDBSCAN min_cluster_size; "
+                         "MD-tools default 0.01). min_samples and the vote are unchanged")
+    ap.add_argument("--k", type=int, default=None,
+                    help="number of voters per frame (MD-tools default 20); a cluster needs about k "
+                         "training frames to win a vote, so a low --mass-floor needs a low --k")
+    ap.add_argument("--min-vote-fraction", type=float, default=None,
+                    help="share of the k voters that must agree (MD-tools default 0.90)")
     ap.add_argument("--max-frames", type=int, default=None,
                     help="raise t_hdbscan's max_precomputed_frames (default 10000): the symmetry-aware "
                          "distance is a dense N x N matrix, 8 N^2 bytes per copy, about three copies")
@@ -436,8 +643,24 @@ def main():
     ap.add_argument("--pair-2d", action="append", default=None, metavar="X,Y",
                     help="draw the joint distribution of torsion Y (vertical axis) against torsion X "
                          "(horizontal), 0-based positions; repeatable. Default: 3,4")
+    ap.add_argument("--gauge", default=None,
+                    help="figures: write this torsion (name or 0-based position) in a window --gauge-width "
+                         "wide centred on the density peak, the symmetry partners following it (MD-tools "
+                         "0.6.5.2 gauge, e.g. one ring torsion of a para-phenyl). Clustering unchanged")
+    ap.add_argument("--gauge-width", type=float, default=np.pi, help="window width, radians (default pi)")
+    ap.add_argument("--recursive-max-rmsd", type=float, default=None,
+                    help="re-cluster every cluster whose internal symmetry-corrected heavy-atom RMSD is "
+                         "above this (A, e.g. 2.0) on its own frames, recursively; the final clusters "
+                         "replace the top-level ones in every output (tree.csv records the hierarchy)")
+    ap.add_argument("--recursive-max-depth", type=int, default=4)
+    ap.add_argument("--rmsd-max-per-cluster", type=int, default=1500,
+                    help="frames per cluster for the inter-cluster RMSD (Shu-Yu's c(RGDfV) setting, "
+                         "1500); 0 = every frame (the paracetamol tutorial)")
+    ap.add_argument("--rmsd-workers", type=int, default=os.cpu_count() or 1)
     ap.add_argument("--out", default="tutorial-clustering")
     args = ap.parse_args()
+    if args.allow_single_cluster and args.no_single_cluster:
+        sys.exit("--allow-single-cluster and --no-single-cluster contradict each other")
     out = os.path.abspath(args.out)
     os.makedirs(out, exist_ok=True)
     P = lambda name: os.path.join(out, name)
@@ -451,6 +674,13 @@ def main():
     # ------------------------------------------------- 1. symmetry-first clustering
     print("== 1. Symmetry-first clustering (Shu-Yu, MD-tools main) ==")
     cmd = md.load(args.traj, top=args.top, stride=args.stride)
+    frame_ids = np.arange(cmd.n_frames)
+    if args.frames_file:
+        frame_ids = np.loadtxt(args.frames_file, dtype=int, ndmin=1)
+        if frame_ids.size == 0 or frame_ids.max() >= cmd.n_frames or frame_ids.min() < 0:
+            sys.exit(f"{args.frames_file}: indices must lie in 0..{cmd.n_frames - 1} (same --traj/--stride)")
+        cmd = cmd[frame_ids]
+        print(f"subset: {cmd.n_frames} frames from {args.frames_file}")
     for name, q in torsions.items():
         print(f"  {name:8s} {q}: " + " - ".join(str(cmd.topology.atom(i)) for i in q))
     tors = md.compute_dihedrals(cmd, quads)
@@ -463,9 +693,24 @@ def main():
                    "torsions": [{"name": n, "atoms": list(q)} for n, q in torsions.items()]},
                   f, indent=2)
 
-    asc = not args.no_single_cluster
-    fit, mapping, why = build_fit(tors, cmd, mol, torsions, allow_single_cluster=asc,
-                                  max_frames=args.max_frames, max_matches=args.max_matches)
+    asc = args.allow_single_cluster
+    try:
+        fit, mapping, why = build_fit(tors, cmd, mol, torsions, allow_single_cluster=asc,
+                                      max_frames=args.max_frames, max_matches=args.max_matches,
+                                      mass_floor=args.mass_floor, k=args.k,
+                                      min_vote_fraction=args.min_vote_fraction)
+    except RuntimeError as e:
+        if "no draw produced a cluster" not in str(e) or asc:
+            raise
+        # allow_single_cluster=False and nothing admissible: EOM refused the root, which is what a
+        # ONE-state ensemble gives (MD-tools 0.6.5.1 release note). Say so instead of a traceback.
+        msg = ("NO CLUSTER with allow_single_cluster=False: no basin above the 1 % mass floor once "
+               "the root of the condensed tree is refused -- the ensemble is most likely ONE state. "
+               "Rerun with --allow-single-cluster. MD-tools: " + str(e))
+        print(msg)
+        with open(P("NO_CLUSTER.txt"), "w") as f:
+            f.write(msg + "\n")
+        sys.exit(3)
     print("atom mapping:", "identity" if mapping == list(range(mol.GetNumAtoms())) else mapping)
     print(" ", why)
     summary = fit.summary()
@@ -482,6 +727,12 @@ def main():
     masses = {i: float(fit.cluster_mass_[i]) for i in range(fit.n_clusters_)}
     noise = float(fit.unassigned_mass_)
     print(f"n_clusters = {fit.n_clusters_}")
+    # per-frame cluster labels, so a group can be re-clustered on its own (--frames-file)
+    with open(P("labels.csv"), "w") as f:
+        f.write("frame,time_ps,label\n")
+        for fid, t_ps, lab in zip(frame_ids, cmd.time, fit.labels_):
+            name = group_name(lab) if lab >= 0 else ("noise" if lab == -2 else "ambiguous")
+            f.write(f"{int(fid)},{float(t_ps):.1f},{name}\n")
     print(f"masses     = { {group_name(k): round(v, 4) for k, v in masses.items()} }")
     print(f"density noise (-2) = {fit.noise_mass_:.4f}, ambiguous vote (-1) = "
           f"{fit.ambiguous_mass_:.4f}, unassigned total = {noise:.4f}")
@@ -491,20 +742,45 @@ def main():
     with open(P("summary.json"), "w") as f:
         json.dump(summary, f, indent=2, default=str)
 
-    refs = {}
+    # heavy-atom coordinates and symmetry operations for the RMSDs (enumerated once: slow for 4j7d)
+    heavy = heavy_atoms(mol)
+    sym_kw = {} if args.max_matches is None else {"max_matches": int(args.max_matches)}
+    operations = operations_on_atoms(enumerate_symmetry(mol, **sym_kw), heavy)
+    X = cmd.xyz[:, np.asarray(mapping)[heavy], :] * 10.0      # nm -> A, heavy atoms in the molecule's order
+    cap = args.rmsd_max_per_cluster or None
+
+    rec = None
+    if args.recursive_max_rmsd and fit.n_clusters_:
+        print(f"\n== Recursive splitting: re-cluster while internal RMSD > {args.recursive_max_rmsd} A ==")
+        rec = recursive_split(fit, tors, cmd, mol, torsions, X, operations, args)
+        pd.DataFrame(rec["tree"]).to_csv(P("tree.csv"), index=False)
+        with open(P("labels.csv"), "w") as f:          # final (leaf) cluster per frame
+            f.write("frame,time_ps,label\n")
+            for fid, t_ps, lab in zip(frame_ids, cmd.time, rec["labels"]):
+                f.write(f"{int(fid)},{float(t_ps):.1f},{rec['leaves'][lab][0] if lab >= 0 else 'unassigned'}\n")
+        print("final clusters:", ", ".join(f"{leaf} {100 * np.mean(rec['labels'] == i):.1f}%"
+                                         for i, (leaf, _, _) in enumerate(rec["leaves"])),
+              f"| unassigned {100 * np.mean(rec['labels'] < 0):.1f}%")
+
+    # crystal ligands: every atom assignment, on all descriptor columns (Shu-Yu's tutorial)
+    refs, crystal_rows = {}, {}
     for path in (args.ref_sdf or []):
         ref_label = os.path.splitext(os.path.basename(path))[0]
-        refs[ref_label] = reference_torsions(path, mol, quads)
-        print(f"crystal reference {ref_label}:")
+        crystal_rows[ref_label] = reference_assignments(path, mol, desc.quads)
+        refs[ref_label] = crystal_rows_to_refs(crystal_rows[ref_label], len(names))
+        print(f"crystal reference {ref_label}: {len(crystal_rows[ref_label])} assignment(s)")
         for name, values in zip(names, refs[ref_label]):
             shown = ", ".join(f"{np.rad2deg(v):.1f}" for v in values) or "n/a (through H)"
             print(f"  {name:20s} {shown} deg")
 
     # ------------------------- 2. one labelling for the figures (two-level Dirichlet alignment)
     print("\n== 2. Alignment: align_all(per_cluster=True) ==")
-    al = fit.align_all(per_cluster=True)
+    gauge = gauge_of(args, names)
+    al = fit.align_all(per_cluster=True, gauge=gauge)
+    if gauge:
+        report_gauge(al, fit, names.index(gauge[0]))
     groups = {group_name(c): c for c in range(fit.n_clusters_)}
-    aligned = {g: al["selected"][fit.labels_ == c] for g, c in groups.items()}
+    aligned ={g: al["selected"][fit.labels_ == c] for g, c in groups.items()}
     raw = {g: tors[fit.labels_ == c] for g, c in groups.items()}
     print(f"reference: frame {al['reference']} (density peak of cluster A)")
     for g, c in groups.items():
@@ -514,6 +790,99 @@ def main():
               f"margin < 0.1 for {100 * float((al['margin'][m] < 0.1).mean()):.1f}%")
     reps = fit.representatives()
     chosen = {g: int(reps[c]) for g, c in groups.items()}
+    peaks = {g: int(al["cluster_references"][c]) for g, c in groups.items()}
+    if rec:                       # the final (leaf) clusters replace the top-level ones from here on
+        groups, aligned, raw, chosen, peaks, node_reps = {}, {}, {}, {}, {}, {}
+        for i, (leaf, node, c) in enumerate(rec["leaves"]):
+            nd = rec["nodes"][node]
+            m = nd["fit"].labels_ == c
+            if node not in node_reps:
+                node_reps[node] = nd["fit"].representatives()
+            groups[leaf] = i
+            aligned[leaf] = nd["al"]["selected"][m]
+            raw[leaf] = tors[nd["idx"][m]]
+            chosen[leaf] = int(nd["idx"][int(node_reps[node][c])])
+            peaks[leaf] = int(nd["idx"][int(nd["al"]["cluster_references"][c])])
+        masses = {i: float(np.mean(rec["labels"] == i)) for i in range(len(groups))}
+        noise = float(np.mean(rec["labels"] < 0))
+
+    # crystal -> cluster: per cluster the assignment nearest its density peak (fit.assign_reference)
+    cluster_refs = {g: {} for g in groups}
+    best_groups, crystal_notes = {}, []
+    assignment_rows, assignment_json = [], {}
+    for ref_label, rows in crystal_rows.items() if rec else ():
+        # follow the tree: assign at the top level, then inside the chosen cluster's split, ...
+        node, outs = "", {}
+        for nname, nd in rec["nodes"].items():
+            outs[nname] = nd["fit"].assign_reference(rows)
+        while True:
+            o = outs[node]
+            b = o["best_cluster"]
+            if b is None:
+                final_best = None
+                consistent = [rec["nodes"][node]["children"][c] for c in o["consistent_with"]]
+                break
+            child = rec["nodes"][node]["children"][b]
+            if child in rec["nodes"]:
+                node = child
+                continue
+            final_best, consistent = child, [child]
+            break
+        print(f"crystal {ref_label}: best cluster {final_best or 'none'}; cannot be told from {consistent}")
+        if final_best:
+            best_groups.setdefault(final_best, []).append(ref_label)
+        else:
+            crystal_notes.append(f"crystal {ref_label}: no single best group (cannot tell "
+                                 f"{', '.join(consistent)} apart)")
+        assignment_json[ref_label] = {"best_cluster": final_best, "consistent_with": consistent,
+                                      "assigned_through": node or "(top level)"}
+        for leaf, nname, c in rec["leaves"]:
+            v = outs[nname]["clusters"][c]
+            nal = rec["nodes"][nname]["al"]
+            line = gauge_crystal(rows, nal["angles"][int(nal["cluster_references"][c])], nal, desc, v["angles"])
+            cluster_refs[leaf][ref_label] = [[float(a)] if np.isfinite(a) else [] for a in line[:len(names)]]
+            assignment_rows.append({"crystal": ref_label, "cluster": leaf, "assignment chosen": v["assignment"],
+                                    "distance to the density peak": round(v["distance_to_peak"], 3),
+                                    "nearest frame": round(v["nearest_member_distance"], 3),
+                                    "frames nearer the peak than the crystal": round(v["peak_percentile"], 3),
+                                    "best cluster": final_best or "none"})
+    for ref_label, rows in crystal_rows.items() if not rec else ():
+        out_ref = fit.assign_reference(rows)
+        best = out_ref["best_cluster"]
+        print(f"crystal {ref_label}: columns compared {out_ref['columns_used']}; best cluster "
+              f"{group_name(best) if best is not None else 'none'}; cannot be told from "
+              f"{[group_name(c) for c in out_ref['consistent_with']]}")
+        if best is not None:
+            best_groups.setdefault(group_name(best), []).append(ref_label)
+        else:
+            crystal_notes.append(f"crystal {ref_label}: no single best group (cannot tell "
+                                 f"{', '.join(group_name(c) for c in out_ref['consistent_with'])} apart)")
+        for pair in out_ref["indistinguishable"]:
+            print(f"   clusters {[group_name(c) for c in pair['clusters']]}: density peaks "
+                  f"{pair['peak_gap']:.3f} apart on these columns, inside a cluster's own spread "
+                  f"({pair['spread']:.3f})")
+        for g, c in groups.items():
+            v = out_ref["clusters"][c]
+            line = gauge_crystal(rows, al["angles"][int(al["cluster_references"][c])], al, desc, v["angles"])
+            cluster_refs[g][ref_label] = [[float(a)] if np.isfinite(a) else [] for a in line[:len(names)]]
+            assignment_rows.append({"crystal": ref_label, "cluster": g, "assignment chosen": v["assignment"],
+                                    "distance to the density peak": round(v["distance_to_peak"], 3),
+                                    "nearest frame": round(v["nearest_member_distance"], 3),
+                                    "frames nearer the peak than the crystal": round(v["peak_percentile"], 3),
+                                    "best cluster": group_name(best) if best is not None else "none"})
+        assignment_json[ref_label] = {
+            "best_cluster": group_name(best) if best is not None else None,
+            "consistent_with": [group_name(c) for c in out_ref["consistent_with"]],
+            "indistinguishable": [{"clusters": [group_name(c) for c in p["clusters"]],
+                                   "peak_gap": p["peak_gap"], "spread": p["spread"]}
+                                  for p in out_ref["indistinguishable"]],
+            "columns_used": out_ref["columns_used"],
+            "clusters": {group_name(c): {k: (np.rad2deg(v[k]).round(2).tolist() if k == "angles" else v[k])
+                                         for k in v} for c, v in out_ref["clusters"].items()}}
+    if assignment_rows:
+        pd.DataFrame(assignment_rows).to_csv(P("crystal_assignment.csv"), index=False)
+        with open(P("crystal_assignment.json"), "w") as f:
+            json.dump(assignment_json, f, indent=2, default=lambda o: o.item() if hasattr(o, "item") else str(o))
 
     # ---------------------------------------------------------------- 3. summary + figures
     print("\n== 3. Summary ==")
@@ -525,32 +894,9 @@ def main():
                    "masses": {g: masses[i] for i, g in enumerate(group_list)},
                    "noise_mass": float(fit.noise_mass_), "ambiguous_mass": float(fit.ambiguous_mass_),
                    "representatives": chosen, "alignment_reference": int(al["reference"]),
-                   "cluster_density_peaks": {g: int(al["cluster_references"][c])
-                                             for g, c in groups.items()}}, f, indent=2)
+                   "cluster_density_peaks": peaks}, f, indent=2)
 
-    ncol = min(3, len(names))
-    nrow = int(np.ceil(len(names) / ncol))
-    fig, axes = plt.subplots(nrow, ncol, figsize=(4.7 * ncol, 3.6 * nrow), layout="constrained", squeeze=False)
-    for extra in axes.flat[len(names):]:
-        extra.axis("off")
-    edges = np.linspace(-np.pi, np.pi, 49)
-    palette = plt.get_cmap("tab10")
-    for column, (axis, torsion) in enumerate(zip(axes.flat, names)):
-        for k, (g, values) in enumerate(aligned.items()):
-            axis.hist(values[:, column], bins=edges, density=True, histtype="step",
-                      lw=2.0, color=palette(k % 10), label=f"group {g} ({100 * masses[k]:.1f}%)")
-        draw_reference_lines(axis, refs, column, with_label=(column == 0))
-        axis.set_xlim(-np.pi, np.pi)
-        axis.set_xlabel(f"{torsion} (rad)")
-        axis.set_title(torsion)
-        if column == 0:
-            axis.set_ylabel("density")
-            axis.legend(fontsize=9)
-    fig.suptitle(f"{label}symmetry-aligned torsion distributions (two-level alignment), one colour "
-                 "per cluster" + ("; black lines = crystal (bioactive) conformation" if refs else ""),
-                 fontsize=11)
-    fig.savefig(P("group_torsions.png"), dpi=150)
-    plt.close(fig)
+    # (group_torsions.png, all groups overlaid per torsion, dropped 2026-10-26: not informative)
 
     n_rep, tau_max = read_rest2_config(args.rest2_config)
     duration = args.duration_ns if args.duration_ns is not None else simulated_ns(cmd, args.stride)
@@ -560,16 +906,33 @@ def main():
                 f"stride {args.stride}, {tors.shape[0]} frames"]
     head = f"{args.name or 'ligand'} — REST2 " + ", ".join(x for x in run_info if x)
     crystal = "; black lines = crystal (bioactive) conformation" if refs else ""
+    marker = (f"; gold frame = group the crystal is assigned to" if best_groups else "")
+    notes = ("\n" + "; ".join(crystal_notes)) if crystal_notes else ""
+    # top row in ONE labelling as well (every frame relabelled by align_all, the same alignment as
+    # the cluster rows), with each crystal in the labelling nearest the alignment reference -- so a
+    # folded torsion (e.g. a carboxylate) shows one peak; the as-stored view is the _unaligned figure
+    top_refs = {}
+    for ref_label, rows in crystal_rows.items():
+        near = desc.nearest_labelling(rows, al["angles"][int(al["reference"])])
+        near = {"angles": gauge_crystal(rows, al["angles"][int(al["reference"])], al, desc, near["angles"])}
+        top_refs[ref_label] = [[float(a)] if np.isfinite(a) else [] for a in near["angles"][:len(names)]]
     unassigned = (f"unassigned {100 * noise:.1f}% (density noise {100 * fit.noise_mass_:.1f}%, "
                   f"ambiguous {100 * fit.ambiguous_mass_:.1f}%)")
-    draw_overview(P("clusters_overview.png"), mol=mol, names=names, quads=quads, tors=tors,
-                  aligned=aligned, masses=masses, noise=noise, refs=refs,
-                  title=f"{head}\n{len(groups)} symmetry-first clusters, {unassigned}{crystal}")
+    if gauge:
+        crystal += f"; gauge: {gauge[0]} in a half-turn window on the density peak"
+    if rec:
+        unassigned = (f"recursive: split while internal RMSD > {args.recursive_max_rmsd} Å, "
+                      f"unassigned {100 * noise:.1f}% (top level {100 * float(fit.unassigned_mass_):.1f}%)")
+    draw_overview(P("clusters_overview.png"), mol=mol, names=names, quads=quads, tors=al["selected"],
+                  aligned=aligned, masses=masses, noise=noise, refs=refs, cluster_refs=cluster_refs,
+                  top_refs=top_refs, top_label="all frames,\none labelling", best=best_groups,
+                  title=f"{head}\n{len(groups)} symmetry-first clusters, {unassigned}{crystal}{marker}{notes}")
 
     # The same overview with each cluster's torsions AS STORED (no relabelling): a cluster that
     # holds one conformer in two labellings shows both images here (e.g. peaks shifted by pi).
     draw_overview(P("clusters_overview_unaligned.png"), mol=mol, names=names, quads=quads,
                   tors=tors, aligned=raw, masses=masses, noise=noise, refs=refs,
+                  top_label="all frames,\nas stored", best=best_groups,
                   title=f"{head}\n{len(groups)} symmetry-first clusters, torsions AS STORED "
                         f"(not relabelled), {unassigned}{crystal}")
 
@@ -617,6 +980,53 @@ def main():
     df = pd.DataFrame(rows).round(3)
     print(df.to_string(index=False))
     df.to_csv(P("groups.csv"), index=False)
+
+    # ------------------------------------------- inter-cluster RMSD, symmetry-corrected (0.6.5.1)
+    if groups:
+        final_labels = rec["labels"] if rec else fit.labels_
+        cname = (lambda c: rec["leaves"][c][0]) if rec else group_name
+        corrected = intercluster_rmsd(X, final_labels, operations, max_per_cluster=cap, workers=args.rmsd_workers)
+        by_index = intercluster_rmsd(X, final_labels, operations[:1], max_per_cluster=cap, workers=args.rmsd_workers)
+        names_c = [cname(c) for c in corrected["clusters"]]
+
+        def as_table(r):
+            return pd.DataFrame([[f"{r['mean'][i, j]:.2f} +- {r['std'][i, j]:.2f}" for j in range(len(names_c))]
+                                 for i in range(len(names_c))], index=names_c, columns=names_c)
+        print(f"\n{len(heavy)} heavy atoms, {corrected['n_operations']} symmetry operations, frames per "
+              f"cluster {corrected['n_frames']} of {corrected['n_frames_in_cluster']}")
+        print("symmetry-corrected RMSD (A), mean +- std:")
+        print(as_table(corrected).to_string())
+        print("by atom index (no symmetry), mean +- std:")
+        print(as_table(by_index).to_string())
+        rmsd_rows = [{"cluster_a": names_c[i], "cluster_b": names_c[j],
+                      "rmsd_mean": corrected["mean"][i, j], "rmsd_std": corrected["std"][i, j],
+                      "rmsd_by_index_mean": by_index["mean"][i, j], "rmsd_by_index_std": by_index["std"][i, j]}
+                     for i in range(len(names_c)) for j in range(len(names_c))]
+        pd.DataFrame(rmsd_rows).round(4).to_csv(P("intercluster_rmsd.csv"), index=False)
+        with open(P("intercluster_rmsd.json"), "w") as f:
+            json.dump({"heavy_atoms": len(heavy), "n_operations": corrected["n_operations"],
+                       "max_per_cluster": cap,
+                       "n_frames": {cname(c): n for c, n in corrected["n_frames"].items()},
+                       "n_frames_in_cluster": {cname(c): n for c, n in corrected["n_frames_in_cluster"].items()},
+                       "clusters": names_c, "corrected_mean": corrected["mean"].tolist(),
+                       "corrected_std": corrected["std"].tolist(), "by_index_mean": by_index["mean"].tolist(),
+                       "by_index_std": by_index["std"].tolist()}, f, indent=2)
+        k = len(names_c)
+        fig, axes = plt.subplots(1, 2, figsize=(4.5 + 0.9 * k, 2.2 + 0.8 * k), layout="constrained")
+        vmax = max(np.nanmax(corrected["mean"]), np.nanmax(by_index["mean"]))
+        for ax, (title, r) in zip(axes, (("symmetry-corrected", corrected), ("by atom index", by_index))):
+            im = ax.imshow(r["mean"], cmap="viridis", vmin=0, vmax=vmax)
+            ax.set_xticks(range(k), names_c)
+            ax.set_yticks(range(k), names_c)
+            for i in range(k):
+                for j in range(k):
+                    ax.text(j, i, f"{r['mean'][i, j]:.2f}\n+- {r['std'][i, j]:.2f}", ha="center", va="center",
+                            color="w" if r["mean"][i, j] < 0.6 * vmax else "k", fontsize=9)
+            ax.set_title(f"heavy-atom RMSD (Å), {title}", fontsize=10)
+        fig.colorbar(im, ax=axes, shrink=0.8, label="Å")
+        fig.suptitle(f"{label}between clusters (off-diagonal) and within (diagonal)", fontsize=11)
+        fig.savefig(P("intercluster_rmsd.png"), dpi=150)
+        plt.close(fig)
 
     keep = strip_nonpolar_hydrogens(cmd)
     try:

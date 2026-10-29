@@ -50,7 +50,7 @@ python "$SHUYU/cluster_prune.py" \
 
 Outputs in `--out/`: `torsion_cv.json`, `summary.json` (MD-tools' full fit record),
 `merged_groups.json` (clusters, masses, noise/ambiguous, representatives, density peaks),
-`groups.csv`, `representative_<A/B/…>.pdb`, `group_torsions.png`, `clusters_overview.png`,
+`groups.csv`, `representative_<A/B/…>.pdb`, `clusters_overview.png`,
 `clusters_overview_unaligned.png`, `representatives.png`, `torsions_<i>_<j>_2d.png`.
 
 `allow_single_cluster` is True by default, as in Shu-Yu's tutorial; `--no-single-cluster`
@@ -64,7 +64,7 @@ Optional labelling / reference flags:
   time comes from the trajectory time stamps (override with `--duration-ns`).
 - `--ref-sdf ../crystal/4ibi_1D8_A.sdf` (repeatable) — crystal (bioactive) ligand; its
   torsions are drawn as black vertical lines (solid, dashed, … per file) in
-  `group_torsions.png` and `clusters_overview.png`. Matched to `--sdf` on heavy-atom element +
+  `clusters_overview.png`. Matched to `--sdf` on heavy-atom element +
   connectivity, so polar-H torsions get no line (no H in crystal structures), and a torsion
   through atoms the crystal cannot tell apart (the two carboxyl O) gets a line per assignment
   (e.g. 0° and 180°). Crystal ligands live in `../crystal/` (from RCSB, one SDF per chain).

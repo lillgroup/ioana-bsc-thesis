@@ -2,7 +2,7 @@
 """
 Convergence of the Shu-Yu clustering with simulated time.
 
-Re-runs exactly the clustering of cluster_prune.py (Shu-Yu's symmetry-first t_hdbscan: symmetry
+Re-runs exactly the clustering of cluster_prune.py (Shu-Yu's symmetry-first t_hdbscan, MD-tools 0.6.5.1: symmetry
 built into the distance, no merge step) on CUMULATIVE windows 0-5, 0-10, 0-15 ... ns of the
 state-0 trajectory and plots the number of clusters against the window end. The run is called
 converged once --plateau consecutive windows (default 3) give the same number of clusters.
@@ -72,11 +72,16 @@ def main():
     ap.add_argument("--torsions-file", action="append", default=None)
     ap.add_argument("--use-torsions", default=None)
     ap.add_argument("--stride", type=int, default=1)
-    ap.add_argument("--no-single-cluster", action="store_true")
+    ap.add_argument("--allow-single-cluster", action="store_true",
+                    help="opt-in; MD-tools' default (and this script's) is False since 0.6.5.1")
+    ap.add_argument("--no-single-cluster", action="store_true",
+                    help="the default now; kept so old commands still run")
     ap.add_argument("--max-matches", type=int, default=None,
                     help="cap on the symmetry (automorphism) enumeration (MD-tools default 200000); "
                          "molecules with several methyl/CF3 groups exceed it and the fit refuses an "
                          "incomplete search -- raise it, e.g. 8000000")
+    ap.add_argument("--mass-floor", type=float, default=None,
+                    help="smallest cluster as a fraction of the frames (MD-tools default 0.01)")
     ap.add_argument("--max-frames", type=int, default=None,
                     help="raise t_hdbscan's max_precomputed_frames (default 10000)")
     ap.add_argument("--step-ns", type=float, default=5.0, help="window increment (ns)")
@@ -101,7 +106,7 @@ def main():
     ends = np.arange(args.step_ns, total_ns + 1e-6, args.step_ns)
     print(f"{cmd.n_frames} frames, {len(names)} torsions, {total_ns:g} ns -> {len(ends)} windows")
 
-    asc = not args.no_single_cluster
+    asc = args.allow_single_cluster
     mol = Chem.SDMolSupplier(args.sdf, removeHs=False)[0]
     with open(P("torsion_cv.json"), "w") as f:
         json.dump({"schema_version": 1, "indexing": "zero-based", "units": "radian",
@@ -111,12 +116,21 @@ def main():
     rows = []
     for end in ends:
         sel = time_ns <= end + 1e-6 if end < ends[-1] else np.ones(len(time_ns), bool)
-        fit, _, why = build_fit(tors[sel], cmd[np.flatnonzero(sel)], mol, torsions,
-                                allow_single_cluster=asc, max_frames=args.max_frames,
-                                max_matches=args.max_matches)
+        try:
+            fit, _, why = build_fit(tors[sel], cmd[np.flatnonzero(sel)], mol, torsions,
+                                    allow_single_cluster=asc, max_frames=args.max_frames,
+                                    max_matches=args.max_matches, mass_floor=args.mass_floor)
+        except RuntimeError as e:
+            # with allow_single_cluster=False a one-state window has no admissible cluster
+            # (MD-tools refuses the root); record it as 0 clusters instead of stopping
+            if "no draw produced a cluster" not in str(e):
+                raise
+            fit = None
         row = {"t_ns": float(end), "n_frames": int(sel.sum()),
-               "n_groups": int(fit.n_clusters_), "noise": float(fit.unassigned_mass_),
-               "density_noise": float(fit.noise_mass_), "ambiguous": float(fit.ambiguous_mass_)}
+               "n_groups": int(fit.n_clusters_) if fit else 0,
+               "noise": float(fit.unassigned_mass_) if fit else 1.0,
+               "density_noise": float(fit.noise_mass_) if fit else 1.0,
+               "ambiguous": float(fit.ambiguous_mass_) if fit else 0.0}
         rows.append(row)
         print(f"  0-{end:g} ns: {row['n_frames']:6d} frames  {row['n_groups']:3d} clusters"
               f"  unassigned {100 * row['noise']:.1f}% (noise {100 * row['density_noise']:.1f}%,"

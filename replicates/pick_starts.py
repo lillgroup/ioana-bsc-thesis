@@ -97,7 +97,10 @@ def main():
     ap.add_argument("--torsion", action="append", default=None)
     ap.add_argument("--torsions-file", action="append", default=None)
     ap.add_argument("--stride", type=int, default=1)
-    ap.add_argument("--no-single-cluster", action="store_true")
+    ap.add_argument("--allow-single-cluster", action="store_true",
+                    help="opt-in; MD-tools' default (and this script's) is False since 0.6.5.1")
+    ap.add_argument("--no-single-cluster", action="store_true",
+                    help="the default now; kept so old commands still run")
     ap.add_argument("--max-frames", type=int, default=None)
     ap.add_argument("--n-embed", type=int, default=300, help="ETKDGv3 embeddings (before pruning)")
     ap.add_argument("--seed", type=int, default=20261017)
@@ -138,7 +141,7 @@ def main():
     traj = md.load(args.traj, top=args.top, stride=args.stride)
     tors = md.compute_dihedrals(traj, quads)
     print(f"replicate 0: {tors.shape[0]} frames, {tors.shape[1]} torsions; fitting ...")
-    fit, _, _ = build_fit(tors, traj, mol, torsions, allow_single_cluster=not args.no_single_cluster,
+    fit, _, _ = build_fit(tors, traj, mol, torsions, allow_single_cluster=args.allow_single_cluster,
                           max_frames=args.max_frames)
     masses = {c: float(fit.cluster_mass_[c]) for c in range(fit.n_clusters_)}
     print(f"n_clusters = {fit.n_clusters_}:",
@@ -226,7 +229,7 @@ def main():
         json.dump({"name": args.name, "molecule": Chem.MolToSmiles(Chem.RemoveHs(mol)),
                    "replicate0": {"traj": os.path.abspath(args.traj), "stride": args.stride,
                                   "frames": int(tors.shape[0]),
-                                  "allow_single_cluster": not args.no_single_cluster,
+                                  "allow_single_cluster": args.allow_single_cluster,
                                   "n_clusters": int(fit.n_clusters_),
                                   "cluster_masses": {group_name(c): m for c, m in masses.items()},
                                   "unassigned_mass": float(fit.unassigned_mass_)},

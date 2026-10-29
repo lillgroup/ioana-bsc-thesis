@@ -73,7 +73,10 @@ def main():
     ap.add_argument("--torsion", action="append", default=None)
     ap.add_argument("--torsions-file", action="append", default=None)
     ap.add_argument("--stride", type=int, default=1)
-    ap.add_argument("--no-single-cluster", action="store_true")
+    ap.add_argument("--allow-single-cluster", action="store_true",
+                    help="opt-in; MD-tools' default (and this script's) is False since 0.6.5.1")
+    ap.add_argument("--no-single-cluster", action="store_true",
+                    help="the default now; kept so old commands still run")
     ap.add_argument("--max-frames", type=int, default=10000,
                     help="fit on a resample of this many pooled frames if there are more")
     ap.add_argument("--blocks", type=int, default=5, help="blocks per replicate for the error bars")
@@ -122,7 +125,7 @@ def main():
     mapping, why = verify_atom_mapping(mol, bonds, [a.element.symbol for a in pooled.topology.atoms])
     resample = int(args.max_frames) if tors.shape[0] > args.max_frames else False
     fit = t_hdbscan(tors, molecule=mol, torsion_definitions=definitions, coordinates=pooled,
-                    atom_mapping=mapping, allow_single_cluster=not args.no_single_cluster,
+                    atom_mapping=mapping, allow_single_cluster=args.allow_single_cluster,
                     resampling=resample, max_precomputed_frames=max(args.max_frames, 2)).fit()
     labels = np.asarray(fit.labels_)
     K = fit.n_clusters_
@@ -190,7 +193,7 @@ def main():
         json.dump({"name": args.name, "replicates": reps, "frames_per_replicate": n_per,
                    "stride": args.stride, "ns_per_used_frame": dt_ns,
                    "fit": {"n_clusters": int(K), "resampling": resample,
-                           "allow_single_cluster": not args.no_single_cluster,
+                           "allow_single_cluster": args.allow_single_cluster,
                            "pooled_masses": dict(zip(map(lab, cats), map(float, pooled_m)))},
                    "per_cluster": per_cluster, "pairs": pair, "start": start,
                    "torsions": {n: list(q) for n, q in torsions.items()}}, f, indent=2)
