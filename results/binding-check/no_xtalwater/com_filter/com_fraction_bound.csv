@@ -1,0 +1,15 @@
+run,ligand,frames,com_crystal,frac_bound,frac_within_1A_of_cutoff,max_com,unbound_frames_from_walkers
+FOL-REST2-v4/4LRH,FOL,25000,1.78,1.0,0.0,3.96,
+FOL-REST2-v4/3QL3,FOL,25000,2.14,0.7354,0.0127,13.8,5 6
+FOL-REST2-mace/4LRH,FOL,25000,1.78,0.9977,0.0346,6.76,3 4 7 8 9
+FOL-REST2-mace/3QL3,FOL,25000,2.14,0.828,0.3885,6.95,3 6 7
+FOL-complex-REST2/4LRH,FOL,25000,1.78,1.0,0.0,3.9,
+FOL-complex-REST2/3QL3,FOL,25000,2.14,0.561,0.4396,8.17,0 1 2 3 4 5 6 7 8 9
+REST2-conformers-v4/4ibi-complex,1D8,20000,3.4,1.0,0.0002,5.21,
+REST2-conformers-v4/4ibk-complex,1DE,20000,3.54,0.9994,0.0042,6.77,2
+REST2-conformers-v4/4j7d-complex,I31,20000,3.99,0.9998,0.0665,6.14,1 2
+REST2-conformers-complex/4ibi,1D8,20000,3.4,1.0,0.0,4.47,
+REST2-conformers-complex/4ibk,1DE,20000,3.54,1.0,0.0,4.54,
+REST2-conformers-complex/4j7d,I31,20000,3.99,0.98,0.0682,7.34,0 5
+REST2-conformers-complex/5mwh,UWX,20000,3.62,0.9992,0.0074,6.72,1 2 3 4
+REST2-conformers-complex/5ov8,AXN,20000,3.92,0.9952,0.038,7.44,1 2 3 4
