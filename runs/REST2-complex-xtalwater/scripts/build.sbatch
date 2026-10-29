@@ -17,12 +17,14 @@
 #   1 FOL-3QL3  <- FOL-REST2-v4/3QL3            4 4j7d <- REST2-conformers-v4/4j7d-complex
 #   2 4ibi      <- REST2-conformers-v4/4ibi-complex  5 5mwh <- REST2-conformers-complex/5mwh
 #                                                    6 5ov8 <- REST2-conformers-complex/5ov8
+#   7 FOL-3QL3-3H: FOL-3QL3 with folate as the 3H tautomer (package FOL-3H, from
+#     scripts/param_fol_3h.sbatch); only with --array=7, never part of the default 0-6.
 # Writes REST2-run1 (production, as in REST2.config) and test/REST2-test (300 exchanges).
 set -uo pipefail
 ROOT=/scicore/home/lill0000/popa0002/thesis/REST2-complex-xtalwater
-NAMES=(FOL-4LRH FOL-3QL3 4ibi 4ibk 4j7d 5mwh 5ov8)
-PKGS=(FOL FOL 4ibi 4ibk 4j7d 5mwh-water 5ov8-water)
-LIGS=(FOL FOL 1D8 1DE I31 UWX AXN)
+NAMES=(FOL-4LRH FOL-3QL3 4ibi 4ibk 4j7d 5mwh 5ov8 FOL-3QL3-3H)
+PKGS=(FOL FOL 4ibi 4ibk 4j7d 5mwh-water 5ov8-water FOL-3H)
+LIGS=(FOL FOL 1D8 1DE I31 UWX AXN FOL)
 i=$SLURM_ARRAY_TASK_ID; n=${NAMES[$i]}; pkg=$ROOT/packages/${PKGS[$i]}; S=$ROOT/$n
 export MAMBA_ROOT_PREFIX=/scicore/home/lill0000/popa0002/software/md-stack
 eval "$(/scicore/home/lill0000/popa0002/software/md-stack/bin/micromamba shell hook -s bash)"

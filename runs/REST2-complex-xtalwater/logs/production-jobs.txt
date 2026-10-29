@@ -5,3 +5,4 @@
 5ov8 28536181 h200 40ns
 FOL-3QL3 28627444 a100 50ns (auto-resubmit)
 FOL-4LRH 28627445 a100 50ns (auto-resubmit; starts after test 28528761 succeeds)
+FOL-3QL3-3H chain: param 29052311 -> build 29052312 (array 7) -> test 29052313 -> production 29052314 (a100, 50 ns, auto-resubmit)

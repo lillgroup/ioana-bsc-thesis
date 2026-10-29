@@ -26,6 +26,7 @@ from pathlib import Path
 SYSTEMS = {
     "FOL-4LRH": ("4LRH", ["FOL"]),
     "FOL-3QL3": ("3QL3", ["FOL", "NAP"]),
+    "FOL-3QL3-3H": ("3QL3", ["FOL", "NAP"]),   # same structure; folate as the 3H tautomer (package FOL-3H)
     "4ibi": ("4IBI", ["1D8"]),
     "4ibk": ("4IBK", ["1DE"]),
     "4j7d": ("4J7D", ["I31"]),
