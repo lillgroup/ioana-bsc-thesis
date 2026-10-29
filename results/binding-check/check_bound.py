@@ -47,14 +47,18 @@ RUNS = ["FOL-REST2-v4/4LRH", "FOL-REST2-v4/3QL3", "FOL-REST2-mace/4LRH", "FOL-RE
         "REST2-conformers-v4/4j7d-complex",
         "REST2-conformers-complex/4ibi", "REST2-conformers-complex/4ibk",
         "REST2-conformers-complex/4j7d", "REST2-conformers-complex/5mwh",
-        "REST2-conformers-complex/5ov8"]
+        "REST2-conformers-complex/5ov8",
+        "REST2-complex-xtalwater/FOL-4LRH", "REST2-complex-xtalwater/FOL-3QL3",
+        "REST2-complex-xtalwater/4ibi", "REST2-complex-xtalwater/4ibk", "REST2-complex-xtalwater/4j7d",
+        "REST2-complex-xtalwater/5mwh", "REST2-complex-xtalwater/5ov8"]
 PROTEIN = set("ALA ARG ASN ASP CYS GLN GLU GLY HIS HID HIE HIP ILE LEU LYS MET PHE PRO SER THR "
               "TRP TYR VAL CYX ACE NME".split())
 POCKET_CUT, CONTACT_CUT, NATIVE_SLACK, UNBOUND_CUT = 5.0, 4.0, 0.5, 5.0
 MASS = {"C": 12.011, "N": 14.007, "O": 15.999, "S": 32.06, "P": 30.974, "F": 18.998, "CL": 35.45,
         "BR": 79.904, "I": 126.90, "H": 1.008}
 LABELS = {"FOL-REST2-v4": "v4 (Sage)", "FOL-REST2-mace": "MACE bespoke", "FOL-complex-REST2": "original",
-          "REST2-conformers-v4": "v4", "REST2-conformers-complex": "original"}
+          "REST2-conformers-v4": "v4", "REST2-conformers-complex": "original",
+          "REST2-complex-xtalwater": "v4 + crystal waters"}
 
 
 def read_pdb(path):
