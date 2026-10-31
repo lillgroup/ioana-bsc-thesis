@@ -1,6 +1,7 @@
 run,ligand,ns,pocket_residues,native_pairs,com_crystal,frac_unbound,max_closest_contact,rmsd_mean,rmsd_last10pct,com_mean,com_last10pct,contacts_mean,contacts_last10pct,Q_mean,Q_last10pct,verdict
 REST2-complex-xtalwater/FOL-4LRH,FOL,50.0,20,113,1.78,0.0,2.9,1.22,1.61,1.79,1.95,124.84,121.04,0.82,0.76,"bound, crystal pose"
 REST2-complex-xtalwater/FOL-3QL3,FOL,50.0,22,88,2.14,0.0,3.46,4.92,4.9,5.77,5.41,62.14,63.39,0.25,0.15,"bound, crystal pose lost"
+REST2-complex-xtalwater/FOL-3QL3-3H,FOL,50.0,22,88,2.14,0.0,2.98,2.91,2.68,3.24,3.22,86.04,84.9,0.74,0.72,"bound, crystal pose"
 REST2-complex-xtalwater/4ibi,1D8,40.0,17,61,3.4,0.0,3.25,1.02,1.04,3.61,3.59,61.92,60.9,0.77,0.76,"bound, crystal pose"
 REST2-complex-xtalwater/4ibk,1DE,40.0,16,51,3.54,0.0,3.26,1.04,1.1,3.65,3.83,55.57,53.63,0.86,0.83,"bound, crystal pose"
 REST2-complex-xtalwater/4j7d,I31,40.0,13,54,3.99,0.0,3.59,1.34,1.52,4.34,4.33,34.65,35.15,0.6,0.62,"bound, crystal pose"

@@ -48,7 +48,7 @@ RUNS = ["FOL-REST2-v4/4LRH", "FOL-REST2-v4/3QL3", "FOL-REST2-mace/4LRH", "FOL-RE
         "REST2-conformers-complex/4ibi", "REST2-conformers-complex/4ibk",
         "REST2-conformers-complex/4j7d", "REST2-conformers-complex/5mwh",
         "REST2-conformers-complex/5ov8",
-        "REST2-complex-xtalwater/FOL-4LRH", "REST2-complex-xtalwater/FOL-3QL3",
+        "REST2-complex-xtalwater/FOL-4LRH", "REST2-complex-xtalwater/FOL-3QL3", "REST2-complex-xtalwater/FOL-3QL3-3H",
         "REST2-complex-xtalwater/4ibi", "REST2-complex-xtalwater/4ibk", "REST2-complex-xtalwater/4j7d",
         "REST2-complex-xtalwater/5mwh", "REST2-complex-xtalwater/5ov8"]
 PROTEIN = set("ALA ARG ASN ASP CYS GLN GLU GLY HIS HID HIE HIP ILE LEU LYS MET PHE PRO SER THR "
