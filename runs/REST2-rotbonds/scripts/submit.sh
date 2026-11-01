@@ -30,7 +30,7 @@ for k in "${idx[@]}"; do
   dep=(); [ -n "${BUILD:-}" ] && dep=(--dependency="afterok:${BUILD}_$k")
   for kind in water complex; do
     T=$(sbatch --parsable "${dep[@]}" -J "rb-test-$n-$kind" "${GPUARGS[@]}" --qos="$GPU-6hours" --time=06:00:00 \
-        scripts/rest2.sbatch "$n-$kind/test/REST2-test")
+        scripts/rest2.sbatch "$n-$kind/test/REST2-test" 4)   # try 4 of 4: a failed test stops here, no resubmit
     P=$(sbatch --parsable --dependency="afterok:$T" -J "rb-$n-$kind" "${GPUARGS[@]}" --qos="$GPU-1day" \
         scripts/rest2.sbatch "$n-$kind/REST2-run1")
     echo "$n-$kind test $T -> production $P ($GPU)" | tee -a logs/jobs.txt
