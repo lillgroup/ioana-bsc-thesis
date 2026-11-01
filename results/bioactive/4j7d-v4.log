@@ -1,0 +1,25 @@
+4j7d chain A: 48 symmetry-equivalent atom assignments tried per frame
+wat: 30000 frames, 6000 labelled, median RMSD 1.56 A
+prot: 20000 frames, 4000 labelled, median RMSD 0.54 A
+
+| ensemble | cluster | frames | population | min (Å) | median (Å) | < 1 Å | < 1.5 Å | < 2 Å |
+|---|---|---|---|---|---|---|---|---|
+| wat | all | 30000 | 100.0 % | 0.17 | 1.56 | 19 % | 47 % | 69 % |
+| wat | A | 1976 | 32.9 % | 1.31 | 2.12 | 0 % | 1 % | 34 % |
+| wat | B | 2044 | 34.1 % | 0.23 | 1.09 | 39 % | 92 % | 100 % |
+| wat | C | 188 | 3.1 % | 1.35 | 1.79 | 0 % | 2 % | 75 % |
+| wat | D | 204 | 3.4 % | 0.40 | 1.31 | 26 % | 82 % | 100 % |
+| wat | E | 142 | 2.4 % | 0.65 | 1.19 | 15 % | 96 % | 100 % |
+| wat | F | 82 | 1.4 % | 1.74 | 2.06 | 0 % | 0 % | 30 % |
+| wat | unassigned | 1364 | 22.7 % | 0.40 | 1.61 | 18 % | 46 % | 65 % |
+| prot | all | 20000 | 100.0 % | 0.15 | 0.54 | 67 % | 80 % | 81 % |
+| prot | A | 2220 | 55.5 % | 0.15 | 0.41 | 100 % | 100 % | 100 % |
+| prot | B | 546 | 13.7 % | 1.82 | 2.24 | 0 % | 0 % | 1 % |
+| prot | C | 160 | 4.0 % | 0.32 | 0.53 | 100 % | 100 % | 100 % |
+| prot | D | 214 | 5.3 % | 0.68 | 1.11 | 17 % | 100 % | 100 % |
+| prot | E | 48 | 1.2 % | 2.08 | 2.16 | 0 % | 0 % | 0 % |
+| prot | F | 320 | 8.0 % | 0.67 | 1.07 | 21 % | 99 % | 100 % |
+| prot | G | 37 | 0.9 % | 0.36 | 0.55 | 100 % | 100 % | 100 % |
+| prot | unassigned | 455 | 11.4 % | 0.32 | 1.09 | 38 % | 64 % | 65 % |
+
+written /home/ioana/bsc-thesis/results/bioactive/4j7d-v4.csv, /home/ioana/bsc-thesis/results/bioactive/4j7d-v4_summary.csv, /home/ioana/bsc-thesis/results/bioactive/4j7d-v4.png

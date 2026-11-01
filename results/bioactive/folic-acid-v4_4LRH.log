@@ -1,0 +1,18 @@
+4LRH: 8 symmetry-equivalent atom assignments tried per frame
+wat: 50000 frames, 10000 labelled, median RMSD 2.13 A
+prot: 25000 frames, 5000 labelled, median RMSD 0.59 A
+
+| ensemble | cluster | frames | population | min (Å) | median (Å) | < 1 Å | < 1.5 Å | < 2 Å |
+|---|---|---|---|---|---|---|---|---|
+| wat | all | 50000 | 100.0 % | 0.59 | 2.13 | 0 % | 7 % | 38 % |
+| wat | A | 5983 | 59.8 % | 0.76 | 2.13 | 0 % | 7 % | 38 % |
+| wat | B | 478 | 4.8 % | 1.38 | 2.20 | 0 % | 1 % | 22 % |
+| wat | C | 133 | 1.3 % | 1.50 | 2.06 | 0 % | 1 % | 44 % |
+| wat | unassigned | 3406 | 34.1 % | 0.60 | 2.11 | 0 % | 8 % | 40 % |
+| prot | all | 25000 | 100.0 % | 0.27 | 0.59 | 92 % | 95 % | 99 % |
+| prot | A | 2378 | 47.6 % | 0.31 | 0.58 | 100 % | 100 % | 100 % |
+| prot | B | 2236 | 44.7 % | 0.37 | 0.58 | 99 % | 100 % | 100 % |
+| prot | C | 311 | 6.2 % | 1.06 | 1.71 | 0 % | 26 % | 94 % |
+| prot | unassigned | 75 | 1.5 % | 0.70 | 1.48 | 8 % | 52 % | 85 % |
+
+written /home/ioana/bsc-thesis/results/bioactive/folic-acid-v4_4LRH.csv, /home/ioana/bsc-thesis/results/bioactive/folic-acid-v4_4LRH_summary.csv, /home/ioana/bsc-thesis/results/bioactive/folic-acid-v4_4LRH.png

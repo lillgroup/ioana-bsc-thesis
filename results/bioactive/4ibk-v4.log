@@ -1,0 +1,29 @@
+4ibk chain A: 2 symmetry-equivalent atom assignments tried per frame
+wat: 30000 frames, 6000 labelled, median RMSD 1.86 A
+prot: 20000 frames, 4000 labelled, median RMSD 0.51 A
+
+| ensemble | cluster | frames | population | min (Å) | median (Å) | < 1 Å | < 1.5 Å | < 2 Å |
+|---|---|---|---|---|---|---|---|---|
+| wat | all | 30000 | 100.0 % | 0.29 | 1.86 | 8 % | 20 % | 63 % |
+| wat | A | 1066 | 17.8 % | 1.47 | 1.71 | 0 % | 0 % | 94 % |
+| wat | B | 895 | 14.9 % | 1.69 | 1.93 | 0 % | 0 % | 71 % |
+| wat | C | 597 | 10.0 % | 0.80 | 1.18 | 11 % | 91 % | 100 % |
+| wat | D | 544 | 9.1 % | 0.29 | 0.80 | 71 % | 98 % | 100 % |
+| wat | E | 572 | 9.5 % | 1.91 | 2.36 | 0 % | 0 % | 0 % |
+| wat | F | 408 | 6.8 % | 1.78 | 2.25 | 0 % | 0 % | 2 % |
+| wat | G | 384 | 6.4 % | 0.90 | 1.68 | 1 % | 5 % | 97 % |
+| wat | H | 368 | 6.1 % | 1.36 | 1.84 | 0 % | 1 % | 92 % |
+| wat | I | 293 | 4.9 % | 1.85 | 2.19 | 0 % | 0 % | 5 % |
+| wat | J | 219 | 3.6 % | 2.43 | 2.88 | 0 % | 0 % | 0 % |
+| wat | K | 140 | 2.3 % | 2.03 | 2.25 | 0 % | 0 % | 0 % |
+| wat | L | 114 | 1.9 % | 1.13 | 1.65 | 0 % | 14 % | 96 % |
+| wat | M | 106 | 1.8 % | 2.52 | 2.95 | 0 % | 0 % | 0 % |
+| wat | N | 41 | 0.7 % | 2.26 | 2.51 | 0 % | 0 % | 0 % |
+| wat | unassigned | 253 | 4.2 % | 0.82 | 2.09 | 2 % | 10 % | 48 % |
+| prot | all | 20000 | 100.0 % | 0.17 | 0.51 | 92 % | 96 % | 97 % |
+| prot | A | 3570 | 89.2 % | 0.18 | 0.49 | 100 % | 100 % | 100 % |
+| prot | B | 279 | 7.0 % | 0.83 | 1.00 | 51 % | 100 % | 100 % |
+| prot | C | 126 | 3.1 % | 2.25 | 2.45 | 0 % | 0 % | 0 % |
+| prot | unassigned | 25 | 0.6 % | 1.72 | 1.81 | 0 % | 0 % | 100 % |
+
+written /home/ioana/bsc-thesis/results/bioactive/4ibk-v4.csv, /home/ioana/bsc-thesis/results/bioactive/4ibk-v4_summary.csv, /home/ioana/bsc-thesis/results/bioactive/4ibk-v4.png
