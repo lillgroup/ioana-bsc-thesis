@@ -265,6 +265,8 @@ Run-specific twists:
 | **REST2-conformers-v4** | 4ibi −2, 4ibk −2, 4j7d +1, water / complex | b3603e0 | 60 / 40 ns | 6, 0.4 | done |
 | **FOL-REST2-mace** | folate, MACE bespoke torsions | b3603e0 | 100 / 50 / 50 ns | 8 / 10 / 10 | done |
 | **REST2-replicates** | PARA rep1; FOL water rep1–3 | b3603e0 | 10 / 100 ns | as rep0 | done, compared |
+| **REST2-complex-xtalwater** (sciCORE) | the 7 complexes again, crystal waters kept; FOL-3QL3-3H | b3603e0 | 40 / 50 ns | as before | see its README |
+| **REST2-rotbonds** (sciCORE) | 15 new PDBbind ligands, 4/5/6/7 rotatable bonds, water / complex (crystal waters) | b3603e0 | 60 / 40 ns | 6, 0.4 | set up 2026-11-01, `runs/REST2-rotbonds/README.md` |
 
 Headline results are in `results/symfirst-2026-10-15/README.txt` and `replicates/README.md`.
 Open items as of 2026-10-21:
