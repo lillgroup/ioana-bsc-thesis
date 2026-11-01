@@ -1,7 +1,7 @@
 """Parameterisation inputs for the REST2-rotbonds compounds: packages/<name>.input.sdf and
 packages/<name>.parameterize.config, one per row of compounds.csv.
 
-  python -I scripts/make_inputs.py <root>
+  python -I scripts/make_inputs.py <root> [name ...]     (names: only those rows; default all)
 
 The chemistry (bond orders, formal charges, stereo) is checked against the wwPDB Chemical Component
 Dictionary entry of the deposited ligand (ccd/<code>_ideal.sdf, from files.rcsb.org/ligands):
@@ -46,15 +46,18 @@ def crystal_ligand(pdb, code, chain):
     return lines
 
 
-def main(root):
-    rows = list(csv.DictReader(open(root / "compounds.csv")))
+def main(root, names):
+    rows = [r for r in csv.DictReader(open(root / "compounds.csv")) if not names or r["name"] in names]
     (root / "packages").mkdir(exist_ok=True)
     for r in rows:
         ccd = Chem.MolFromMolFile(str(root / "ccd" / f"{r['ligand']}_ideal.sdf"), removeHs=False)
         lines = crystal_ligand(root / "crystal" / f"{r['pdb']}.pdb", r["ligand"], r["chain"])
-        pdbbind = Chem.MolFromMolFile(str(root / "pdbbind" / f"{r['name']}_ligand.sdf"), removeHs=False)
         inchi = lambda m: Chem.MolToInchi(rdMolStandardize.Uncharger().uncharge(Chem.RemoveHs(m)))
-        source = "PDBbind" if inchi(pdbbind) == inchi(ccd) else "CCD (PDBbind SDF differs)"
+        pb_path = root / "pdbbind" / f"{r['name']}_ligand.sdf"
+        pdbbind = Chem.MolFromMolFile(str(pb_path), removeHs=False) if pb_path.exists() else None
+        # compounds added on sciCORE (2026-11-01: 1l8g, 6qlp) have no PDBbind file there: CCD chemistry
+        source = ("CCD (no PDBbind file)" if pdbbind is None else
+                  "PDBbind" if inchi(pdbbind) == inchi(ccd) else "CCD (PDBbind SDF differs)")
         heavy = Chem.RemoveHs(pdbbind if source == "PDBbind" else ccd)
         # the deposited heavy atoms (bonds by proximity) get the template's bond orders by graph match
         cryst = Chem.MolFromPDBBlock("\n".join(lines) + "\nEND\n", removeHs=True, proximityBonding=True,
@@ -82,4 +85,4 @@ def main(root):
 
 
 if __name__ == "__main__":
-    main(Path(sys.argv[1]).resolve())
+    main(Path(sys.argv[1]).resolve(), set(sys.argv[2:]))

@@ -9,7 +9,8 @@ small-molecule v4 runs so that only the molecule changes:
 The complex's ligand residue number is not known before the build: scaler.config and REST2.config
 carry the mask ":LIGRES", which scripts/build.sbatch replaces with the built residue number.
 
-  python -I scripts/make_configs.py <root>
+  python -I scripts/make_configs.py <root> [name ...]    (names: only those rows; default all -- note that
+  rewriting a built complex's configs resets its mask to :LIGRES)
 """
 import csv
 import sys
@@ -118,7 +119,10 @@ reporting:
 
 if __name__ == "__main__":
     root = Path(sys.argv[1]).resolve()
+    names = set(sys.argv[2:])
     for r in csv.DictReader(open(root / "compounds.csv")):
+        if names and r["name"] not in names:
+            continue
         files = {
             f"{r['name']}-water/build/build-top.config": WATER_BUILD,
             f"{r['name']}-water/build/scaler.config": WATER_SCALER,

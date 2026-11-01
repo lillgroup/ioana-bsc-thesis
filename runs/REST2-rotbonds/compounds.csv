@@ -1,11 +1,11 @@
 name,pdb,ligand,chain,resname,rot_bonds,mw,heavy_atoms,n_residues,protein,uniprot,resolution_A,affinity,crystal_waters,note
 6cjr,6CJR,E0G,A,X01,4,464.5,33,213,Heat Shock Protein 90 Homolog,P46598,1.8,Ki=0.30nM,156,"replaces 4nh7 (same ligand E0G, human HSP90a: residue 212 missing inside the chain)"
-1v2k,1V2K,ZEN,T,X02,4,499.0,34,223,Trypsin,P00760,2.0,Ki=0.65uM,95,ZEN P1 aminopyridine binds the S1 pocket (cationic after Open Babel); structural Ca2+ 23 A away kept
-6cn5,6CN5,F7M,A,X03,4,469.6,35,231,Nuclear Receptor Ror-Gamma,P51449,2.3,Ki=0.02uM,50,
+1v2k,1V2K,ZEN,T,X02,4,499.0,34,223,Trypsin,P00760,2.0,Ki=0.65uM,95,"ZEN P1 aminopyridine binds the S1 pocket (Open Babel leaves it neutral; simulated as the pyridinium cation, decided 2026-11-01); structural Ca2+ 23 A away kept"
+6cn5,6CN5,F7M,A,X03,4,469.6,35,231,Nuclear Receptor Ror-Gamma,P51449,2.3,Ki=0.02uM,50,md-tools refused the package (parameterisation self-check: 2 proper torsions missing from the package); replaced by 1l8g (2026-11-01)
 4p6w,4P6W,MOF,A,X04,4,523.5,35,252,Glucocorticoid Receptor,P04150,1.95,Ki=0.7nM,126,PDBbind SDF wrong (C20 ketone as CH-OH); input from the CCD (MOF = mometasone furoate). Co-activator peptide chain B not in contact with the ligand: not kept
 4k9y,4K9Y,K9Y,A,X05,4,481.6,36,271,Focal Adhesion Kinase 1,Q05397,2.0,Kd=0.111uM,253,replaces 4p5z (EphA3: 21 + 7 residues missing inside the chain)
 6s56,6S56,KVZ,A,X06,5,491.0,33,130,Atpase Family Aaa Domain-Containing Protein 2,Q6PL18,2.01,Kd=8uM,195,
-5ufr,5UFR,88J,A,X07,5,470.0,34,223,Nuclear Receptor Ror-Gamma,P51449,2.07,Kd=0.002uM,1,"replaces 6fni (EphB4: 5 + 17 residues missing); same receptor as 6cn5 (RORg), other ligand; 1 crystal water deposited"
+5ufr,5UFR,88J,A,X07,5,470.0,34,223,Nuclear Receptor Ror-Gamma,P51449,2.07,Kd=0.002uM,1,"md-tools refused the package (parameterisation self-check: improper-torsion atom order differs from openmmforcefields); replaced by 6qlp (2026-11-01); replaces 6fni (EphB4: 5 + 17 residues missing); same receptor as 6cn5 (RORg), other ligand; 1 crystal water deposited"
 6r8o,6R8O,JV2,A,X08,6,496.6,35,164,Peptidyl-Prolyl Cis-Trans Isomerase F,P30405,1.36,Kd=0.006uM,187,
 3b67,3B67,B67,A,X09,6,474.3,32,247,Androgen Receptor,P10275,1.9,Ki=1.4nM,179,
 4ase,4ASE,AV9,A,X10,6,454.9,32,305,Vascular Endothelial Growth Factor Receptor 2,P35968,1.83,Ki=0.01nM,249,replaces 5fck (factor D: residue 60 missing inside the chain)
@@ -14,3 +14,5 @@ name,pdb,ligand,chain,resname,rot_bonds,mw,heavy_atoms,n_residues,protein,unipro
 1rd4,1RD4,L08,A,X13,7,478.6,34,184,Integrin Alpha-L,P20701,2.4,Kd=18.3nM,0,no crystal waters deposited
 4crf,4CRF,R9B,A,X14,7,543.0,39,237,Coagulation Factor Xi,P03951,2.3,Ki=0.5nM,95,
 1eld,1ELD,0Z0,E,X15,7,475.4,33,240,Elastase,P00772,2.0,Ki=0.20uM,133,peptide-like (TFA-Phe-Ala anilide); structural Ca2+ 21 A away kept
+1l8g,1L8G,DBD,A,X16,4,466.4,31,297,Protein-Tyrosine Phosphatase Non-Receptor Type 1,P18031,2.5,Ki=0.6uM,136,"replaces 6cn5 (md-tools refused its package); PTP1B, no additives"
+6qlp,6QLP,J3Q,A,X17,5,467.5,32,138,Galectin-3,P17931,1.08,Kd=5.2uM,139,"replaces 5ufr (md-tools refused its package); thiogalactoside-derived inhibitor; PEG fragment left out, Cl- 4 A from the ligand kept"

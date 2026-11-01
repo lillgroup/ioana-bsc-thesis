@@ -30,6 +30,7 @@ EXCLUDED = {
     "GOL": "cryo-protectant (glycerol)",
     "EDO": "cryo-protectant (ethylene glycol)",
     "PG4": "crystallisation solution (PEG fragment)",
+    "PGE": "crystallisation solution (PEG fragment)",
     "ACY": "crystallisation solution (acetate)",
     "DMS": "crystallisation solution (DMSO)",
 }

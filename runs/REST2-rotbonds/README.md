@@ -80,3 +80,21 @@ Check after the builds (`logs/build-*.out`): the package's net charge and SMILES
 (e.g. 1v2k's aminopyridine and 4erf's COOH should come out charged), that the complex ligand mapped
 to the same package, and the mask. After a complex production, rest2.sbatch prints check_run.py's
 exchange acceptance and binding report into its log.
+
+## Changes on sciCORE, 2026-11-01
+
+- **6cn5 and 5ufr dropped**: md-tools refused their packages (its parameterisation self-check found the
+  package's torsions differ from the openmmforcefields reference: 6cn5 two proper torsions missing,
+  5ufr improper torsions in the other cyclic atom order). Replaced by **1l8g** (4 bonds, PTP1B, X16,
+  net -2 after Open Babel) and **6qlp** (5 bonds, galectin-3, X17, neutral; PEG fragment left out,
+  Cl- kept), from `selection/candidates_screened.csv`. Their inputs come from the CCD (no PDBbind
+  files on sciCORE; `make_inputs.py` falls back to the CCD) via `scripts/new_inputs_20261101.sbatch`.
+  `make_inputs.py` / `make_configs.py` now take compound names, so earlier rows are not rewritten.
+- **1v2k as the pyridinium cation** (user's decision): Open Babel's pH model leaves its
+  4-piperidinylpyridine (pKa ~9.5) neutral. `packages/1v2k.input.sdf` is now the cation
+  (`1v2k.input.neutral.sdf` the old input). md-tools refuses the cation's package with the same
+  improper-order check as 5ufr, also for three other atom orders of the same molecule
+  (`scripts/trial_1v2k_atom_order.sbatch`). **1v2k is not running**; it needs a decision (neutral
+  package, which passed, or wait for an md-tools fix). Its neutral builds are kept in
+  `$THESIS/REST2-rotbonds/_superseded/` (never started).
+- Running: 13 compounds, water and complex (`logs/jobs.txt`).
