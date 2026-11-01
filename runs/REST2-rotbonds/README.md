@@ -97,4 +97,6 @@ exchange acceptance and binding report into its log.
   (`scripts/trial_1v2k_atom_order.sbatch`). **1v2k is not running**; it needs a decision (neutral
   package, which passed, or wait for an md-tools fix). Its neutral builds are kept in
   `$THESIS/REST2-rotbonds/_superseded/` (never started).
-- Running: 13 compounds, water and complex (`logs/jobs.txt`).
+- Running: 14 compounds, water and complex (`logs/jobs.txt`). The A100 queue was full, so all tests
+  and the productions of 6cjr, 4p6w, 4k9y, 6s56, 6r8o, 3b67, 4ase were moved to H200 (h200-6hours,
+  2 jobs at a time); the other 7 compounds run on A100.
