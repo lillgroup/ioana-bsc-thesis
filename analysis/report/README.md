@@ -47,3 +47,11 @@ from the populations of each clustering method -> `results/overview/conformation
 checks every run's own record and stops if they differ. HDBSCAN: populations over the assigned frames
 (the unassigned fraction is in the CSV); a run with no cluster is drawn at e^S = 1, hollow. Error bars:
 block standard error over 5 time blocks. x: rotatable bonds, RDKit on the heavy-atom graph.
+
+## KL divergence: bound vs free ensemble
+
+`kl_divergence.py` (`sbatch kl_divergence.sbatch`): KL(pi^complex || pi^water) on ONE shared clustering
+of water + complex frames (equal numbers from each) per (ligand, complex), for both methods, each in its
+own environment -> `results/overview/kl-divergence/` (`kl_divergence_{cut,hdbscan}.png`, `kl_{cut,hdbscan}.csv`).
+Next to KL: S_w (KL of selecting a typical water conformer) and the fraction of the bound ensemble in
+clusters with no water frame (induced fit). Pseudocount 0.5 frames per cluster; block-SE error bars.

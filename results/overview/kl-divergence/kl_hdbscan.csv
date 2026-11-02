@@ -1,0 +1,8 @@
+method,ligand,complex,frames_each,n_clusters,KL_kB,KL_block_se,S_water_kB,S_complex_kB,complex_in_unseen_clusters,water_unassigned,complex_unassigned,top_complex_cluster,top_complex_mass,water_mass_of_that_cluster,md_tools,settings,pseudocount
+hdbscan,4j7d,4J7D,5000,6,0.2928,0.0877,1.1554,0.7642,0.0,0.2648,0.1022,0,0.7819,0.4508,0.6.5.2,"{""allow_single_cluster"": false, ""mass_floor"": 0.01, ""route"": ""symmetry-first""}",0.5
+hdbscan,4ibi,4IBI,5000,11,1.3809,0.2692,2.2258,0.0132,0.0,0.1212,0.0,0,0.9982,0.2465,0.6.5.2,"{""allow_single_cluster"": false, ""mass_floor"": 0.01, ""route"": ""symmetry-first""}",0.5
+hdbscan,4ibk,4IBK,5000,11,2.01,0.94,2.255,0.2389,0.0,0.0908,0.0,0,0.9356,0.1043,0.6.5.2,"{""allow_single_cluster"": false, ""mass_floor"": 0.01, ""route"": ""symmetry-first""}",0.5
+hdbscan,5mwh,5MWH,5000,11,0.8304,0.1357,2.0955,1.6984,0.0,0.2478,0.062,0,0.3183,0.0441,0.6.5.2,"{""allow_single_cluster"": false, ""mass_floor"": 0.01, ""route"": ""symmetry-first""}",0.5
+hdbscan,5ov8,5OV8,5000,9,0.3919,0.0771,1.9889,1.646,0.0,0.5652,0.1234,0,0.334,0.2024,0.6.5.2,"{""allow_single_cluster"": false, ""mass_floor"": 0.01, ""route"": ""symmetry-first""}",0.5
+hdbscan,folic-acid,4LRH,5000,4,1.5225,0.2455,1.0884,0.8987,0.0,0.854,0.0436,1,0.4705,0.4726,0.6.5.2,"{""allow_single_cluster"": false, ""mass_floor"": 0.01, ""route"": ""symmetry-first""}",0.5
+hdbscan,folic-acid,3QL3,5000,10,2.2961,0.2491,1.3679,1.9733,0.0,0.7168,0.109,0,0.2189,0.0099,0.6.5.2,"{""allow_single_cluster"": false, ""mass_floor"": 0.01, ""route"": ""symmetry-first""}",0.5
