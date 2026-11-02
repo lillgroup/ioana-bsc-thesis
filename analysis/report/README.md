@@ -37,3 +37,13 @@ plus MD-tools' `_cut_split_tree.png` and `_cut_free_energy.png`, and `_cut_group
 section to the folder's README (rerun it after `report.sbatch`, which rewrites the README).
 Environment: `analysis-env-cut` (a clone of `analysis-env-main` with md-tools from the `MD-tools-cut`
 worktree at 306b109), so `analysis-env-main` and the symmetry-first results stay on c30c1c0.
+
+## Conformational entropy across ligands
+
+`conformational_entropy.py` (`sbatch conformational_entropy.sbatch`): S_c = -sum pi_c ln pi_c (k_B) and
+e^S_c, the effective number of equally populated conformers, for every ligand in water and complex,
+from the populations of each clustering method -> `results/overview/conformational-entropy/`
+(`_hdbscan.png`, `_cut.png`, `.csv`). Each figure uses one method with one set of settings; the script
+checks every run's own record and stops if they differ. HDBSCAN: populations over the assigned frames
+(the unassigned fraction is in the CSV); a run with no cluster is drawn at e^S = 1, hollow. Error bars:
+block standard error over 5 time blocks. x: rotatable bonds, RDKit on the heavy-atom graph.
