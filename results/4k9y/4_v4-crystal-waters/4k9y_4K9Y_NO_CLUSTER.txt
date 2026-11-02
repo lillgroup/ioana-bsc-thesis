@@ -1,0 +1,1 @@
+NO CLUSTER with allow_single_cluster=False: no basin above the 1 % mass floor once the root of the condensed tree is refused -- the ensemble is most likely ONE state. Rerun with --allow-single-cluster. MD-tools: no draw produced a cluster (counts [0]); the mass floor 0.01 may be above every basin's population

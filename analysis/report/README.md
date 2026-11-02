@@ -1,0 +1,39 @@
+# Per-compound report: the figures for the thesis
+
+One Slurm job per compound (`report.sbatch <compound>`, or `bash submit.sh [compound ...]`) makes,
+from the compound's current water and complex runs (`compounds.csv`):
+
+| figure (`results/<compound>/<version>/`) | what | script |
+|---|---|---|
+| `<c>_water_clusters.png`, `<c>_<PDB>_clusters.png` | Shu-Yu's symmetry-first clustering, `--no-single-cluster`, water and each complex | `../shuyu_clustering/cluster_prune.py` |
+| `<c>_rmsd_density.png` | ligand conformation RMSD to the crystal, water vs complex (density) | `rmsd_density.py` |
+| `<c>_binding.png` | complex: pocket-frame RMSD, ligand-pocket COM, contacts, native Q over time | `../binding-check/check_bound.py --runs` |
+| `<c>_water_vs_complex.png` | torsion distributions, water vs complex, one panel per torsion | `water_vs_complex.py` |
+
+plus the CSVs behind them and a `README.md` (runs, crystal references, torsion list, md-tools version,
+Slurm job). `prepare.py` writes the inputs to `$THESIS/analysis-report/<compound>/` (outside git).
+
+**One torsion numbering per compound.** `prepare.py` runs `select_torsions.py` once on the water
+ligand (rotatable, then rigid, then polar-H; ring torsions are not used) and maps those torsions onto
+every complex ligand by matching the heavy-atom graph. t<k> is therefore the same bond in all four
+figures, also when the complex uses a different package (3QL3: folate as the 3H tautomer).
+
+`compounds.csv`: water run (+ extensions joined, e.g. 5mwh/5ov8 run1 + ext1), complexes as
+`<PDB>=<run>=<crystal SDF>`, crystal SDFs for the water clustering, stride, automorphism cap. Run folders
+are relative to `$THESIS`, crystal SDFs to the repository. Environment: `analysis-env-main`
+(MD-tools c30c1c0 = 0.6.5.2).
+
+A complex whose clustering finds no cluster (one conformation for the whole run, e.g. 4ibi bound)
+gets `<c>_<PDB>_NO_CLUSTER.txt` instead of a figure: only `--no-single-cluster` is run.
+
+## Second clustering: torsion partitioning (barrier cuts)
+
+`report_cut.sbatch <compound>` runs `../shuyu_clustering/cluster_cut.py` -- Shu-Yu's `cut_clustering`
+(MD-tools main 306b109; docs: openmm_methods/analysis/torsional-clustering/torsion-partitioning) -- on
+the same prepared inputs, water and every complex, MD-tools' defaults, every frame. Figures:
+`<c>_<system>_clusters_cut.png` (same layout and t-numbering as the symmetry-first figures; clusters
+>= 1 % drawn, the rest summed in the title; each cluster in the labelling nearest its own central frame),
+plus MD-tools' `_cut_split_tree.png` and `_cut_free_energy.png`, and `_cut_groups.csv`. It appends a
+section to the folder's README (rerun it after `report.sbatch`, which rewrites the README).
+Environment: `analysis-env-cut` (a clone of `analysis-env-main` with md-tools from the `MD-tools-cut`
+worktree at 306b109), so `analysis-env-main` and the symmetry-first results stay on c30c1c0.

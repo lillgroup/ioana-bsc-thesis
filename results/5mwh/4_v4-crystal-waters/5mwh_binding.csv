@@ -1,0 +1,2 @@
+run,ligand,ns,pocket_residues,native_pairs,com_crystal,frac_unbound,max_closest_contact,rmsd_mean,rmsd_last10pct,com_mean,com_last10pct,contacts_mean,contacts_last10pct,Q_mean,Q_last10pct,verdict
+REST2-complex-xtalwater/5mwh,UWX,40.0,16,58,3.62,0.0,3.46,2.99,3.28,3.54,3.58,49.16,49.38,0.59,0.6,"bound, rearranged"

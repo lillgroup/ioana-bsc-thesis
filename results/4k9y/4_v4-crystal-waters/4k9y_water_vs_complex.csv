@@ -1,0 +1,7 @@
+torsion,atoms,complex,complex_peak_deg,complex_mass_at_peak,water_mass_at_complex_peak,crystal_deg,complex_mass_at_crystal,water_mass_at_crystal
+t0,C12-C13-N7-C2,4K9Y complex,142.5,0.71,0.219,"117.9, -54.3",0.523,0.127
+t1,C22-C21-N15-C16,4K9Y complex,-152.5,1.0,0.235,"-138.7, 40.6",0.974,0.239
+t2,C29-N28-C16-N15,4K9Y complex,-167.5,0.998,0.489,-156.4,0.962,0.379
+t3,C29-N31-C10-C9,4K9Y complex,157.5,0.706,0.274,"168.7, -19.9",0.67,0.326
+t4,O30-C29-N28-C16,4K9Y complex,17.5,0.978,0.26,1.9,0.866,0.3
+t5,C10-N31-C29-N28,4K9Y complex,177.5,0.998,0.646,177.5,0.998,0.645

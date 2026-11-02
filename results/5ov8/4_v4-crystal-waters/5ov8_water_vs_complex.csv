@@ -1,0 +1,7 @@
+torsion,atoms,complex,complex_peak_deg,complex_mass_at_peak,water_mass_at_complex_peak,crystal_deg,complex_mass_at_crystal,water_mass_at_crystal
+t0,C1-C2-S3-O4,5OV8 complex,32.5,0.397,0.082,"-106.7, 12.7, 73.3, -167.2",0.367,0.202
+t1,C2-S3-N6-C7,5OV8 complex,-57.5,0.75,0.392,-70.5,0.726,0.357
+t2,S3-N6-C7-C8,5OV8 complex,122.5,0.961,0.42,148.0,0.75,0.215
+t3,C7-C8-N9-C10,5OV8 complex,-97.5,0.358,0.162,"76.1, -108.2",0.33,0.177
+t4,C0-C28-C29-C30,5OV8 complex,87.5,0.497,0.434,"-62.7, 117.2",0.321,0.289
+t5,C28-C29-C30-C31,5OV8 complex,172.5,0.464,0.44,"-95.9, 145.2",0.308,0.289

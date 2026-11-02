@@ -1,0 +1,5 @@
+curve,frames,median_A,frac_below_1A,frac_below_1.5A
+in water vs 4LRH crystal,50000,2.126,0.004,0.070
+4LRH complex vs 4LRH crystal,25000,0.625,0.897,0.971
+in water vs 3QL3 crystal,50000,2.541,0.001,0.042
+3QL3 complex vs 3QL3 crystal,25000,1.065,0.449,0.573

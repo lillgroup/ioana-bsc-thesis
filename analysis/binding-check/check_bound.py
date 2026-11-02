@@ -27,6 +27,9 @@ Writes binding_folate.png, binding_small_molecules.png (one row per run) and bin
 (whole run and last 10 %, plus the closest contact for a dissociation check).
 Needs numpy, scipy, matplotlib (bsc-thesis/venv).
   python check_bound.py [--thesis DIR] [--out DIR] [--stride N]
+One compound's complexes in one figure (used by ../report/report.sbatch):
+  python check_bound.py --runs REST2-complex-xtalwater/FOL-4LRH REST2-complex-xtalwater/FOL-3QL3-3H \
+      --name folic-acid --title "..." --out DIR       -> binding_folic-acid.png / .csv
 """
 import argparse
 import csv
@@ -58,7 +61,7 @@ MASS = {"C": 12.011, "N": 14.007, "O": 15.999, "S": 32.06, "P": 30.974, "F": 18.
         "BR": 79.904, "I": 126.90, "H": 1.008}
 LABELS = {"FOL-REST2-v4": "v4 (Sage)", "FOL-REST2-mace": "MACE bespoke", "FOL-complex-REST2": "original",
           "REST2-conformers-v4": "v4", "REST2-conformers-complex": "original",
-          "REST2-complex-xtalwater": "v4 + crystal waters"}
+          "REST2-complex-xtalwater": "v4 + crystal waters", "REST2-rotbonds": "v4 + crystal waters"}
 
 
 def read_pdb(path):
@@ -193,10 +196,16 @@ def main():
     ap.add_argument("--thesis", default=f"{HOME}/thesis-sbrinz-data/thesis")
     ap.add_argument("--out", default=os.path.dirname(os.path.abspath(__file__)))
     ap.add_argument("--stride", type=int, default=10, help="analyse every N-th saved frame")
+    ap.add_argument("--runs", nargs="+", default=None,
+                    help="only these runs (<dataset>/<system>, relative to --thesis), in ONE figure; needs --name")
+    ap.add_argument("--name", default=None, help="with --runs: writes binding_<name>.png and binding_<name>.csv")
+    ap.add_argument("--title", default=None, help="with --runs: figure title")
     args = ap.parse_args()
+    if bool(args.runs) != bool(args.name):
+        ap.error("--runs and --name go together")
 
     results = []
-    for run in RUNS:
+    for run in (args.runs or RUNS):
         d = f"{args.thesis}/{run}"
         if not os.path.exists(f"{d}/REST2-run1/solute_state0_prod1.nc"):
             print(f"skip {run}: no trajectory")
@@ -219,6 +228,14 @@ def main():
               f"(crystal {row['com_crystal']:5.2f})  contacts {row['contacts_last10pct']:5.1f}  "
               f"Q {row['Q_last10pct']:.2f}  -> {row['verdict']}")
 
+    if args.runs:
+        with open(f"{args.out}/binding_{args.name}.csv", "w", newline="") as fh:
+            w = csv.DictWriter(fh, fieldnames=list(results[0][0]))
+            w.writeheader()
+            w.writerows(r[0] for r in results)
+        plot_group(results, args.title or args.name, f"{args.out}/binding_{args.name}.png")
+        print(f"wrote {args.out}/binding_{args.name}.png and .csv")
+        return
     with open(f"{args.out}/binding_summary.csv", "w", newline="") as fh:
         w = csv.DictWriter(fh, fieldnames=list(results[0][0]))
         w.writeheader()

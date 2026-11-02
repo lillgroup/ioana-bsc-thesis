@@ -53,6 +53,7 @@ Two pinned commits are used:
 |---|---|---|---|
 | **simulation** (build-top, scaler, build-md, REST2 runs) | `b3603e0` (2026-10-13) | branch `feature/ligand-protonation-and-ligand-amides`; now also in `main` | `openmm-env-protonation` |
 | **analysis** (symmetry-first `t_hdbscan`, `align_all`, `predict`; 0.6.5.1 folding, crystal assignment, symmetric RMSD; 0.6.5.2 gauge) | `c30c1c0` (0.6.5.2, 2026-10-26; was `69c262b`) | `main` | `analysis-env-main` |
+| **torsion partitioning** (`cut_clustering`, barrier cuts; `analysis/shuyu_clustering/cluster_cut.py`) | `306b109` (main, 2026-11-02) | `main`, worktree `MD-tools-cut` | `analysis-env-cut` (clone of `analysis-env-main` + this md-tools) |
 
 **Keep the environment names exactly as written.** Every sbatch script activates them by name.
 

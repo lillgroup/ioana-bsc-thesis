@@ -1,0 +1,2 @@
+run,ligand,ns,pocket_residues,native_pairs,com_crystal,frac_unbound,max_closest_contact,rmsd_mean,rmsd_last10pct,com_mean,com_last10pct,contacts_mean,contacts_last10pct,Q_mean,Q_last10pct,verdict
+REST2-rotbonds/6r8o-complex,JV2,40.0,23,85,3.25,0.0,3.06,0.64,0.64,3.36,3.35,81.64,80.52,0.9,0.9,"bound, crystal pose"

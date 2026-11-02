@@ -1,0 +1,2 @@
+run,ligand,ns,pocket_residues,native_pairs,com_crystal,frac_unbound,max_closest_contact,rmsd_mean,rmsd_last10pct,com_mean,com_last10pct,contacts_mean,contacts_last10pct,Q_mean,Q_last10pct,verdict
+REST2-complex-xtalwater/4ibi,1D8,40.0,17,61,3.4,0.0,3.25,1.02,1.04,3.61,3.59,61.92,60.9,0.77,0.76,"bound, crystal pose"

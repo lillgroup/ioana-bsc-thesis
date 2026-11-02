@@ -1,0 +1,3 @@
+cluster_id,original_clusters,torsions_0_avg,torsions_0_std,torsions_1_avg,torsions_1_std,torsions_2_avg,torsions_2_std,torsions_3_avg,torsions_3_std,torsions_4_avg,torsions_4_std,torsions_rigid_5_avg,torsions_rigid_5_std,n_samples,mass
+A,0,87.105,34.563,1.78,109.496,4.925,129.934,-179.332,22.881,79.573,14.017,-179.892,12.279,4044,0.674
+B,1,85.302,34.383,17.363,120.758,2.927,176.932,178.49,21.14,-80.662,14.948,179.993,12.35,1828,0.305

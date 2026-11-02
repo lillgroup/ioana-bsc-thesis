@@ -1,0 +1,2 @@
+run,ligand,ns,pocket_residues,native_pairs,com_crystal,frac_unbound,max_closest_contact,rmsd_mean,rmsd_last10pct,com_mean,com_last10pct,contacts_mean,contacts_last10pct,Q_mean,Q_last10pct,verdict
+REST2-rotbonds/4k9y-complex,K9Y,40.0,27,106,1.59,0.0,3.08,0.88,0.88,1.71,1.56,93.34,90.92,0.82,0.82,"bound, crystal pose"

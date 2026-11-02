@@ -1,0 +1,3 @@
+cluster_id,original_clusters,torsions_0_avg,torsions_0_std,torsions_1_avg,torsions_1_std,torsions_2_avg,torsions_2_std,torsions_3_avg,torsions_3_std,torsions_4_avg,torsions_4_std,torsions_5_avg,torsions_5_std,torsions_rigid_6_avg,torsions_rigid_6_std,torsions_rigid_7_avg,torsions_rigid_7_std,torsions_rigid_8_avg,torsions_rigid_8_std,torsions_polarH_9_avg,torsions_polarH_9_std,n_samples,mass
+A,0,-41.715,51.551,-152.308,11.51,163.431,9.682,-75.895,11.295,144.433,13.675,124.743,10.737,-177.551,9.794,-20.803,12.217,-179.245,11.015,40.774,55.529,3534,0.884
+B,1,-39.946,59.251,-154.289,10.812,149.621,10.317,-78.171,12.215,-138.591,12.614,-133.535,8.965,-177.21,9.52,-16.973,12.19,22.442,14.353,57.173,11.814,400,0.1

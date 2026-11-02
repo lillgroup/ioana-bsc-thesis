@@ -1,0 +1,2 @@
+run,ligand,ns,pocket_residues,native_pairs,com_crystal,frac_unbound,max_closest_contact,rmsd_mean,rmsd_last10pct,com_mean,com_last10pct,contacts_mean,contacts_last10pct,Q_mean,Q_last10pct,verdict
+REST2-rotbonds/4p6w-complex,MOF,40.0,27,71,0.68,0.0,3.42,0.66,0.67,0.85,0.95,60.07,57.22,0.74,0.7,"bound, crystal pose"

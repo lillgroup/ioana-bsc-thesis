@@ -1,0 +1,6 @@
+torsion,atoms,complex,complex_peak_deg,complex_mass_at_peak,water_mass_at_complex_peak,crystal_deg,complex_mass_at_crystal,water_mass_at_crystal
+t0,O0-C1-C3-C4,4IBI complex,-7.5,0.471,0.412,"-180.0, 0.6",0.487,0.527
+t1,C6-C7-N8-C9,4IBI complex,-142.5,0.947,0.494,-127.3,0.898,0.388
+t2,C11-C13-C14-O15,4IBI complex,142.5,0.979,0.571,153.7,0.944,0.51
+t3,C13-C14-C16-C17,4IBI complex,-32.5,0.991,0.473,-34.8,0.989,0.464
+t4,N8-C26-C27-C28,4IBI complex,-137.5,0.987,0.645,-121.6,0.952,0.562
