@@ -9,7 +9,7 @@
 #SBATCH --mem=48G
 #SBATCH --array=0-1
 #SBATCH --output=/scicore/home/lill0000/popa0002/thesis/FOL-complex-REST2/logs/%x-%A_%a.out
-# Shu-Yu analysis (bsc-thesis/shuyu_clustering: cluster_prune.py + cluster_convergence.py) of the
+# Shu-Yu analysis (bsc-thesis/analysis/shuyu_clustering: cluster_prune.py + cluster_convergence.py) of the
 # bound-folate REST2 runs, with EXACTLY the settings of the water run (bsc-thesis/results/
 # run_fol_para.sbatch, task 0): state 0, stride 5, --no-single-cluster, 5 ns windows, plateau 3,
 # the water run's torsion files; crystal ref = the complex's own structure only (4LRH A or 3QL3 A).
@@ -24,7 +24,7 @@ SYSTEMS=(4LRH 3QL3)
 SYS=${SYSTEMS[$SLURM_ARRAY_TASK_ID]}
 ROOT=/scicore/home/lill0000/popa0002/thesis/FOL-complex-REST2/$SYS
 WATER=/scicore/home/lill0000/popa0002/thesis/FOLn-REST2-50ns
-SHUYU=/scicore/home/lill0000/popa0002/thesis/bsc-thesis/shuyu_clustering
+SHUYU=/scicore/home/lill0000/popa0002/thesis/bsc-thesis/analysis/shuyu_clustering
 CRYSTAL=/scicore/home/lill0000/popa0002/thesis/bsc-thesis/crystal
 OUT=$ROOT/analysis-shuyu
 NAME="folic-acid-$SYS-complex"

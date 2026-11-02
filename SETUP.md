@@ -7,13 +7,13 @@ What this repo holds and what it does not:
 
 | in git | not in git (stays on sbrinz or the user's laptop) |
 |---|---|
-| analysis scripts (`shuyu_clustering/`, `ioana_clustering/`, `replicates/`, `results/*.sbatch`) | trajectories (`*.nc`, ~TB) |
+| analysis code (`analysis/`: `shuyu_clustering/`, `binding-check/`, `run_*.sbatch`) | trajectories (`*.nc`, ~TB) |
 | every run's inputs: configs, parameter packages, prepared complexes, sbatch scripts (`runs/`) | built systems (`built.xml/pdb`, rebuildable from `runs/`) |
-| final figures (`results/`) | per-run analysis outputs (CSV, representatives) |
+| results (`results/<compound>/<version>/`) | per-run analysis outputs (CSV, representatives) |
 | exact environment specs (`envs/`) | the conda environments themselves |
 | crystal ligands (`crystal/`), project notes (`docs/notes/`) | |
 
-The results in `results/` are final. Do not rerun anything just to "have it" on the new machine.
+The results in `results/` are final (layout: `README.md`). Do not rerun anything just to "have it" on the new machine.
 Rerun only what the user asks for (new replicates, extensions, new molecules).
 
 ---
@@ -86,7 +86,7 @@ micromamba create -y -n openmm-env-protonation -f $SOFT/MD-tools-protonation/env
 micromamba activate openmm-env-protonation
 pip install --no-deps -e $SOFT/MD-tools-protonation
 
-# analysis env: the same stack + md-tools main with the analysis extra (+ networkx for ioana_clustering)
+# analysis env: the same stack + md-tools main with the analysis extra (+ networkx)
 micromamba create -y -n analysis-env-main -f $SOFT/MD-tools-main/environment.yml
 micromamba activate analysis-env-main
 micromamba install -y -c conda-forge scikit-learn networkx matplotlib
@@ -222,18 +222,18 @@ Each run folder in `runs/` is one dataset. The generic chain, using `md-openmm` 
    (min, eq_1..3, production).
 5. **Run.** `sbatch scripts/rest2.sbatch <run>` (GPU, MPS); check with `scripts/check_run.py`.
 6. **Analyse** in `analysis-env-main`:
-   - **Clustering:** `results/run_symfirst.sbatch` and `results/run_small_symfirst.sbatch` call
-     `shuyu_clustering/cluster_prune.py` and `cluster_convergence.py`.
+   - **Clustering:** `analysis/run_symfirst.sbatch` and `analysis/run_small_symfirst.sbatch` call
+     `analysis/shuyu_clustering/cluster_prune.py` and `cluster_convergence.py`.
    - **Inputs:** state 0 only, using `solute_state0_prod1.nc` + `build/built.solute.pdb`. Do not use
      the whole-system trajectory, which has 50× fewer frames.
-   - **Torsions:** `shuyu_clustering/select_torsions.py` writes torsions.txt / torsions_rigid.txt /
+   - **Torsions:** `analysis/shuyu_clustering/select_torsions.py` writes torsions.txt / torsions_rigid.txt /
      torsions_polarH.txt.
    - **Two settings, both reported.** `--no-single-cluster` gives the `*-nosingle` figures (the ones
      to use). `allow_single_cluster=True` is Shu-Yu's default; for folate it collapses to 1 cluster.
    - **Frame cap:** ≤ 10000 frames for the dense matrix. Folate water uses stride 5.
    - **Crystal comparisons:** `FOL-REST2-*/scripts/rmsd_vs_crystal.py`, the water-vs-bound scripts,
      and crystal ligands from `crystal/`.
-7. **Run the replicates** (`replicates/`, see its README): pick_starts → build → rest2 → compare.
+7. **Run the replicates** (`runs/REST2-replicates/`, see its README): pick_starts → build → rest2 → compare.
 
 Run-specific twists:
 - **FOL-REST2-mace.** Shu-Yu's bespoke MACE-OMOL System XML (`folic_acid_mace_omol/`) is spliced
@@ -268,7 +268,7 @@ Run-specific twists:
 | **REST2-complex-xtalwater** (sciCORE) | the 7 complexes again, crystal waters kept; FOL-3QL3-3H | b3603e0 | 40 / 50 ns | as before | see its README |
 | **REST2-rotbonds** (sciCORE) | 15 new PDBbind ligands, 4/5/6/7 rotatable bonds, water / complex (crystal waters) | b3603e0 | 60 / 40 ns | 6, 0.4 | set up 2026-11-01, `runs/REST2-rotbonds/README.md` |
 
-Headline results are in `results/symfirst-2026-10-15/README.txt` and `replicates/README.md`.
+Headline results are in `results/` (one folder per compound and version, see `results/README.md`).
 Open items as of 2026-10-21:
 - Paracetamol replicates disagree (A 46 % vs 57 %), probably because 10 ns is too short. Extending
   both to 50 ns was offered but not started.

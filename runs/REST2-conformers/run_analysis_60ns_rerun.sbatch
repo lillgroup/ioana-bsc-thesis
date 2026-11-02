@@ -10,7 +10,7 @@
 #SBATCH --array=0-4
 #SBATCH --output=/scicore/home/lill0000/popa0002/thesis/REST2-conformers/slurm-%x-%A_%a.out
 # Re-run of the Shu-Yu analysis on 0-60 ns state 0 for all five compounds with the CURRENT
-# bsc-thesis/shuyu_clustering scripts (the old run_analysis_60ns.sbatch and
+# bsc-thesis/analysis/shuyu_clustering scripts (the old run_analysis_60ns.sbatch and
 # 4ibi/analysis-0-60ns/run_analysis.sbatch point at bsc-thesis/shuyu/, since renamed).
 # Arguments are identical to those two scripts; only the script path differs.
 set -euo pipefail
@@ -26,7 +26,7 @@ eval "$(/scicore/home/lill0000/popa0002/software/md-stack/bin/micromamba shell h
 micromamba activate analysis-env
 export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK:-8}
 
-SHUYU=/scicore/home/lill0000/popa0002/thesis/bsc-thesis/shuyu_clustering
+SHUYU=/scicore/home/lill0000/popa0002/thesis/bsc-thesis/analysis/shuyu_clustering
 CRYSTAL=/scicore/home/lill0000/popa0002/thesis/bsc-thesis/crystal
 cd "/scicore/home/lill0000/popa0002/thesis/REST2-conformers/$NAME/analysis-0-60ns"
 

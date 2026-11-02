@@ -11,7 +11,7 @@ New runs (computed here): REST2-complex-xtalwater/FOL-4LRH and FOL-3QL3, folate 
 state-0 solute trajectory. They use the unchanged v4 folate package, so the atom order is the one of
 the earlier v4 runs (checked on the elements against packages/FOL/FOL.sdf).
 Folic acid in water (read, not recomputed; the trajectory is not on sciCORE): the per-frame values in
-results/symfirst-2026-10-15/1_v4-new-rest2/folic-acid-v4_rmsd_vs_crystal.csv (v4 water vs both
+results/folic-acid/2_v4/folic-acid-v4_rmsd_vs_crystal.csv (v4 water vs both
 crystals). The complexes without crystal waters in that file are no longer plotted.
 
   python -I rmsd_vs_crystal.py [--thesis DIR] [--repo DIR] --out <prefix>
@@ -31,7 +31,7 @@ import numpy as np
 from rdkit import Chem
 
 SCICORE = "/scicore/home/lill0000/popa0002/thesis"
-OLD_CSV = "results/symfirst-2026-10-15/1_v4-new-rest2/folic-acid-v4_rmsd_vs_crystal.csv"
+OLD_CSV = "results/folic-acid/2_v4/folic-acid-v4_rmsd_vs_crystal.csv"
 NEW = {"4LRH": "4LRH complex, crystal waters", "3QL3": "3QL3 complex, crystal waters"}
 # (run label, crystal, colour, line style, legend); 4LRH red family, 3QL3 blue family
 CURVES = [

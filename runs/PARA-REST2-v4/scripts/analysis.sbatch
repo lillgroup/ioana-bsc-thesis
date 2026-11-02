@@ -23,7 +23,7 @@ cr = json.load(open("REST2-run1/remd_records/restart_prod1.json"))["completion_r
 for p in cr["by_neighbouring_pair"]:
     print(f"acceptance {p['state_pair']} tau {p['tau_pair']}: {p['acceptance']:.3f}")
 PY
-SHUYU=/scicore/home/lill0000/popa0002/thesis/bsc-thesis/shuyu_clustering
+SHUYU=/scicore/home/lill0000/popa0002/thesis/bsc-thesis/analysis/shuyu_clustering
 COMMON=(--traj REST2-run1/solute_state0_prod1.nc --top build/built.solute.pdb --sdf build/TYL.sdf
         --stride 1 --no-single-cluster --name paracetamol-v4 --rest2-config REST2.config)
 cp -p build/parameter/TYL.sdf build/TYL.sdf

@@ -1,3 +1,7 @@
+> Paths in these notes predate the repository reorganisation of 2026-11-02 (results per compound
+> and version in `results/`, analysis code in `analysis/`, ligand selection in `ligand-selection/`,
+> Ioana's clustering and the FOL run removed); see `README.md` for the current layout.
+
 - [MD-tools / OpenMM env](md-tools-openmm-env.md) — scratch paths, activation, and the CUDA 13.0 pin
 - [Folic acid REST2 workflow](fol-rest2-workflow.md) — dataset layout, the solute traj/top pairing, and why the clustering thresholds mislead
 - [Bound folic-acid conformations vs clusters](fol-bound-confs-clusters.md) — 4LRH/3QL3 land nearest to noise, not in any cluster; the crystal→topology mapping method

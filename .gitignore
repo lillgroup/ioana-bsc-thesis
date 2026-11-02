@@ -3,3 +3,20 @@ venv/
 .venv/
 __pycache__/
 *.pyc
+
+# simulation outputs never go into git (they stay in $THESIS/<dataset>/ on the cluster)
+*.nc
+*.dcd
+*.xtc
+*.checkpoints/
+checkpoints/
+remd_records/
+rem.log
+REST2-run*/
+REST2-test/
+built.xml
+built.pdb
+built.solute.pdb
+system_state*.xml
+slurm-*.out
+results/_incoming/

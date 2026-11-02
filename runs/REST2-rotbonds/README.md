@@ -14,9 +14,9 @@ small-molecule v4 protocol. Together with the earlier five (4j7d, 4ibi, 4ibk: 5;
 `compounds.csv`: per compound the PDB entry, deposited ligand code, chain, package residue name
 (X01-X15), protein, residues, resolution, affinity, crystal waters and why it was chosen.
 
-## Selection (`selection/`)
+## Selection (`../../ligand-selection/rotbonds/`)
 
-The original criteria (`../../filter.py`): MW ~500 (450-550), neutral, <= 40 heavy atoms, smallest
+The original criteria (`../../ligand-selection/filter.py`): MW ~500 (450-550), neutral, <= 40 heavy atoms, smallest
 proteins first. Changes, decided 2026-11-01:
 - **Rotatable bonds on heavy atoms** (RDKit on the heavy-atom graph, the usual definition).
   `filter.py` counted on the SDF with explicit H, which also counts OH/NH rotors; with that count
@@ -29,8 +29,8 @@ proteins first. Changes, decided 2026-11-01:
   This replaced 4nh7 -> 6cjr, 4p5z -> 4k9y, 6fni -> 5ufr, 5fck -> 4ase; 4tpw -> 4erf because eIF4E
   also binds an m7GTP cap analogue that would need its own parameters.
 
-`selection/scan_refined_set.py` (properties of all refined-set ligands ->
-`refined_set_properties.csv`), `selection/screen_candidates.py` (filter + structure screen of each
+`ligand-selection/rotbonds/scan_refined_set.py` (properties of all refined-set ligands ->
+`refined_set_properties.csv`), `ligand-selection/rotbonds/screen_candidates.py` (filter + structure screen of each
 4-7-bond candidate: ligand chain, gaps, hetero groups, packing contacts -> `candidates_screened.csv`).
 The refined set itself is local only (not in git).
 
@@ -87,7 +87,7 @@ exchange acceptance and binding report into its log.
   package's torsions differ from the openmmforcefields reference: 6cn5 two proper torsions missing,
   5ufr improper torsions in the other cyclic atom order). Replaced by **1l8g** (4 bonds, PTP1B, X16,
   net -2 after Open Babel) and **6qlp** (5 bonds, galectin-3, X17, neutral; PEG fragment left out,
-  Cl- kept), from `selection/candidates_screened.csv`. Their inputs come from the CCD (no PDBbind
+  Cl- kept), from `ligand-selection/rotbonds/candidates_screened.csv`. Their inputs come from the CCD (no PDBbind
   files on sciCORE; `make_inputs.py` falls back to the CCD) via `scripts/new_inputs_20261101.sbatch`.
   `make_inputs.py` / `make_configs.py` now take compound names, so earlier rows are not rewritten.
 - **1v2k as the pyridinium cation** (user's decision): Open Babel's pH model leaves its

@@ -18,4 +18,4 @@ python -I $B/runs/FOL-REST2-v4/scripts/fragments.py $R/FOL-3QL3-3H/REST2-run1 $R
   2>&1 | grep -iv warning | tee $R/FOL-3QL3-3H/analysis/fragments.txt
 micromamba activate analysis-env-main
 echo "######## binding check"
-python -I $B/results/binding-check/check_bound.py --thesis /scicore/home/lill0000/popa0002/thesis --out $R/analysis/binding-check-3H 2>&1 | grep -v '^skip'
+python -I $B/analysis/binding-check/check_bound.py --thesis /scicore/home/lill0000/popa0002/thesis --out $R/analysis/binding-check-3H 2>&1 | grep -v '^skip'

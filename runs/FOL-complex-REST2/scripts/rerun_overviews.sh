@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Re-run bsc-thesis/shuyu_clustering/cluster_prune.py (new horizontal clusters_overview layout) for
+# Re-run bsc-thesis/analysis/shuyu_clustering/cluster_prune.py (new horizontal clusters_overview layout) for
 # folic acid in water, paracetamol, and the 4LRH / 3QL3 complexes, with the SAME arguments as their
 # previous runs. Run through Slurm:  srun -p scicore --qos=1day -c 8 --mem=32G bash rerun_overviews.sh
 set -uo pipefail
@@ -7,7 +7,7 @@ export MAMBA_ROOT_PREFIX=/scicore/home/lill0000/popa0002/software/md-stack
 eval "$(/scicore/home/lill0000/popa0002/software/md-stack/bin/micromamba shell hook -s bash)"
 micromamba activate analysis-env
 export OMP_NUM_THREADS=8
-SHUYU=/scicore/home/lill0000/popa0002/thesis/bsc-thesis/shuyu_clustering
+SHUYU=/scicore/home/lill0000/popa0002/thesis/bsc-thesis/analysis/shuyu_clustering
 CRYSTAL=/scicore/home/lill0000/popa0002/thesis/bsc-thesis/crystal
 run() {  # run <dir> <out> <args...>
   local dir=$1 out=$2; shift 2
@@ -18,7 +18,7 @@ run() {  # run <dir> <out> <args...>
   if cmp -s "/tmp/groups-before-$(basename "$out").csv" "$out/groups.csv"; then same="groups.csv unchanged"; else same="groups.csv CHANGED"; fi
   echo "$(basename "$dir")/$out rc=$rc  $same"
 }
-# folic acid in water (bsc-thesis/results/run_fol_para.sbatch task 0)
+# folic acid in water (bsc-thesis/analysis/run_fol_para.sbatch task 0)
 run /scicore/home/lill0000/popa0002/thesis/FOLn-REST2-50ns folic-acid-clustering-shuyu-nosingle-ref \
   --traj REST2-run1/solute_state0_prod1.nc --top build/built.solute.pdb --sdf build/FOL.sdf \
   --torsions-file REST2-run1/torsions.txt --torsions-file REST2-run1/torsions_rigid.txt \

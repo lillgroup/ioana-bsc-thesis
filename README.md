@@ -1,27 +1,18 @@
-# bsc-thesis — REST2 ligand-torsion analysis
+# bsc-thesis — REST2 of drug-like ligands in water and bound, with torsion clustering
 
-Two independent analysis protocols live here, each in its own folder. They share the
-same inputs (ligand SDF + simulation topology + a state-0 solute trajectory) but differ
-in torsion selection, clustering algorithm and reporting.
+REST2 simulations (MD-tools / OpenMM) of folate, paracetamol and small drug-like ligands with 4-7
+rotatable bonds, each in water and in its protein, analysed with Shu-Yu's symmetry-first torsion
+clustering (MD-tools `t_hdbscan`).
 
-| | **Ioana's protocol** (`ioana/`) | **Shu-Yu's protocol** (`shuyu/`) |
-|---|---|---|
-| Torsions | symmetry version of `select_torsions.py` → `torsions.txt` + `torsions_symops.txt` | compact `select_torsions.py` → `torsions.txt` / `torsions_rigid.txt` / `torsions_polarH.txt` (`--polar-h`) |
-| Clustering | `cluster.py` — symmetry-aware, `--metric max`, `--drop-free`, assign-to-cores, stability + block-bootstrap error | `cluster_prune.py` — MD-tools `t_hdbscan` + `TorsionSymmetry` pruning + summary |
-| PCA | `dpca.py` (dihedral PCA) | — |
-| Torsion diagnostics | `torsion_analysis.py` | — |
-| Report format | Shu-Yu-compatible files via `group_report.py` **plus** native outputs | `groups.csv`, `merged_groups.json`, `torsion_cv.json`, `representative_<X>.pdb`, `group_*.png`, `group_torsions.png`, `representatives.png`, `torsions_<i>_<j>_2d.png` |
+| folder | contents |
+|---|---|
+| `results/` | **results only**, one folder per compound, one subfolder per simulation version (see `results/README.md`); `results/overview/` for figures that cover several compounds |
+| `analysis/` | **analysis code**: `shuyu_clustering/` (torsion selection, clustering, convergence, bioactive RMSD, water-vs-complex), `binding-check/` (pocket-frame RMSD, COM, contacts, PyMOL export), `run_*.sbatch` / `run_*.sh` drivers |
+| `ligand-selection/` | choosing ligands and conformers by rotatable bonds: `filter.py`, `easy_candidates.csv`, `rotbonds_histogram.png`, `conformer_generation_from_SMILES.py`, `conformers/`; `rotbonds/` = the 4-7-bond PDBbind refined-set scan and structure screen |
+| `runs/` | **simulation inputs only**, one folder per dataset: configs, parameter packages, prepared complexes, build / run scripts (see `runs/README.md`) |
+| `crystal/` | crystal ligand SDFs used as references |
+| `envs/` | exact environment specs and install / test jobs |
+| `docs/notes/` | project notes (the why behind protocol choices) |
 
-**The two `select_torsions.py` are not interchangeable** — Shu-Yu's needs `--polar-h` and
-writes no symmetry file; Ioana's writes `torsions_symops.txt` that `cluster.py`/`dpca.py`
-require. Each folder keeps its own copy.
-
-Shared, protocol-independent early-stage files (ligand candidate filtering and conformer
-generation) sit at the top level: `filter.py`, `conformer_generation_from_SMILES.py`,
-`conformers/`, `easy_candidates.csv`, `rotbonds_histogram.png`.
-
-**Moving to a new machine: see `SETUP.md`** (software, paths, Slurm, workflow). Run inputs are in
-`runs/`, environment specs in `envs/`, project notes in `docs/notes/`, results in `results/`.
-
-See the per-folder READMEs for the exact commands and required environment
-(`source folenv.sh` then `micromamba activate analysis-env`).
+No simulation outputs in git (trajectories, checkpoints, built systems, run logs): they stay in the
+run folders on the cluster (`$THESIS/<dataset>/`). Moving to a new machine: `SETUP.md`.

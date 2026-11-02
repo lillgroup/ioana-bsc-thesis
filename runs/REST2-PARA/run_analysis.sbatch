@@ -8,9 +8,9 @@
 #SBATCH --mem=16G
 #SBATCH --time=02:00:00
 #SBATCH --output=/scicore/home/lill0000/popa0002/thesis/REST2-PARA/logs/%x-%j.out
-# Shu-Yu analysis of the full paracetamol run, same settings as bsc-thesis/results/run_fol_para.sbatch
+# Shu-Yu analysis of the full paracetamol run, same settings as bsc-thesis/analysis/run_fol_para.sbatch
 # task 1 (no --torsions-file: the script's default omega/aryl/phenol set; stride 1; 0.5 ns windows;
-# no crystal reference), with the current bsc-thesis/shuyu_clustering scripts.
+# no crystal reference), with the current bsc-thesis/analysis/shuyu_clustering scripts.
 set -euo pipefail
 cd /scicore/home/lill0000/popa0002/thesis/REST2-PARA
 grep -q '^run_status: completed' REST2-run1/remd_records/REST2_prod1.out || { echo "run not completed"; exit 1; }
@@ -18,7 +18,7 @@ export MAMBA_ROOT_PREFIX=/scicore/home/lill0000/popa0002/software/md-stack
 eval "$(/scicore/home/lill0000/popa0002/software/md-stack/bin/micromamba shell hook -s bash)"
 micromamba activate analysis-env
 export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK:-8}
-SHUYU=/scicore/home/lill0000/popa0002/thesis/bsc-thesis/shuyu_clustering
+SHUYU=/scicore/home/lill0000/popa0002/thesis/bsc-thesis/analysis/shuyu_clustering
 COMMON=(--traj REST2-run1/solute_state0_prod1.nc --top build/built.solute.pdb --sdf build/TYL.sdf
         --stride 1 --no-single-cluster --name paracetamol --rest2-config REST2.config)
 echo "== cluster_prune.py  $(date)"

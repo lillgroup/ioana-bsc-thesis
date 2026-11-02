@@ -19,7 +19,7 @@
 # the water files on a folate-only trajectory (same atom order, asserted).
 set -uo pipefail
 ROOT=/scicore/home/lill0000/popa0002/thesis/FOL-REST2-mace
-SHUYU=/scicore/home/lill0000/popa0002/thesis/bsc-thesis/shuyu_clustering
+SHUYU=/scicore/home/lill0000/popa0002/thesis/bsc-thesis/analysis/shuyu_clustering
 CRYSTAL=/scicore/home/lill0000/popa0002/thesis/bsc-thesis/crystal
 export MAMBA_ROOT_PREFIX=/scicore/home/lill0000/popa0002/software/md-stack
 eval "$(/scicore/home/lill0000/popa0002/software/md-stack/bin/micromamba shell hook -s bash)"

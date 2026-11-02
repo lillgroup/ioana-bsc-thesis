@@ -4,7 +4,7 @@ REST2 (MD-tools/OpenMM) of folate, paracetamol and 5 small ligands in water and 
 torsion clustering. Moved from the sbrinz cluster on 2026-10-21.
 
 - Read `SETUP.md` first (software, paths, Slurm, workflow, dataset index), then `runs/README.md`,
-  `replicates/README.md` and `docs/notes/` (project memory from the previous sessions: the why
+  `runs/REST2-replicates/README.md` and `docs/notes/` (project memory from the previous sessions: the why
   behind the protocol choices).
 - **Every compute job via the scheduler (sbatch/srun). Never on the login node** — no nohup, `&`,
   setsid. Quick inspection commands are fine.
@@ -13,4 +13,7 @@ torsion clustering. Moved from the sbrinz cluster on 2026-10-21.
 - Reuse the committed ligand packages; never re-parameterise. Never edit MD-tools source.
 - Now on sciCORE (since 2026-10-22): paths and Slurm headers are ported; see SETUP.md §0.
 - Ask before deleting run data or overwriting results; don't touch `REST2-conformers/extend_all.sh`.
+- Layout (2026-11-02, `README.md`): results only in `results/<compound>/<version>/` (versions in
+  `results/README.md`), analysis code in `analysis/`, ligand selection in `ligand-selection/`, run
+  inputs in `runs/`. No simulation outputs in git.
 - Commits end with the Co-Authored-By line; push to github.com:ioapopa04/bsc-thesis.
