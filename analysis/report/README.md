@@ -55,3 +55,13 @@ of water + complex frames (equal numbers from each) per (ligand, complex), for b
 own environment -> `results/overview/kl-divergence/` (`kl_divergence_{cut,hdbscan}.png`, `kl_{cut,hdbscan}.csv`).
 Next to KL: S_w (KL of selecting a typical water conformer) and the fraction of the bound ensemble in
 clusters with no water frame (induced fit). Pseudocount 0.5 frames per cluster; block-SE error bars.
+
+## KL divergence, Shu-Yu's protocol: clusters of one ensemble, frames of the other assigned
+
+`kl_cross.py` (`bash kl_cross_submit.sh`: one 30-min task per compound and method, then the figures):
+water clusters + complex frames assigned -> KL(pi^p || pi^w) (y); complex clusters + water frames
+assigned -> KL(pi^w || pi^p) (x) -> `results/overview/kl-divergence/kl_cross_{cut,hdbscan}.{png,csv}`.
+Barrier cuts: a frame is walked down the reference's cut tree (MD-tools has no assignment for this
+method). HDBSCAN: THDBSCAN.predict; its unassigned fraction is in the CSV (very large for water frames
+on complex clusters, so the HDBSCAN x values rest on few frames). This replaces the pooled version
+above (`kl_divergence.py`, one clustering of water + complex together).
