@@ -34,7 +34,8 @@ from rdkit.Chem import rdMolDescriptors
 
 WORK = "/scicore/home/lill0000/popa0002/thesis/analysis-report"
 REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-DEFAULT = ["paracetamol", "4j7d", "4ibi", "4ibk", "5mwh", "5ov8", "folic-acid"]
+import csv as _csv
+DEFAULT = [r["name"] for r in _csv.DictReader(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "compounds.csv")))]
 METHODS = {"hdbscan": ("clustering", "symmetry-first HDBSCAN (no single cluster)"),
            "cut": ("cut", "torsion partitioning (barrier cuts)")}
 
@@ -127,16 +128,17 @@ def main():
     with pd.option_context("display.width", 200):
         print(df.drop(columns="algorithm").to_string(index=False))
 
-    colours = dict(zip(args.compounds, plt.get_cmap("tab10").colors))
+    palette = list(plt.get_cmap("tab20").colors[::2]) + list(plt.get_cmap("tab20").colors[1::2]) + list(plt.get_cmap("Dark2").colors)
+    colours = dict(zip(args.compounds, palette))
     markers = ["s", "D", "^", "v"]
     for method, (_, title) in METHODS.items():
         sub = df[df.method == method]
-        fig, ax = plt.subplots(figsize=(11.5, 6.2), layout="constrained")
+        fig, ax = plt.subplots(figsize=(13.5, 6.8), layout="constrained")
         per_rb = {}
         for name in args.compounds:                       # spread ligands that share a bond count
             rb = int(sub[sub.ligand == name].rot_bonds.iloc[0])
             per_rb.setdefault(rb, []).append(name)
-        offset = {n: (i - (len(v) - 1) / 2) * 0.18 for v in per_rb.values() for i, n in enumerate(v)}
+        offset = {n: (i - (len(v) - 1) / 2) * min(0.18, 0.8 / max(len(v), 1)) for v in per_rb.values() for i, n in enumerate(v)}
         for name in args.compounds:
             g = sub[sub.ligand == name]
             col = colours[name]
@@ -166,7 +168,8 @@ def main():
                                 label="complex, no cluster found: one basin, e^S = 1"))
         leg1 = ax.legend(handles=h, loc="upper left", fontsize=8.5)
         ax.add_artist(leg1)
-        ax.legend(loc="center left", bbox_to_anchor=(1.01, 0.5), fontsize=8.5, title="ligand")
+        ax.legend(loc="center left", bbox_to_anchor=(1.01, 0.5), fontsize=8, title="ligand",
+                  ncol=1 if len(args.compounds) <= 12 else 2)
         extra = ("populations over the assigned frames (noise and ambiguous frames left out)"
                  if method == "hdbscan" else "every frame labelled")
         ax.set_title(f"Conformational entropy $S_c = -\\sum_c \\pi_c \\ln \\pi_c$ from cluster populations\n"

@@ -1,0 +1,2 @@
+method,ligand,complex,KL_p_w_waterdef,KL_p_w_se,n_water_clusters,complex_unassigned_on_water_clusters,top_complex_share_on_water_clusters,water_share_of_that_cluster,KL_w_p_complexdef,KL_w_p_se,n_complex_clusters,water_unassigned_on_complex_clusters,note,md_tools,settings
+cut,6qlp,6QLP,3.0683,0.0312,349,0.0,0.1532,0.0017,1.7862,0.0143,8,0.0,,0.6.5.2,"{""gauge"": null, ""kT_cut"": 1.0, ""kT_step"": 0.5, ""mass_floor"": 0.001, ""min_p2p"": 1.0471975511965976, ""n_bins"": 72, ""z_min"": 0.5}"

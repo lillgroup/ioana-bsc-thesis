@@ -45,7 +45,9 @@ sys.path.insert(0, os.path.join(os.path.dirname(HERE), "shuyu_clustering"))
 WORK = "/scicore/home/lill0000/popa0002/thesis/analysis-report"
 REPO = os.path.dirname(os.path.dirname(HERE))
 OUT = os.path.join(REPO, "results", "overview", "kl-divergence")
-DEFAULT = ["4j7d", "4ibi", "4ibk", "5mwh", "5ov8", "folic-acid"]       # paracetamol has no complex
+import csv as _csv
+DEFAULT = [r["name"] for r in _csv.DictReader(open(os.path.join(HERE, "compounds.csv")))
+           if r["complexes"]]                                          # paracetamol has no complex
 KINDS = ("torsions", "torsions_rigid", "torsions_polarH")
 
 
@@ -231,8 +233,9 @@ def plot(args):
             sys.exit(f"{method}: settings differ between compounds: {set(df.settings)}")
         df.drop(columns="settings").to_csv(f"{args.out}/kl_cross_{method}.csv", index=False)
         ligands = list(dict.fromkeys(df.ligand))
-        colours = dict(zip(ligands, plt.get_cmap("tab10").colors))
-        fig, ax = plt.subplots(figsize=(8.8, 7.2), layout="constrained")
+        palette = list(plt.get_cmap("tab20").colors[::2]) + list(plt.get_cmap("tab20").colors[1::2]) + list(plt.get_cmap("Dark2").colors)
+        colours = dict(zip(ligands, palette))
+        fig, ax = plt.subplots(figsize=(10.5, 8.5), layout="constrained")
         top = np.nanmax(np.r_[df.KL_p_w_waterdef + df.KL_p_w_se, (df.KL_w_p_complexdef + df.KL_w_p_se).dropna()]) * 1.12
         ax.plot([0, top], [0, top], color="0.6", ls="--", lw=1, label="KL(w||p) = KL(p||w)")
         missing = []
