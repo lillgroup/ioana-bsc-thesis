@@ -19,3 +19,14 @@ Torsions t0..t7 (the same in every figure; rotatable, then rigid, then polar-H; 
 - t7: `11 18 30 51`  #X171-C12 X171-C19 X171-O4 X171-H20 | polar-H O-H
 
 Figures: `*_water_clusters.png` / `*_<PDB>_clusters.png` (symmetry-first clustering, no single cluster), `*_rmsd_density.png` (ligand conformation vs crystal, water vs complex), `*_binding.png` (complex: pocket-frame RMSD, ligand-pocket COM, contacts, native Q), `*_water_vs_complex.png` (torsion distributions).
+
+## Torsion partitioning (barrier cuts)
+
+`*_clusters_cut.png` (+ `_cut_split_tree.png`, `_cut_free_energy.png`, `_cut_groups.csv`): Shu-Yu's
+`cut_clustering` (MD-tools main 306b109), `analysis/report/report_cut.sbatch` (Slurm job 29468038, 2026-11-03);
+MD-tools defaults (kT_cut 1, mass_floor 0.001, min_p2p pi/3), every frame, same torsions t0.. as above.
+
+| system | clusters | masses (%) |
+|---|---|---|
+| water | 349 clusters | 3.6, 3.58, 2.57, 2.42, 2.35, 1.61, 1.54, 1.39, 1.37, 1.36 ... (+339 more, 78.3 % together) |
+| 6QLP | 8 clusters | 49.64, 32.28, 17.27, 0.19, 0.19, 0.18, 0.14, 0.11 |

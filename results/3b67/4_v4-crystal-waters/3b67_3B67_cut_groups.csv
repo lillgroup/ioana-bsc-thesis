@@ -1,0 +1,3 @@
+cluster,frames,mass,central_frame,t0_mean_deg,t0_std_deg,t1_mean_deg,t1_std_deg,t2_mean_deg,t2_std_deg,t3_mean_deg,t3_std_deg,t4_mean_deg,t4_std_deg,t5_mean_deg,t5_std_deg,t6_mean_deg,t6_std_deg,t7_mean_deg,t7_std_deg
+A,15547,0.77735,10196,60.1,18.3,1.7,16.8,-19.2,12.3,-59.0,9.2,147.7,18.4,-119.1,16.1,3.0,12.6,-178.0,13.6
+B,4453,0.22265,6612,-59.2,16.6,-1.6,16.9,-19.8,12.3,-60.1,9.8,154.8,21.3,-111.7,18.0,1.3,12.5,177.7,13.9
