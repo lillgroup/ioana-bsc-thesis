@@ -1,0 +1,2 @@
+run,ligand,ns,pocket_residues,native_pairs,com_crystal,frac_unbound,max_closest_contact,rmsd_mean,rmsd_last10pct,com_mean,com_last10pct,contacts_mean,contacts_last10pct,Q_mean,Q_last10pct,verdict
+REST2-rotbonds/1rd4-complex,L08,40.0,22,83,2.3,0.0,3.48,1.94,1.98,2.63,2.56,61.36,65.67,0.54,0.57,"bound, rearranged"

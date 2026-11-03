@@ -1,0 +1,20 @@
+# 6fo5 -- 4_v4-crystal-waters
+
+Made by `analysis/report/report.sbatch` (Slurm job 29365390, 2026-11-02, md-tools 0.6.5.2); state 0, stride 5.
+
+| system | run | crystal reference |
+|---|---|---|
+| water | `REST2-rotbonds/6fo5-water` (REST2-run1) | `6fo5.input.sdf` |
+| 6FO5 complex | `REST2-rotbonds/6fo5-complex` | `6fo5.input.sdf` |
+
+Torsions t0..t6 (the same in every figure; rotatable, then rigid, then polar-H; atom indices of the water ligand):
+
+- t0: `10 9 4 12`  #X121-C11 X121-C10 X121-C5 X121-N2 | rotatable
+- t1: `18 12 4 9`  #X121-S1 X121-N2 X121-C5 X121-C10 | rotatable
+- t2: `12 18 7 6`  #X121-N2 X121-S1 X121-C8 X121-C7 | rotatable
+- t3: `7 18 12 4`  #X121-C8 X121-S1 X121-N2 X121-C5 | rotatable
+- t4: `14 24 21 1`  #X121-N3 X121-C18 X121-C15 X121-C2 | rotatable
+- t5: `21 24 14 25`  #X121-C15 X121-C18 X121-N3 X121-C19 | rotatable
+- t6: `36 35 32 27`  #X121-C25 X121-C24 X121-N6 X121-C21 | rotatable
+
+Figures: `*_water_clusters.png` / `*_<PDB>_clusters.png` (symmetry-first clustering, no single cluster), `*_rmsd_density.png` (ligand conformation vs crystal, water vs complex), `*_binding.png` (complex: pocket-frame RMSD, ligand-pocket COM, contacts, native Q), `*_water_vs_complex.png` (torsion distributions).

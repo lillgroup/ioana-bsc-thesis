@@ -1,0 +1,2 @@
+run,ligand,ns,pocket_residues,native_pairs,com_crystal,frac_unbound,max_closest_contact,rmsd_mean,rmsd_last10pct,com_mean,com_last10pct,contacts_mean,contacts_last10pct,Q_mean,Q_last10pct,verdict
+REST2-rotbonds/1l8g-complex,DBD,40.0,16,107,3.6,0.0,2.95,1.63,1.7,3.75,3.82,91.45,89.05,0.67,0.64,"bound, crystal pose"
