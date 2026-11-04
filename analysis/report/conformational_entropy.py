@@ -9,7 +9,8 @@ partitioning by barrier cuts, MD-tools 306b109), one figure per clustering metho
 figure come from exactly one algorithm with one set of settings: the script reads each run's own
 record (summary.json) and stops if route, settings or md-tools version differ between points.
 
-  pi_c   HDBSCAN: cluster masses renormalised over the frames assigned to a cluster (noise and
+  pi_c   HDBSCAN: the final clusters (leaves of the recursive split, merged_groups.json), masses
+         renormalised over the frames assigned to a cluster (noise and
          ambiguous frames are left out; their fraction is in the CSV). A run where no cluster is found
          (NO_CLUSTER.txt: one basin, e.g. 4ibi bound) is drawn at e^S = 1 with a hollow marker.
          Barrier cuts: every frame is labelled; all clusters.
@@ -74,12 +75,14 @@ def read_run(d, method, blocks):
     s = json.load(open(f"{d}/summary.json"))
     lab = pd.read_csv(f"{d}/labels.csv").iloc[:, 2].astype(str).to_numpy()
     if method == "hdbscan":
-        masses = s["cluster_mass"]
-        p = list(masses.values()) if isinstance(masses, dict) else list(masses)
-        names = [letters(i) for i in range(len(p))]          # labels.csv names clusters A, B, ... by index
+        # the FINAL clusters: with recursive splitting these are the leaves of the split tree, which
+        # merged_groups.json holds (masses as fractions of all frames) and labels.csv names
+        groups = json.load(open(f"{d}/merged_groups.json"))["masses"]
+        names, p = list(groups), list(groups.values())
         rec = {"route": s["route"], "allow_single_cluster": s["allow_single_cluster"], "mass_floor": s["mass_floor"],
-               "vote": json.dumps(s.get("vote"), sort_keys=True, default=str)}
-        unassigned = float(s.get("unassigned_mass", 1.0 - sum(p)))
+               "vote": json.dumps(s.get("vote"), sort_keys=True, default=str),
+               "recursive": os.path.exists(f"{d}/tree.csv")}
+        unassigned = float(1.0 - sum(p))
         clusters = [str(n) for n in names]
     else:
         p = list(s["cluster_mass"].values())

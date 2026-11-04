@@ -19,7 +19,9 @@ every complex ligand by matching the heavy-atom graph. t<k> is therefore the sam
 figures, also when the complex uses a different package (3QL3: folate as the 3H tautomer).
 
 `compounds.csv`: water run (+ extensions joined, e.g. 5mwh/5ov8 run1 + ext1), complexes as
-`<PDB>=<run>=<crystal SDF>`, crystal SDFs for the water clustering, stride, automorphism cap. Run folders
+`<PDB>=<run>=<crystal SDF>`, crystal SDFs for the water clustering, stride, automorphism cap, and `gauge`:
+the torsion position for cluster_prune's --gauge where one symmetry moves two torsions together (first
+torsion of that pair; folate t3 = the pABA ring, paracetamol t0 = aryl as in Shu-Yu's tutorial). Run folders
 are relative to `$THESIS`, crystal SDFs to the repository. Environment: `analysis-env-main`
 (MD-tools c30c1c0 = 0.6.5.2).
 

@@ -9,6 +9,9 @@
 # The figures of ONE compound (a row of compounds.csv), from its current water and complex runs:
 #   1. prepare.py          water + complex ligand trajectories (state 0), one torsion numbering for all
 #   2. cluster_prune.py    Shu-Yu's symmetry-first clustering (MD-tools 0.6.5.2), --no-single-cluster,
+#                          with RECURSIVE splitting: the 'rec' settings of ../run_symfirst_0651.sh (FIT_ARGS below:
+#                          re-cluster while a cluster's internal RMSD > 2 A, mass floor 0.5 %, 19 of 20 votes);
+#                          + cluster_network.py (network from the inter-cluster RMSD) for each clustering,
 #                          water and every complex
 #   3. rmsd_density.py     ligand conformation RMSD to the crystal, water vs complex
 #   4. check_bound.py      complex: pocket-frame RMSD, ligand-pocket COM, contacts, native Q
@@ -68,7 +71,8 @@ s = m["water"] if key == "water" else m["complexes"][int(key.split(".")[1])]
 label = "water" if key == "water" else s["label"] + " complex"
 print(s["label"])
 args = ["--traj", s["traj"], "--top", s["top"], "--sdf", s["sdf"], "--stride", str(m["stride"]),
-        "--no-single-cluster", "--name", f"{sys.argv[3]} {label}"]
+        "--no-single-cluster", "--name", f"{sys.argv[3]} {label}",
+        "--mass-floor", "0.005", "--k", "20", "--min-vote-fraction", "0.95", "--recursive-max-rmsd", "2.0"]   # rec settings
 for k in ("torsions", "torsions_rigid", "torsions_polarH"):
     if os.path.getsize(f"{s['torsions']}/{k}.txt") > 0:
         args += ["--torsions-file", f"{s['torsions']}/{k}.txt"]
@@ -76,6 +80,8 @@ for r in s["refs"]:
     args += ["--ref-sdf", r]
 if m["max_matches"]:
     args += ["--max-matches", str(m["max_matches"])]
+if m.get("gauge"):                    # 0.6.5.2 gauge for a joint symmetry (drawing only), compounds.csv
+    args += ["--gauge", str(m["gauge"])]
 if s.get("rest2_config") and os.path.exists(s["rest2_config"]):
     args += ["--rest2-config", s["rest2_config"]]
 print("\n".join(args))
@@ -85,7 +91,9 @@ EOF
   python "$SHUYU/cluster_prune.py" "${A[@]:1}" --rmsd-workers "${SLURM_CPUS_PER_TASK:-8}" --out "$OUT" > "$OUT.log" 2>&1
   local rc=$?
   [ $rc != 0 ] && [ $rc != 3 ] && { tail -20 "$OUT.log"; fail "cluster_prune $LABEL ($rc)"; }
-  echo "   $LABEL: $(grep -hE '^n_clusters' "$OUT.log" | head -1) $( [ -s "$OUT/NO_CLUSTER.txt" ] && echo '(NO cluster found)')"
+  echo "   $LABEL: $(grep -hE '^n_clusters|^final clusters' "$OUT.log" | tr '\n' ' ') $( [ -s "$OUT/NO_CLUSTER.txt" ] && echo '(NO cluster found)')"
+  [ -s "$OUT/intercluster_rmsd.json" ] && { python "$SHUYU/cluster_network.py" "$OUT" --name "$NAME $LABEL" > "$OUT-network.log" 2>&1 \
+    || echo "   cluster_network failed: $(tail -1 "$OUT-network.log")"; }
 }
 echo "== 2. clustering (no single cluster)"
 cluster water
@@ -105,7 +113,8 @@ OUTDIR=$REPO/results/$NAME/$VERSION
 mkdir -p "$OUTDIR"
 for d in "$WORK"/*-clustering; do
   L=$(basename "$d" -clustering)
-  for f in clusters_overview.png groups.csv NO_CLUSTER.txt; do [ -s "$d/$f" ] && cp "$d/$f" "$OUTDIR/${NAME}_${L}_${f/clusters_overview/clusters}"; done
+  for f in clusters_overview.png groups.csv NO_CLUSTER.txt intercluster_rmsd.png cluster_network.png tree.csv; do
+    [ -s "$d/$f" ] && cp "$d/$f" "$OUTDIR/${NAME}_${L}_${f/clusters_overview/clusters}"; done
 done
 if [ "$NC" -gt 0 ]; then
   cp "$WORK/rmsd_density.png" "$OUTDIR/${NAME}_rmsd_density.png"; cp "$WORK/rmsd_density.csv" "$OUTDIR/${NAME}_rmsd_density.csv"
@@ -127,10 +136,13 @@ for c in m["complexes"]:
     L.append(f"| {c['label']} complex | `{c['run_rel']}` | `{os.path.basename(c['refs'][0])}` |")
 L += ["", f"Torsions t0..t{len(tors) - 1} (the same in every figure; rotatable, then rigid, then polar-H; "
       "atom indices of the water ligand):", ""] + [f"- t{k}: `{l.split('#')[0].strip()}`  {('#' + l.split('#', 1)[1].strip()) if '#' in l else ''}" for k, l in enumerate(tors)]
-L += ["", "Figures: `*_water_clusters.png` / `*_<PDB>_clusters.png` (symmetry-first clustering, no single cluster), "
+L += ["", "Figures: `*_water_clusters.png` / `*_<PDB>_clusters.png` (symmetry-first clustering, no single cluster, recursive splitting while internal RMSD > 2 A, mass floor 0.5 %, 19-of-20 vote), `*_intercluster_rmsd.png` and `*_cluster_network.png`, "
       "`*_rmsd_density.png` (ligand conformation vs crystal, water vs complex), `*_binding.png` (complex: "
       "pocket-frame RMSD, ligand-pocket COM, contacts, native Q), `*_water_vs_complex.png` (torsion distributions)."]
-open(f"{out}/README.md", "w").write("\n".join(L) + "\n")
+# keep the barrier-cut section report_cut.sbatch appended (this job rewrites the rest)
+old = open(f"{out}/README.md").read() if os.path.exists(f"{out}/README.md") else ""
+keep = old[old.find("\n## Torsion partitioning"):] if "\n## Torsion partitioning" in old else ""
+open(f"{out}/README.md", "w").write("\n".join(L) + "\n" + keep)
 EOF
 echo "== $NAME done -> $OUTDIR  $(date)"
 ls "$OUTDIR"

@@ -130,6 +130,7 @@ def main():
            [a.GetSymbol().upper() for a in water_mol.GetAtoms()], "water topology and SDF atom order differ"
 
     manifest = {"name": args.name, "version": row["version"], "stride": int(row["stride"]),
+                "gauge": row.get("gauge") or None,                     # torsion position for cluster_prune --gauge
                 "max_matches": row["max_matches"] or None,
                 "water": {"label": "water", "run": wrun, "traj": f"{work}/water.nc", "top": f"{work}/water.pdb",
                           "sdf": f"{work}/water.sdf", "torsions": tdir,

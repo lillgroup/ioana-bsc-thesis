@@ -1,6 +1,6 @@
 # folic-acid -- 5_v4-crystal-waters-3H
 
-Made by `analysis/report/report.sbatch` (Slurm job 29363278, 2026-11-02, md-tools 0.6.5.2); state 0, stride 5.
+Made by `analysis/report/report.sbatch` (Slurm job 29620716, 2026-11-04, md-tools 0.6.5.2); state 0, stride 5.
 
 | system | run | crystal reference |
 |---|---|---|
@@ -21,9 +21,7 @@ Torsions t0..t9 (the same in every figure; rotatable, then rigid, then polar-H; 
 - t8: `27 28 29 30`  #FOL1-C17 FOL1-C18 FOL1-C19 FOL1-O5 | rotatable
 - t9: `3 4 5 6`  #FOL1-C2 FOL1-N1 FOL1-C3 FOL1-O3 | rigid amide-like C-N
 
-Figures: `*_water_clusters.png` / `*_<PDB>_clusters.png` (symmetry-first clustering, no single cluster), `*_rmsd_density.png` (ligand conformation vs crystal, water vs complex), `*_binding.png` (complex: pocket-frame RMSD, ligand-pocket COM, contacts, native Q), `*_water_vs_complex.png` (torsion distributions).
-
-
+Figures: `*_water_clusters.png` / `*_<PDB>_clusters.png` (symmetry-first clustering, no single cluster, recursive splitting while internal RMSD > 2 A, mass floor 0.5 %, 19-of-20 vote), `*_intercluster_rmsd.png` and `*_cluster_network.png`, `*_rmsd_density.png` (ligand conformation vs crystal, water vs complex), `*_binding.png` (complex: pocket-frame RMSD, ligand-pocket COM, contacts, native Q), `*_water_vs_complex.png` (torsion distributions).
 
 ## Torsion partitioning (barrier cuts)
 
