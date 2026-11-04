@@ -82,7 +82,7 @@ def main():
         ax = fig.add_subplot(grid[divmod(k, ncol)])
         ax.hist(angles[:, k], bins=edges, density=True, color=colours[k], alpha=0.85)
         draw_reference_lines(ax, refs, k, with_label=(k == 0))
-        ax.set_xlim(-np.pi, np.pi)
+        ax.set_xlim(-1.02 * np.pi, 1.02 * np.pi)       # a crystal value at +-180 deg would hide under the frame
         ax.set_xticks([-np.pi, 0, np.pi], ["-π", "0", "π"])
         ax.set_yticks([])
         kind = names[k].rsplit("_", 1)[0].replace("torsions_", "").replace("torsions", "rotatable")
