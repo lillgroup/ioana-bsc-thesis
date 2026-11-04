@@ -20,7 +20,8 @@ Defaults are MD-tools' (kT_cut 1, mass_floor 0.001, min_p2p pi/3, kT_step 0.5, 7
 it needs no distance matrix, so it runs on every frame (--stride 1 by default).
 
 Figures and files (--out DIR):
-  clusters_overview.png   ../report-style overview (cluster_prune.draw_overview): molecule, one column
+  clusters_overview.png   ../report-style overview (cluster_prune.draw_overview; gold frame: the cluster
+                          the crystal falls in, by walking its cut coordinates down the tree): molecule, one column
                           per torsion t0.., the full distribution and one row per cluster (clusters
                           >= --draw-min-mass; the rest summed in the title), all in ONE labelling
                           (result["aligned_angles"], the labelling nearest frame `reference`), crystal
@@ -60,6 +61,56 @@ try:
 except ImportError as e:
     sys.exit(f"md_tools.analysis has no cut_clustering ({e}): needs MD-tools main >= 306b109 "
              "(env analysis-env-cut)")
+
+
+def cut_assign(r, Y):
+    """Leaf cluster of every row of Y (rows x cut coordinates, radians) in the cut tree of result r,
+    or -1 where a cut is made on a coordinate the row does not define (NaN). The side of a cut is
+    decided as MD-tools' _Cutter splits: periodic cut c1, c2 -> first child iff (x - c1) mod 360 <
+    (c2 - c1) mod 360; bounded cut c in a cell from lo -> iff (x - lo) mod 360 < (c - lo) mod 360.
+    (A copy lives in ../report/kl_cross.py, which must also run in the env without cut_clustering.)"""
+    tree = {nd["node"]: nd for nd in r["tree"]}
+    col = {name: j for j, name in enumerate(r["coordinates"])}
+    root = next(i for i, nd in tree.items() if nd["parent"] is None)
+    out = np.empty(len(Y), dtype=np.int64)
+    for f, y in enumerate(np.degrees(Y)):
+        i = root
+        while tree[i]["children"]:
+            cut = tree[i]["cut"]
+            x = y[col[cut["coordinate"]]]
+            if not np.isfinite(x):
+                i = None
+                break
+            if cut["kind"] == "periodic":
+                c1, c2 = cut["positions_degrees"]
+                first = (x - c1) % 360.0 < (c2 - c1) % 360.0
+            else:
+                lo = tree[i]["box_degrees"][cut["coordinate"]][0]
+                first = (x - lo) % 360.0 < (cut["positions_degrees"][0] - lo) % 360.0
+            i = tree[i]["children"][0 if first else 1]
+        out[f] = -1 if i is None else tree[i]["cluster"]
+    return out
+
+
+def crystal_cluster(fit, r, rows):
+    """The cluster a crystal ligand falls in: its cut coordinates (MD-tools' _invariant_coordinates on
+    the crystal's angle rows -- every atom assignment, which the invariants do not distinguish) walked
+    down the cut tree. Returns (cluster or None, note)."""
+    from types import SimpleNamespace
+    from md_tools.analysis._t_cut import _invariant_coordinates
+    proxy = SimpleNamespace(n_torsions_=fit.n_torsions_, names=fit.names, symmetry=fit.symmetry,
+                            descriptor_=fit.descriptor_, closed_theta_=np.asarray(rows, float))
+    with np.errstate(invalid="ignore"):
+        Y, cname, _, _ = _invariant_coordinates(proxy, r["settings"]["z_min"])
+    if list(cname) != list(r["coordinates"]):
+        return None, f"cut coordinates differ ({cname})"
+    found = set(int(c) for c in cut_assign(r, Y))
+    if found == {-1} or -1 in found and len(found) == 1:
+        return None, "a cut on its way is on a coordinate the crystal does not define (through H)"
+    found.discard(-1)
+    if len(found) > 1:
+        return None, f"its atom assignments fall in different clusters ({', '.join(group_name(c) for c in sorted(found))})"
+    return found.pop(), ""
 
 
 def main():
@@ -163,6 +214,22 @@ def main():
     # ------------------------------------------------------------------ 3. figures
     shown = [c for c in range(n) if masses[c] >= args.draw_min_mass]
     rest = 1.0 - sum(masses[c] for c in shown)
+    # crystal -> cluster (gold frame, as cluster_prune's assign_reference in the HDBSCAN figures)
+    best, crystal_notes, assignment = {}, [], {}
+    for label, rows_c in crystal_rows.items():
+        c, why = crystal_cluster(fit, r, rows_c)
+        assignment[label] = {"cluster": None if c is None else group_name(c), "note": why}
+        if c is None:
+            crystal_notes.append(f"crystal {label}: not placed ({why})")
+        elif c in shown:
+            best.setdefault(group_name(c), []).append(label)
+        else:
+            crystal_notes.append(f"crystal {label}: in cluster {group_name(c)} ({100 * masses[c]:.2f} %, not drawn)")
+        print(f"crystal {label}: cluster {assignment[label]['cluster'] or 'none'} {why}")
+    summary_path = P("summary.json")
+    summary = json.load(open(summary_path))
+    summary["crystal_assignment"] = assignment
+    json.dump(summary, open(summary_path, "w"), indent=2)
     aligned = {group_name(c): cluster_al[c] for c in shown}
     cluster_refs = {group_name(c): crystal_lines(C[centre[c]]) for c in shown}
     for row, c in zip(stats, range(n)):         # per-cluster statistics in the cluster's own labelling
@@ -180,10 +247,12 @@ def main():
              f"{s['mass_floor']:g} ({s['floor_frames']:g} frames); every frame labelled"
              f"\ndrawn: the {len(shown)} clusters >= {100 * args.draw_min_mass:g} %"
              + (f" (the other {n - len(shown)} hold {100 * rest:.1f} %)" if len(shown) < n else "")
-             + ("; black lines = crystal (bioactive) conformation" if crystal_rows else ""))
+             + ("; black lines = crystal (bioactive) conformation" if crystal_rows else "")
+             + ("; gold frame = cluster the crystal falls in" if best else "")
+             + ("\n" + "; ".join(crystal_notes) if crystal_notes else ""))
     draw_overview(P("clusters_overview.png"), mol=mol, names=names, quads=quads, tors=al, aligned=aligned,
                   masses=[masses[c] for c in shown], noise=0.0, refs=top_refs, cluster_refs=cluster_refs,
-                  top_refs=top_refs, top_label="all frames,\none labelling", title=title)
+                  top_refs=top_refs, top_label="all frames,\none labelling", title=title, best=best)
     try:
         plot_split_tree(r)
         plt.gcf().savefig(P("split_tree.png"), dpi=130, bbox_inches="tight")
