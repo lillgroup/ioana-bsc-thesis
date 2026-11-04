@@ -1,0 +1,4 @@
+cluster,parent,depth,frames,mass_of_ensemble,internal_rmsd_A,outcome
+A,,1,1429,0.35725,0.505,leaf
+B,,1,1322,0.3305,0.443,leaf
+C,,1,1092,0.273,0.478,leaf

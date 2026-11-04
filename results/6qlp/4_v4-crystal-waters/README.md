@@ -1,6 +1,6 @@
 # 6qlp -- 4_v4-crystal-waters
 
-Made by `analysis/report/report.sbatch` (Slurm job 29365391, 2026-11-03, md-tools 0.6.5.2); state 0, stride 5.
+Made by `analysis/report/report.sbatch` (Slurm job 29620728, 2026-11-04, md-tools 0.6.5.2); state 0, stride 5.
 
 | system | run | crystal reference |
 |---|---|---|
@@ -18,8 +18,7 @@ Torsions t0..t7 (the same in every figure; rotatable, then rigid, then polar-H; 
 - t6: `12 13 29 50`  #X171-C13 X171-C14 X171-O3 X171-H19 | polar-H O-H
 - t7: `11 18 30 51`  #X171-C12 X171-C19 X171-O4 X171-H20 | polar-H O-H
 
-Figures: `*_water_clusters.png` / `*_<PDB>_clusters.png` (symmetry-first clustering, no single cluster), `*_rmsd_density.png` (ligand conformation vs crystal, water vs complex), `*_binding.png` (complex: pocket-frame RMSD, ligand-pocket COM, contacts, native Q), `*_water_vs_complex.png` (torsion distributions).
-
+Figures: `*_water_clusters.png` / `*_<PDB>_clusters.png` (symmetry-first clustering, no single cluster, recursive splitting while internal RMSD > 2 A, mass floor 0.5 %, 19-of-20 vote), `*_intercluster_rmsd.png` and `*_cluster_network.png`, `*_rmsd_density.png` (ligand conformation vs crystal, water vs complex), `*_binding.png` (complex: pocket-frame RMSD, ligand-pocket COM, contacts, native Q), `*_water_vs_complex.png` (torsion distributions).
 
 ## Torsion partitioning (barrier cuts)
 
