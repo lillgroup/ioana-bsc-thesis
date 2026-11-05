@@ -77,3 +77,14 @@ conformer in water) when the complex sits mostly in one cluster (right axis):
   the populations towards it.
 Thresholds are our choice, not a standard; KL measures populations, not the binding mechanism's order of
 events. The HDBSCAN version drops unassigned frames, so its regimes are unreliable (use the cut one).
+
+## Cost of the bioactive conformation in water (Zivanovic et al., JCTC 2020)
+
+`bioactive_cost.py` (`sbatch bioactive_cost.sbatch`): dG_dist = -ln P_b (P_b = population of the
+barrier-cut WATER cluster the crystal falls in, the gold frame of `*_water_clusters_cut.png`) and
+dG_strain = -ln(P_b/P_0) (P_0 = most populated water cluster), in k_BT, block SE over 5 time blocks;
+cluster-free cross-check: fraction of water frames within 1.0 / 1.5 / 2.0 A symmetry-corrected
+heavy-atom RMSD of the crystal -> `results/overview/bioactive-cost/` (`bioactive_cost_ranked.png`,
+`bioactive_cost_cumulative.png` with the paper's numbers, `bioactive_cost.csv`). Crystals cluster_cut
+cannot place (cut through a polar H; symmetric assignments in different clusters) are left out of the
+figures but keep their RMSD-based values in the CSV.

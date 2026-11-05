@@ -1,0 +1,24 @@
+ligand,crystal,complex,regime,water_cluster,placed,note,n_water_clusters,frames,min_rmsd_A,P_b,P_b_se,top_cluster,P_0,dG_dist,dG_dist_se,dG_strain,dG_strain_se,P_rmsd_1A,dG_rmsd_1A,P_rmsd_1.5A,dG_rmsd_1.5A,P_rmsd_2A,dG_rmsd_2A
+folic-acid,fol_4LRH_A,4LRH,induced fit,EU,True,,308,50000,0.588,0.00138,0.00029,A,0.0814,6.58567,0.21176,4.07729,0.22427,0.00448,5.40813,0.07,2.65926,0.37982,0.96806
+folic-acid,fol_3QL3_A,3QL3,conformational selection,EP,True,,308,50000,0.672,0.0014,0.00048,A,0.0814,6.57128,0.34032,4.0629,0.34824,0.00086,7.05858,0.04206,3.16866,0.18626,1.68061
+4ibi,4ibi_1D8_A,4IBI,conformational selection,A,True,,25,30000,0.234,0.2276,0.05568,A,0.2276,1.48017,0.24465,-0.0,0.34598,0.14843,1.90762,0.2171,1.5274,0.47973,0.73452
+4ibk,4ibk_1DE_A,4IBK,conformational selection,E,True,,26,30000,0.288,0.0889,0.04559,A,0.17413,2.42024,0.51287,0.67231,0.52916,0.0794,2.53326,0.196,1.62964,0.6262,0.46809
+4j7d,4j7d_I31_A,4J7D,lock and key,A,True,,8,30000,0.172,0.39323,0.0146,A,0.39323,0.93335,0.03714,-0.0,0.05252,0.1851,1.68686,0.47433,0.74584,0.68777,0.37431
+5mwh,5mwh_UWX_A,5MWH,lock and key,,False,"its atom assignments fall in different clusters (A, G)",50,30000,0.291,,,,,,,,,0.12373,2.08963,0.32427,1.12619,0.4278,0.8491
+5mwh,5mwh_UWX_B,5MWH,lock and key,,False,"its atom assignments fall in different clusters (A, G)",50,30000,0.32,,,,,,,,,0.1137,2.17419,0.31943,1.14121,0.4314,0.84072
+5ov8,5ov8_AXN_A,5OV8,lock and key,,False,"its atom assignments fall in different clusters (G, H)",72,30000,0.341,,,,,,,,,0.0635,2.75672,0.28993,1.2381,0.40847,0.89534
+5ov8,5ov8_AXN_B,5OV8,lock and key,,False,"its atom assignments fall in different clusters (G, S)",72,30000,0.383,,,,,,,,,0.05837,2.84101,0.29387,1.22463,0.44747,0.80415
+6cjr,6cjr.input,6CJR,conformational selection,,False,a cut on its way is on a coordinate the crystal does not define (through H),41,30000,0.232,,,,,,,,,0.10837,2.22223,0.23853,1.43325,0.42363,0.85889
+4p6w,4p6w.input,4P6W,lock and key,,False,a cut on its way is on a coordinate the crystal does not define (through H),11,30000,0.165,,,,,,,,,0.99957,0.00043,1.0,-0.0,1.0,-0.0
+4k9y,4k9y.input,4K9Y,induced fit,T,True,,74,30000,0.382,0.02127,0.00197,A,0.1209,3.85061,0.09242,1.73782,0.2095,0.05267,2.94377,0.2102,1.5597,0.37053,0.99281
+1l8g,1l8g.input,1L8G,conformational selection,F,True,,17,30000,0.293,0.0842,0.01457,A,0.20583,2.47456,0.17304,0.89387,0.20213,0.15893,1.83927,0.28917,1.24075,0.43583,0.8305
+6s56,6s56.input,6S56,conformational selection,B,True,,26,30000,0.324,0.11923,0.00706,A,0.1287,2.12667,0.05917,0.0764,0.1454,0.02177,3.82738,0.22957,1.47156,0.4412,0.81826
+6qlp,6qlp.input,6QLP,induced fit,,False,a cut on its way is on a coordinate the crystal does not define (through H),349,30000,0.238,,,,,,,,,0.17007,1.77156,0.6776,0.3892,0.94057,0.06127
+6r8o,6r8o.input,6R8O,induced fit,,False,a cut on its way is on a coordinate the crystal does not define (through H),413,30000,0.499,,,,,,,,,0.00963,4.64253,0.06837,2.68287,0.1825,1.70101
+3b67,3b67.input,3B67,conformational selection,,False,a cut on its way is on a coordinate the crystal does not define (through H),105,30000,0.314,,,,,,,,,0.08387,2.47853,0.2433,1.41346,0.4577,0.78154
+4ase,4ase.input,4ASE,induced fit,X,True,,27,30000,0.4,0.00107,0.0009,A,0.2991,6.84322,0.84664,5.63624,0.85183,0.00143,6.54775,0.07867,2.54254,0.5183,0.6572
+4erf,4erf.input,4ERF,conformational selection,,False,a cut on its way is on a coordinate the crystal does not define (through H),49,30000,0.249,,,,,,,,,0.11467,2.16573,0.4331,0.83679,0.96557,0.03504
+6fo5,6fo5.input,6FO5,conformational selection,P,True,,180,30000,0.299,0.01803,0.00321,A,0.0697,4.01553,0.17793,1.35198,0.44172,0.01623,4.12069,0.05103,2.97528,0.14607,1.92369
+1rd4,1rd4.input,1RD4,conformational selection,EA,True,,304,30000,0.752,0.00167,0.00044,A,0.02837,6.39693,0.26458,2.83439,0.31369,0.00203,6.19808,0.06767,2.69316,0.20127,1.60312
+4crf,4crf.input,4CRF,induced fit,CJ,True,,150,30000,0.607,0.00167,0.00138,A,0.13443,6.39693,0.82885,4.39024,0.84747,0.00047,7.6699,0.00213,6.15007,0.01317,4.33007
+1eld,1eld.input,1ELD,lock and key,A,True,,44,30000,0.698,0.38277,0.01169,A,0.38277,0.96033,0.03055,-0.0,0.0432,0.01733,4.05512,0.23163,1.4626,0.5381,0.61971
