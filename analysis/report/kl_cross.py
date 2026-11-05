@@ -31,7 +31,10 @@ ensemble against the reference's full populations (the clustering is not refitte
   (kl_cross.sbatch: one Slurm task per compound and method, then --plot)
   python -I kl_cross.py --plot     -> <out>/kl_cross_{cut,hdbscan}.png + .csv (all compounds), and
                                       <out>/kl_cross_{cut,hdbscan}_regions.png: the same with the binding
-                                      regimes as background (regime(); --lock-key-max, --induced-fit-min)
+                                      regimes as background (regime(); --lock-key-max, --induced-fit-min);
+                                      <out>/kl_cross_cut_examples{,_regions}.png: only 4j7d, 4crf, 4ase, 1l8g.
+                                      Points coloured by rotatable bonds, marker = compound set; the
+                                      figures without regions have a transparent background (slides)
 """
 import argparse
 import json
@@ -219,61 +222,106 @@ def run(args):
         print(f"wrote {args.out}/kl_cross_{args.method}_{name}.csv", flush=True)
 
 
+EXAMPLES = ("4j7d", "4crf", "4ase", "1l8g")     # the four corners of the cut plot (Shu-Yu: explain the equation with them)
+SETS = {"folate": "^", "original small molecules": "s", "rotatable-bond set": "o"}
+
+
+def ligand_info():
+    """name -> (rotatable bonds, compound set): rotatable bonds of the water ligand as in
+    conformational_entropy.py (RDKit, heavy atoms), set from compounds.csv."""
+    from rdkit import Chem
+    from rdkit.Chem import rdMolDescriptors
+    out = {}
+    for row in _csv.DictReader(open(os.path.join(HERE, "compounds.csv"))):
+        path = f"{WORK}/{row['name']}/manifest.json"
+        if not os.path.exists(path):
+            continue
+        sdf = json.load(open(path))["water"]["sdf"]
+        rb = rdMolDescriptors.CalcNumRotatableBonds(Chem.RemoveHs(Chem.MolFromMolFile(sdf)))
+        kind = ("folate" if row["name"] == "folic-acid" else
+                "rotatable-bond set" if row["water"].startswith("REST2-rotbonds") else "original small molecules")
+        out[row["name"]] = (int(rb), kind)
+    return out
+
+
+def point_label(df, r):
+    """The ligand name; the complex only where a ligand has several (folate 4LRH / 3QL3)."""
+    return f"{r.ligand} {r.complex}" if (df.ligand == r.ligand).sum() > 1 else r.ligand
+
+
+def draw_kl(ax, df, info, cmap, norm, top, args, regions, big=False):
+    from matplotlib.lines import Line2D
+    if regions:
+        draw_regions(ax, top, args)
+    ax.plot([0, top], [0, top], color="0.6", ls="--", lw=1, zorder=1)
+    for _, r in df.iterrows():
+        rb, kind = info[r.ligand]
+        col = cmap(norm(rb))
+        x = 0 if pd.isna(r.KL_w_p_complexdef) else r.KL_w_p_complexdef
+        ax.errorbar(x, r.KL_p_w_waterdef, xerr=None if pd.isna(r.KL_w_p_complexdef) else r.KL_w_p_se,
+                    yerr=r.KL_p_w_se, fmt=SETS[kind], ms=15 if big else 10, mfc="white" if pd.isna(r.KL_w_p_complexdef) else col,
+                    mec="k" if not pd.isna(r.KL_w_p_complexdef) else col, mew=1.0 if not pd.isna(r.KL_w_p_complexdef) else 2,
+                    ecolor="0.25", elinewidth=1, capsize=3, zorder=4, clip_on=False)
+        text = point_label(df, r) + ("\n(no complex cluster)" if pd.isna(r.KL_w_p_complexdef) else "")
+        ax.annotate(text, (x, r.KL_p_w_waterdef), textcoords="offset points", xytext=(10, 6) if big else (7, 4),
+                    fontsize=13 if big else 8.5, color="k", fontweight="bold" if big else "normal", zorder=5)
+    ax.set_xlim(-0.03 * top, top)
+    ax.set_ylim(0, top)
+    ax.set_xlabel(r"KL($\pi^{water}\,\|\,\pi^{protein}$)  (k$_B$), clusters defined on the complex")
+    ax.set_ylabel(r"KL($\pi^{protein}\,\|\,\pi^{water}$)  (k$_B$), clusters defined in water")
+    ax.grid(alpha=0.3)
+    kinds = [k for k in SETS if any(info[l][1] == k for l in df.ligand)]
+    handles = [Line2D([], [], color="0.6", ls="--", lw=1, label="KL(w||p) = KL(p||w)")]
+    handles += [Line2D([], [], marker=SETS[k], ls="", mfc="0.8", mec="k", ms=9, label=k) for k in kinds]
+    ax.legend(handles=handles, loc="upper left", fontsize=8.5, framealpha=0.9)
+
+
 def plot(args):
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
+    from matplotlib.colors import BoundaryNorm
     titles = {"cut": "torsion partitioning (barrier cuts)", "hdbscan": "symmetry-first HDBSCAN (no single cluster)"}
+    info = ligand_info()
     for method, title in titles.items():
         import glob
         files = sorted(glob.glob(f"{args.out}/kl_cross_{method}_*.csv"))
+        files = [f for f in files if not f.endswith(("_regions.csv", "_examples.csv"))]
         if not files:
             print(f"skip {method}: no kl_cross_{method}_*.csv")
             continue
         df = pd.concat([pd.read_csv(f) for f in files], ignore_index=True)
         if len(set(df.settings)) != 1:
             sys.exit(f"{method}: settings differ between compounds: {set(df.settings)}")
-        ligands = list(dict.fromkeys(df.ligand))
-        palette = list(plt.get_cmap("tab20").colors[::2]) + list(plt.get_cmap("tab20").colors[1::2]) + list(plt.get_cmap("Dark2").colors)
-        colours = dict(zip(ligands, palette))
         df["regime"] = [regime(x, y, args) for x, y in zip(df.KL_w_p_complexdef, df.KL_p_w_waterdef)]
+        df["rot_bonds"] = [info[l][0] for l in df.ligand]
+        df["compound_set"] = [info[l][1] for l in df.ligand]
         df.drop(columns="settings").to_csv(f"{args.out}/kl_cross_{method}.csv", index=False)
         top = np.nanmax(np.r_[df.KL_p_w_waterdef + df.KL_p_w_se, (df.KL_w_p_complexdef + df.KL_w_p_se).dropna()]) * 1.12
-        for regions in (False, True):
+        lo, hi = int(df.rot_bonds.min()), int(df.rot_bonds.max())
+        cmap = plt.get_cmap("viridis", hi - lo + 1)
+        norm = BoundaryNorm(np.arange(lo - 0.5, hi + 1.5), cmap.N)
+        sub = f"{title}, REST2 state 0; bars: block SE over {args.blocks} time blocks"
+        variants = [("", df, False), ("_regions", df, True)]
+        if method == "cut":
+            ex = df[df.ligand.isin(EXAMPLES)]
+            variants += [("_examples", ex, False), ("_examples_regions", ex, True)]
+        for suffix, d, regions in variants:
+            big = "examples" in suffix
             fig, ax = plt.subplots(figsize=(10.5 + 1.2 * regions, 8.5), layout="constrained")
-            if regions:
-                draw_regions(ax, top, args)
-            ax.plot([0, top], [0, top], color="0.6", ls="--", lw=1, label="KL(w||p) = KL(p||w)")
-            missing = []
-            for _, r in df.iterrows():
-                col = colours[r.ligand]
-                if pd.isna(r.KL_w_p_complexdef):
-                    missing.append(f"{r.ligand} {r.complex}: KL(p||w) = {r.KL_p_w_waterdef:.2f}, no cluster in the complex")
-                    ax.errorbar(0, r.KL_p_w_waterdef, yerr=r.KL_p_w_se, fmt="s", mfc="white", mec=col, ecolor=col, ms=9,
-                                mew=2, capsize=3, clip_on=False, zorder=3)
-                    ax.annotate(f"{r.ligand} {r.complex}\n(no complex cluster)", (0, r.KL_p_w_waterdef),
-                                textcoords="offset points", xytext=(8, -4), fontsize=7.5, color=col)
-                    continue
-                ax.errorbar(r.KL_w_p_complexdef, r.KL_p_w_waterdef, xerr=r.KL_w_p_se, yerr=r.KL_p_w_se, fmt="o",
-                            color=col, ms=9, capsize=3, zorder=3)
-                ax.annotate(f"{r.ligand} {r.complex}", (r.KL_w_p_complexdef, r.KL_p_w_waterdef),
-                            textcoords="offset points", xytext=(7, 4), fontsize=8.5, color=col)
-            ax.set_xlim(-0.03 * top, top)
-            ax.set_ylim(0, top)
-            ax.set_xlabel(r"KL($\pi^{water}\,\|\,\pi^{protein}$)  (k$_B$), clusters defined on the complex")
-            ax.set_ylabel(r"KL($\pi^{protein}\,\|\,\pi^{water}$)  (k$_B$), clusters defined in water")
-            ax.grid(alpha=0.3)
-            ax.legend(loc="upper left", fontsize=8.5)
-            ax.set_title(f"Bound vs free ligand ensemble, clusters of one ensemble, frames of the other assigned\n"
-                         f"{title}, REST2 state 0; bars: block SE over {args.blocks} time blocks"
+            draw_kl(ax, d, info, cmap, norm, top, args, regions, big=big)
+            cb = fig.colorbar(matplotlib.cm.ScalarMappable(norm=norm, cmap=cmap), ax=ax, shrink=0.6,
+                              pad=0.09 if regions else 0.02, ticks=range(lo, hi + 1))
+            cb.set_label("rotatable bonds")
+            ax.set_title(f"Bound vs free ligand ensemble, clusters of one ensemble, frames of the other assigned\n{sub}"
                          + ("\nunassigned (noise) frames are dropped before the KL, so regimes are unreliable where "
                             "most frames are unassigned: use the barrier-cut plot" if regions and method == "hdbscan" else ""),
                          fontsize=10)
-            path = f"{args.out}/kl_cross_{method}{'_regions' if regions else ''}.png"
-            fig.savefig(path, dpi=150)
+            path = f"{args.out}/kl_cross_{method}{suffix}.png"
+            fig.savefig(path, dpi=150, transparent=not regions)      # no regions: transparent, for slides
             plt.close(fig)
-            print(f"wrote {path}" + (f" ({'; '.join(missing)})" if missing and not regions else ""))
-        print("  " + "; ".join(f"{g}: {', '.join(f'{r.ligand} {r.complex}' for _, r in d.iterrows())}"
+            print(f"wrote {path}")
+        print("  " + "; ".join(f"{g}: {', '.join(point_label(df, r) for r in d.itertuples())}"
                                for g, d in df.groupby("regime", sort=False)))
 
 
