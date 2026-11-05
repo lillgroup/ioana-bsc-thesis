@@ -597,6 +597,54 @@ def recursive_split(top_fit, tors, cmd, mol, torsions, X, operations, args):
     return {"nodes": nodes, "leaves": leaves, "labels": labels, "tree": tree}
 
 
+def write_intercluster_rmsd(P, label, X, final_labels, cname, operations, cap, workers):
+    """Symmetry-corrected (and by-atom-index) heavy-atom RMSD between and within the clusters of
+    final_labels (negative = left out): intercluster_rmsd.csv/.json/.png via the path function P.
+    cname(c) names cluster c. Shared with cluster_cut_rmsd.py (barrier cuts)."""
+    corrected = intercluster_rmsd(X, final_labels, operations, max_per_cluster=cap, workers=workers)
+    by_index = intercluster_rmsd(X, final_labels, operations[:1], max_per_cluster=cap, workers=workers)
+    names_c = [cname(c) for c in corrected["clusters"]]
+
+    def as_table(r):
+        return pd.DataFrame([[f"{r['mean'][i, j]:.2f} +- {r['std'][i, j]:.2f}" for j in range(len(names_c))]
+                             for i in range(len(names_c))], index=names_c, columns=names_c)
+    print(f"\n{X.shape[1]} heavy atoms, {corrected['n_operations']} symmetry operations, frames per "
+          f"cluster {corrected['n_frames']} of {corrected['n_frames_in_cluster']}")
+    print("symmetry-corrected RMSD (A), mean +- std:")
+    print(as_table(corrected).to_string())
+    print("by atom index (no symmetry), mean +- std:")
+    print(as_table(by_index).to_string())
+    rmsd_rows = [{"cluster_a": names_c[i], "cluster_b": names_c[j],
+                  "rmsd_mean": corrected["mean"][i, j], "rmsd_std": corrected["std"][i, j],
+                  "rmsd_by_index_mean": by_index["mean"][i, j], "rmsd_by_index_std": by_index["std"][i, j]}
+                 for i in range(len(names_c)) for j in range(len(names_c))]
+    pd.DataFrame(rmsd_rows).round(4).to_csv(P("intercluster_rmsd.csv"), index=False)
+    with open(P("intercluster_rmsd.json"), "w") as f:
+        json.dump({"heavy_atoms": X.shape[1], "n_operations": corrected["n_operations"],
+                   "max_per_cluster": cap,
+                   "n_frames": {cname(c): n for c, n in corrected["n_frames"].items()},
+                   "n_frames_in_cluster": {cname(c): n for c, n in corrected["n_frames_in_cluster"].items()},
+                   "clusters": names_c, "corrected_mean": corrected["mean"].tolist(),
+                   "corrected_std": corrected["std"].tolist(), "by_index_mean": by_index["mean"].tolist(),
+                   "by_index_std": by_index["std"].tolist()}, f, indent=2)
+    k = len(names_c)
+    fig, axes = plt.subplots(1, 2, figsize=(4.5 + 0.9 * k, 2.2 + 0.8 * k), layout="constrained")
+    vmax = max(np.nanmax(corrected["mean"]), np.nanmax(by_index["mean"]))
+    for ax, (title, r) in zip(axes, (("symmetry-corrected", corrected), ("by atom index", by_index))):
+        im = ax.imshow(r["mean"], cmap="viridis", vmin=0, vmax=vmax)
+        ax.set_xticks(range(k), names_c)
+        ax.set_yticks(range(k), names_c)
+        for i in range(k):
+            for j in range(k):
+                ax.text(j, i, f"{r['mean'][i, j]:.2f}\n+- {r['std'][i, j]:.2f}", ha="center", va="center",
+                        color="w" if r["mean"][i, j] < 0.6 * vmax else "k", fontsize=9)
+        ax.set_title(f"heavy-atom RMSD (Å), {title}", fontsize=10)
+    fig.colorbar(im, ax=axes, shrink=0.8, label="Å")
+    fig.suptitle(f"{label}between clusters (off-diagonal) and within (diagonal)", fontsize=11)
+    fig.savefig(P("intercluster_rmsd.png"), dpi=150)
+    plt.close(fig)
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--traj", required=True, help="solute trajectory of the physical state (state 0)")
@@ -985,48 +1033,7 @@ def main():
     if groups:
         final_labels = rec["labels"] if rec else fit.labels_
         cname = (lambda c: rec["leaves"][c][0]) if rec else group_name
-        corrected = intercluster_rmsd(X, final_labels, operations, max_per_cluster=cap, workers=args.rmsd_workers)
-        by_index = intercluster_rmsd(X, final_labels, operations[:1], max_per_cluster=cap, workers=args.rmsd_workers)
-        names_c = [cname(c) for c in corrected["clusters"]]
-
-        def as_table(r):
-            return pd.DataFrame([[f"{r['mean'][i, j]:.2f} +- {r['std'][i, j]:.2f}" for j in range(len(names_c))]
-                                 for i in range(len(names_c))], index=names_c, columns=names_c)
-        print(f"\n{len(heavy)} heavy atoms, {corrected['n_operations']} symmetry operations, frames per "
-              f"cluster {corrected['n_frames']} of {corrected['n_frames_in_cluster']}")
-        print("symmetry-corrected RMSD (A), mean +- std:")
-        print(as_table(corrected).to_string())
-        print("by atom index (no symmetry), mean +- std:")
-        print(as_table(by_index).to_string())
-        rmsd_rows = [{"cluster_a": names_c[i], "cluster_b": names_c[j],
-                      "rmsd_mean": corrected["mean"][i, j], "rmsd_std": corrected["std"][i, j],
-                      "rmsd_by_index_mean": by_index["mean"][i, j], "rmsd_by_index_std": by_index["std"][i, j]}
-                     for i in range(len(names_c)) for j in range(len(names_c))]
-        pd.DataFrame(rmsd_rows).round(4).to_csv(P("intercluster_rmsd.csv"), index=False)
-        with open(P("intercluster_rmsd.json"), "w") as f:
-            json.dump({"heavy_atoms": len(heavy), "n_operations": corrected["n_operations"],
-                       "max_per_cluster": cap,
-                       "n_frames": {cname(c): n for c, n in corrected["n_frames"].items()},
-                       "n_frames_in_cluster": {cname(c): n for c, n in corrected["n_frames_in_cluster"].items()},
-                       "clusters": names_c, "corrected_mean": corrected["mean"].tolist(),
-                       "corrected_std": corrected["std"].tolist(), "by_index_mean": by_index["mean"].tolist(),
-                       "by_index_std": by_index["std"].tolist()}, f, indent=2)
-        k = len(names_c)
-        fig, axes = plt.subplots(1, 2, figsize=(4.5 + 0.9 * k, 2.2 + 0.8 * k), layout="constrained")
-        vmax = max(np.nanmax(corrected["mean"]), np.nanmax(by_index["mean"]))
-        for ax, (title, r) in zip(axes, (("symmetry-corrected", corrected), ("by atom index", by_index))):
-            im = ax.imshow(r["mean"], cmap="viridis", vmin=0, vmax=vmax)
-            ax.set_xticks(range(k), names_c)
-            ax.set_yticks(range(k), names_c)
-            for i in range(k):
-                for j in range(k):
-                    ax.text(j, i, f"{r['mean'][i, j]:.2f}\n+- {r['std'][i, j]:.2f}", ha="center", va="center",
-                            color="w" if r["mean"][i, j] < 0.6 * vmax else "k", fontsize=9)
-            ax.set_title(f"heavy-atom RMSD (Å), {title}", fontsize=10)
-        fig.colorbar(im, ax=axes, shrink=0.8, label="Å")
-        fig.suptitle(f"{label}between clusters (off-diagonal) and within (diagonal)", fontsize=11)
-        fig.savefig(P("intercluster_rmsd.png"), dpi=150)
-        plt.close(fig)
+        write_intercluster_rmsd(P, label, X, final_labels, cname, operations, cap, workers=args.rmsd_workers)
 
     keep = strip_nonpolar_hydrogens(cmd)
     try:
