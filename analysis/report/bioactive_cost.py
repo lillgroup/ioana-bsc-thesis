@@ -19,7 +19,7 @@ Figures (results/overview/bioactive-cost/):
   bioactive_cost_ranked.png      one row per ligand, sorted by dG_dist: dG_dist (dot, block SE),
                                  dG_strain (hollow diamond), RMSD-based dG from 2.0 to 1.0 A (grey bar,
                                  tick at 1.5 A); ligand names coloured by the barrier-cut KL regime
-  bioactive_cost_cumulative.png  % of ligands with dG <= x (dist and strain), with the paper's numbers
+  bioactive_cost_cumulative.png  % of ligands with dG_dist <= x
   bioactive_cost.csv
 
   python -I bioactive_cost.py [--compounds ...] [--blocks 5]
@@ -188,20 +188,9 @@ def plot_cumulative(df, left_out, path):
     fig, ax = plt.subplots(figsize=(7.5, 5.5), layout="constrained")
     xmax = max(8.0, float(df.dG_dist.max()) + 0.5)
     grid = np.linspace(0, xmax, 801)
-    for col, lab, c in (("dG_dist", r"$\Delta G_{dist}$", "k"), ("dG_strain", r"$\Delta G_{strain}$", "#7b3294"),
-                        ("dG_rmsd_1.5A", r"$\Delta G$ from frames within 1.5 Å (cluster-free)", "0.6")):
-        v = df[col].to_numpy()
-        ax.plot(grid, [100 * np.mean(v <= g) for g in grid], color=c, lw=2, label=lab)
-    # Zivanovic et al. 2020: MD (10 clusters, 2.0 A) dG_dist < 4 kT and dG_strain < 3 kT in > 90 %;
-    # QM/SCRF dG_strain < 3 kT in 73 % (abstract)
-    ax.plot([4], [90], "s", color="k", mfc="white", ms=8, mew=1.5)
-    ax.plot([3], [90], "s", color="#7b3294", mfc="white", ms=8, mew=1.5)
-    ax.plot([3], [73], "^", color="#7b3294", mfc="white", ms=9, mew=1.5)
-    ax.annotate("paper, MD: >90 % below 4 kT", (4, 90), textcoords="offset points", xytext=(8, -14), fontsize=8)
-    ax.annotate("paper, MD: >90 % below 3 kT", (3, 90), textcoords="offset points", xytext=(-150, 6), fontsize=8,
-                color="#7b3294")
-    ax.annotate("paper, QM: 73 % below 3 kT", (3, 73), textcoords="offset points", xytext=(8, -4), fontsize=8,
-                color="#7b3294")
+    v = df["dG_dist"].to_numpy()
+    ax.plot(grid, [100 * np.mean(v <= g) for g in grid], color="k", lw=2,
+            label=r"$\Delta G_{dist} = -\ln P_b$  (crystal's water cluster)")
     for x in (3, 5):
         ax.axvline(x, color="0.6", ls="--", lw=1)
     ax.set_xlim(0, xmax)
@@ -211,7 +200,7 @@ def plot_cumulative(df, left_out, path):
     ax.grid(alpha=0.3)
     ax.legend(loc="lower right", fontsize=8.5)
     ax.set_title("Cumulative cost of the bioactive conformation in water\n"
-                 "squares/triangle: Zivanovic et al., JCTC 2020 (115 drug-like ligands; MD: 10 clusters, 2 Å)"
+                 "barrier-cut water clusters; dashed: 3 and 5 k$_B$T (Zivanovic et al. 2020)"
                  + (f"\nleft out: {', '.join(left_out)}" if left_out else ""), fontsize=9.5)
     fig.savefig(path, dpi=160)
     plt.close(fig)

@@ -85,6 +85,6 @@ barrier-cut WATER cluster the crystal falls in, the gold frame of `*_water_clust
 dG_strain = -ln(P_b/P_0) (P_0 = most populated water cluster), in k_BT, block SE over 5 time blocks;
 cluster-free cross-check: fraction of water frames within 1.0 / 1.5 / 2.0 A symmetry-corrected
 heavy-atom RMSD of the crystal -> `results/overview/bioactive-cost/` (`bioactive_cost_ranked.png`,
-`bioactive_cost_cumulative.png` with the paper's numbers, `bioactive_cost.csv`). Crystals cluster_cut
+`bioactive_cost_cumulative.png` (dG_dist only), `bioactive_cost.csv`). Crystals cluster_cut
 cannot place (cut through a polar H; symmetric assignments in different clusters) are left out of the
 figures but keep their RMSD-based values in the CSV.
