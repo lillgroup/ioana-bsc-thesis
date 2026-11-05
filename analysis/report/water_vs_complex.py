@@ -1,6 +1,9 @@
 """Torsions of the ligand in water vs in its complex(es): one figure per compound, one panel per
 torsion, the state-0 distributions overlaid (all frames, no clustering) and each complex's crystal
-value as a dashed line in that complex's colour.
+value as a dashed line in that complex's colour. Every frame of every system is written in ONE
+labelling (the molecule's symmetry: ring flips, carboxylates), the one nearest the crystal, so a
+symmetric torsion shows one peak per conformer and water and complex peaks of the same conformer
+coincide, as in the clustering figures.
 
 Generalises ../shuyu_clustering/compare_water_complex.py (folate only) to any compound in the
 manifest (prepare.py). Each system reads its own torsion files, which prepare.py mapped from the water
@@ -31,7 +34,8 @@ from rdkit import Chem
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(os.path.dirname(HERE), "shuyu_clustering"))
-from cluster_prune import load_torsions, reference_torsions, molecule_png, simulated_ns  # noqa: E402
+from cluster_prune import load_torsions, molecule_png, simulated_ns  # noqa: E402
+from md_tools.analysis import t_hdbscan, TorsionDefinitions, verify_atom_mapping, reference_assignments  # noqa: E402
 
 KINDS = ("torsions", "torsions_rigid", "torsions_polarH")
 COLOURS = ["#d62728", "#1f77b4", "#2ca02c", "#ff7f0e"]
@@ -50,14 +54,52 @@ def peak(values, edges):
     return 0.5 * (edges[h.argmax()] + edges[h.argmax() + 1])
 
 
-def system_torsions(system, stride):
-    """(names, per-frame dihedrals (F, n), quads, RDKit mol, simulated ns) for one system."""
+def canonical_row(rows, K):
+    """One of a crystal's symmetry-equivalent assignment rows, chosen by a rule that does not depend
+    on the system's atom order (lowest torsion values first, rounded to 1 deg), so every system
+    is written in the same labelling of the same crystal."""
+    R = np.asarray(rows, float)
+    key = np.where(np.isfinite(R[:, :K]), np.round(np.rad2deg(wrap(R[:, :K]))), 999.0)
+    return R[np.lexsort(key.T[::-1])[0]]
+
+
+def system_torsions(system, stride, crystal, max_matches):
+    """(names, per-frame dihedrals (F, n) in ONE labelling, quads, RDKit mol, simulated ns, descriptor,
+    reference row) for one system. Symmetric torsions (ring flips, carboxylates) are written in the
+    labelling nearest the crystal `crystal` -- the same crystal and the same rule for every system,
+    so water and complex peaks of one conformer coincide (as in the clustering figures). The
+    crystal's undefined columns (torsions through H) are filled from the system frame closest to it."""
     tors = load_torsions([f"{system['torsions']}/{k}.txt" for k in KINDS
                           if os.path.getsize(f"{system['torsions']}/{k}.txt") > 0])
-    quads = list(tors.values())
+    names, quads = list(tors), list(tors.values())
     t = md.load(system["traj"], top=system["top"], stride=stride)
     mol = Chem.SDMolSupplier(system["sdf"], removeHs=False)[0]
-    return list(tors), md.compute_dihedrals(t, quads), quads, mol, simulated_ns(t, stride)
+    mapping, _ = verify_atom_mapping(mol, [(a.index, b.index) for a, b in t.topology.bonds],
+                                     [a.element.symbol for a in t.topology.atoms])
+    defs = TorsionDefinitions(quads=tuple(quads), names=tuple(names), indexing="zero-based", units="radian")
+    extra = {"max_matches": int(max_matches)} if max_matches else {}
+    fit = t_hdbscan(md.compute_dihedrals(t, quads), molecule=mol, torsion_definitions=defs, coordinates=t,
+                    atom_mapping=mapping, **extra)                      # not fitted: symmetry only
+    d, C, K = fit.descriptor_, np.asarray(fit.closed_theta_, float), len(names)
+    ref = canonical_row(reference_assignments(crystal, mol, d.quads), K)
+    ok = np.isfinite(ref)
+    if not ok.all():                         # fill the H columns from the closest frame, in the crystal's labelling
+        best = (np.inf, None)
+        for op in d.operations:
+            G = d.transform(C, op.index)
+            dist = np.abs(wrap(G[:, ok] - ref[ok])).sum(axis=1)
+            i = int(dist.argmin())
+            if dist[i] < best[0]:
+                best = (dist[i], G[i])
+        ref = np.where(ok, ref, best[1])
+    angles = wrap(d.align_to_reference(C, ref)["angles"][:, :K])
+    return names, angles, quads, mol, simulated_ns(t, stride), d, ref
+
+
+def crystal_lines(d, path, mol, ref, K):
+    """A crystal's torsion values in the labelling nearest `ref` (one value per torsion, [] through H)."""
+    near = d.nearest_labelling(reference_assignments(path, mol, d.quads), ref)["angles"]
+    return [[float(wrap(a))] if np.isfinite(a) else [] for a in near[:K]]
 
 
 def main():
@@ -70,13 +112,15 @@ def main():
     man = json.load(open(args.manifest))
     stride = man["stride"]
 
-    names, wvals, wquads, wmol, wns = system_torsions(man["water"], stride)
+    # one labelling for every system: the one nearest the first complex's crystal (water: its own first)
+    crystal = man["complexes"][0]["refs"][0] if man["complexes"] else man["water"]["refs"][0]
+    names, wvals, wquads, wmol, wns, _, _ = system_torsions(man["water"], stride, crystal, man["max_matches"])
     systems = {"water": (wvals, "#9a9a9a", None, wns)}
     for k, c in enumerate(man["complexes"]):
-        cnames, cvals, cquads, cmol, cns = system_torsions(c, stride)
+        cnames, cvals, cquads, cmol, cns, d, ref = system_torsions(c, stride, crystal, man["max_matches"])
         assert len(cnames) == len(names), f"{c['label']}: {len(cnames)} torsions, water has {len(names)}"
-        ref = reference_torsions(c["refs"][0], cmol, cquads)
-        systems[f"{c['label']} complex"] = (cvals, COLOURS[k % len(COLOURS)], ref, cns)
+        lines = crystal_lines(d, c["refs"][0], cmol, ref, len(cnames))
+        systems[f"{c['label']} complex"] = (cvals, COLOURS[k % len(COLOURS)], lines, cns)
 
     edges = np.linspace(-np.pi, np.pi, args.bins + 1)
     win = np.deg2rad(args.window)
@@ -133,7 +177,7 @@ def main():
         if k == 0:
             ax.legend(fontsize=7, loc="upper left", frameon=False)
     lengths = ", ".join(f"{label} {s[3]:.0f} ns" for label, s in systems.items())
-    fig.suptitle(f"{man['name']} torsions: water vs bound (state 0, all frames; {lengths}; dashed = crystal)",
+    fig.suptitle(f"{man['name']} torsions: water vs bound (state 0, all frames, one symmetry labelling; {lengths}; dashed = crystal)",
                  fontsize=12)
     fig.savefig(args.out + ".png", dpi=150)
     plt.close(fig)

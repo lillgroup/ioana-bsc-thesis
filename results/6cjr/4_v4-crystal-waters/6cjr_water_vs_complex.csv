@@ -1,6 +1,6 @@
 torsion,atoms,complex,complex_peak_deg,complex_mass_at_peak,water_mass_at_complex_peak,crystal_deg,complex_mass_at_crystal,water_mass_at_crystal
 t0,C0-N6-C1-C2,6CJR complex,-157.5,0.762,0.57,-173.6,0.83,0.655
-t1,C1-N6-C0-C14,6CJR complex,-162.5,0.65,0.491,"-162.1, 78.2",0.65,0.491
+t1,C1-N6-C0-C14,6CJR complex,-162.5,0.65,0.491,-162.1,0.65,0.491
 t2,C4-C8-N7-N10,6CJR complex,-137.5,0.999,0.198,-134.3,0.999,0.196
 t3,N3-C26-C2-C1,6CJR complex,-147.5,0.983,0.449,-153.7,0.972,0.536
 t4,C11-C12-O25-H52,6CJR complex,-57.5,0.342,0.246,n/a,,

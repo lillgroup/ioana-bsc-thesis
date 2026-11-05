@@ -1,9 +1,9 @@
 torsion,atoms,complex,complex_peak_deg,complex_mass_at_peak,water_mass_at_complex_peak,crystal_deg,complex_mass_at_crystal,water_mass_at_crystal
 t0,C13-C12-C0-O28,6QLP complex,-172.5,0.994,0.739,-171.0,0.993,0.739
-t1,C5-C16-C1-C15,6QLP complex,7.5,0.777,0.481,"18.7, -165.6",0.76,0.425
+t1,C5-C16-C1-C15,6QLP complex,-167.5,0.989,0.898,-165.6,0.986,0.874
 t2,C15-N24-C14-C13,6QLP complex,-72.5,0.996,0.38,-63.4,0.98,0.338
 t3,C10-S31-C11-C18,6QLP complex,147.5,0.651,0.6,140.2,0.686,0.528
-t4,C11-S31-C10-C9,6QLP complex,52.5,0.298,0.196,"32.1, -145.4",0.203,0.126
+t4,C11-S31-C10-C9,6QLP complex,-122.5,0.599,0.431,-145.4,0.422,0.249
 t5,C12-C0-O28-H49,6QLP complex,-72.5,0.914,0.356,n/a,,
 t6,C12-C13-O29-H50,6QLP complex,157.5,0.89,0.319,n/a,,
 t7,C11-C18-O30-H51,6QLP complex,-62.5,0.486,0.291,n/a,,
