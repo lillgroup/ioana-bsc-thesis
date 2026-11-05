@@ -33,8 +33,7 @@ ensemble against the reference's full populations (the clustering is not refitte
                                       <out>/kl_cross_{cut,hdbscan}_regions.png: the same with the binding
                                       regimes as background (regime(); --lock-key-max, --induced-fit-min);
                                       <out>/kl_cross_cut_examples{,_regions}.png: only 4j7d, 4crf, 4ase, 1l8g.
-                                      Points coloured by rotatable bonds, marker = compound set; the
-                                      figures without regions have a transparent background (slides)
+                                      Points coloured by rotatable bonds
 """
 import argparse
 import json
@@ -223,6 +222,7 @@ def run(args):
 
 
 EXAMPLES = ("4j7d", "4crf", "4ase", "1l8g")     # the four corners of the cut plot (Shu-Yu: explain the equation with them)
+LABEL_OFFSETS = {"5ov8": (-9, 5, "right"), "4p6w": (8, -12, "left"), "1eld": (8, 5, "left")}  # crowded corner
 SETS = {"folate": "^", "original small molecules": "s", "rotatable-bond set": "o"}
 
 
@@ -259,20 +259,19 @@ def draw_kl(ax, df, info, cmap, norm, top, args, regions, big=False):
         col = cmap(norm(rb))
         x = 0 if pd.isna(r.KL_w_p_complexdef) else r.KL_w_p_complexdef
         ax.errorbar(x, r.KL_p_w_waterdef, xerr=None if pd.isna(r.KL_w_p_complexdef) else r.KL_w_p_se,
-                    yerr=r.KL_p_w_se, fmt=SETS[kind], ms=15 if big else 10, mfc="white" if pd.isna(r.KL_w_p_complexdef) else col,
+                    yerr=r.KL_p_w_se, fmt="o", ms=15 if big else 10, mfc="white" if pd.isna(r.KL_w_p_complexdef) else col,
                     mec="k" if not pd.isna(r.KL_w_p_complexdef) else col, mew=1.0 if not pd.isna(r.KL_w_p_complexdef) else 2,
                     ecolor="0.25", elinewidth=1, capsize=3, zorder=4, clip_on=False)
         text = point_label(df, r) + ("\n(no complex cluster)" if pd.isna(r.KL_w_p_complexdef) else "")
-        ax.annotate(text, (x, r.KL_p_w_waterdef), textcoords="offset points", xytext=(10, 6) if big else (7, 4),
+        dx, dy, ha = (10, 6, "left") if big else LABEL_OFFSETS.get(r.ligand, (7, 4, "left"))
+        ax.annotate(text, (x, r.KL_p_w_waterdef), textcoords="offset points", xytext=(dx, dy), ha=ha,
                     fontsize=13 if big else 8.5, color="k", fontweight="bold" if big else "normal", zorder=5)
     ax.set_xlim(-0.03 * top, top)
     ax.set_ylim(0, top)
     ax.set_xlabel(r"KL($\pi^{water}\,\|\,\pi^{protein}$)  (k$_B$), clusters defined on the complex")
     ax.set_ylabel(r"KL($\pi^{protein}\,\|\,\pi^{water}$)  (k$_B$), clusters defined in water")
     ax.grid(alpha=0.3)
-    kinds = [k for k in SETS if any(info[l][1] == k for l in df.ligand)]
     handles = [Line2D([], [], color="0.6", ls="--", lw=1, label="KL(w||p) = KL(p||w)")]
-    handles += [Line2D([], [], marker=SETS[k], ls="", mfc="0.8", mec="k", ms=9, label=k) for k in kinds]
     ax.legend(handles=handles, loc="upper left", fontsize=8.5, framealpha=0.9)
 
 
@@ -318,7 +317,7 @@ def plot(args):
                             "most frames are unassigned: use the barrier-cut plot" if regions and method == "hdbscan" else ""),
                          fontsize=10)
             path = f"{args.out}/kl_cross_{method}{suffix}.png"
-            fig.savefig(path, dpi=150, transparent=not regions)      # no regions: transparent, for slides
+            fig.savefig(path, dpi=150)
             plt.close(fig)
             print(f"wrote {path}")
         print("  " + "; ".join(f"{g}: {', '.join(point_label(df, r) for r in d.itertuples())}"
