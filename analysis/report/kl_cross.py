@@ -29,7 +29,9 @@ ensemble against the reference's full populations (the clustering is not refitte
 
   python -I kl_cross.py --method cut|hdbscan --compounds 4ibi  -> <out>/kl_cross_<method>_4ibi.csv
   (kl_cross.sbatch: one Slurm task per compound and method, then --plot)
-  python -I kl_cross.py --plot     -> <out>/kl_cross_{cut,hdbscan}.png + .csv (all compounds)
+  python -I kl_cross.py --plot     -> <out>/kl_cross_{cut,hdbscan}.png + .csv (all compounds), and
+                                      <out>/kl_cross_{cut,hdbscan}_regions.png: the same with the binding
+                                      regimes as background (regime(); --lock-key-max, --induced-fit-min)
 """
 import argparse
 import json
@@ -231,38 +233,99 @@ def plot(args):
         df = pd.concat([pd.read_csv(f) for f in files], ignore_index=True)
         if len(set(df.settings)) != 1:
             sys.exit(f"{method}: settings differ between compounds: {set(df.settings)}")
-        df.drop(columns="settings").to_csv(f"{args.out}/kl_cross_{method}.csv", index=False)
         ligands = list(dict.fromkeys(df.ligand))
         palette = list(plt.get_cmap("tab20").colors[::2]) + list(plt.get_cmap("tab20").colors[1::2]) + list(plt.get_cmap("Dark2").colors)
         colours = dict(zip(ligands, palette))
-        fig, ax = plt.subplots(figsize=(10.5, 8.5), layout="constrained")
+        df["regime"] = [regime(x, y, args) for x, y in zip(df.KL_w_p_complexdef, df.KL_p_w_waterdef)]
+        df.drop(columns="settings").to_csv(f"{args.out}/kl_cross_{method}.csv", index=False)
         top = np.nanmax(np.r_[df.KL_p_w_waterdef + df.KL_p_w_se, (df.KL_w_p_complexdef + df.KL_w_p_se).dropna()]) * 1.12
-        ax.plot([0, top], [0, top], color="0.6", ls="--", lw=1, label="KL(w||p) = KL(p||w)")
-        missing = []
-        for _, r in df.iterrows():
-            col = colours[r.ligand]
-            if pd.isna(r.KL_w_p_complexdef):
-                missing.append(f"{r.ligand} {r.complex}: KL(p||w) = {r.KL_p_w_waterdef:.2f}, no cluster in the complex")
-                ax.errorbar(0, r.KL_p_w_waterdef, yerr=r.KL_p_w_se, fmt="s", mfc="white", mec=col, ecolor=col, ms=9,
-                            mew=2, capsize=3, clip_on=False)
-                ax.annotate(f"{r.ligand} {r.complex}\n(no complex cluster)", (0, r.KL_p_w_waterdef),
-                            textcoords="offset points", xytext=(8, -4), fontsize=7.5, color=col)
-                continue
-            ax.errorbar(r.KL_w_p_complexdef, r.KL_p_w_waterdef, xerr=r.KL_w_p_se, yerr=r.KL_p_w_se, fmt="o",
-                        color=col, ms=9, capsize=3)
-            ax.annotate(f"{r.ligand} {r.complex}", (r.KL_w_p_complexdef, r.KL_p_w_waterdef),
-                        textcoords="offset points", xytext=(7, 4), fontsize=8.5, color=col)
-        ax.set_xlim(-0.03 * top, top)
-        ax.set_ylim(0, top)
-        ax.set_xlabel(r"KL($\pi^{water}\,\|\,\pi^{protein}$)  (k$_B$), clusters defined on the complex")
-        ax.set_ylabel(r"KL($\pi^{protein}\,\|\,\pi^{water}$)  (k$_B$), clusters defined in water")
-        ax.grid(alpha=0.3)
-        ax.legend(loc="upper left", fontsize=8.5)
-        ax.set_title(f"Bound vs free ligand ensemble, clusters of one ensemble, frames of the other assigned\n"
-                     f"{title}, REST2 state 0; bars: block SE over {args.blocks} time blocks", fontsize=10)
-        fig.savefig(f"{args.out}/kl_cross_{method}.png", dpi=150)
-        plt.close(fig)
-        print(f"wrote {args.out}/kl_cross_{method}.png" + (f" ({'; '.join(missing)})" if missing else ""))
+        for regions in (False, True):
+            fig, ax = plt.subplots(figsize=(10.5 + 1.2 * regions, 8.5), layout="constrained")
+            if regions:
+                draw_regions(ax, top, args)
+            ax.plot([0, top], [0, top], color="0.6", ls="--", lw=1, label="KL(w||p) = KL(p||w)")
+            missing = []
+            for _, r in df.iterrows():
+                col = colours[r.ligand]
+                if pd.isna(r.KL_w_p_complexdef):
+                    missing.append(f"{r.ligand} {r.complex}: KL(p||w) = {r.KL_p_w_waterdef:.2f}, no cluster in the complex")
+                    ax.errorbar(0, r.KL_p_w_waterdef, yerr=r.KL_p_w_se, fmt="s", mfc="white", mec=col, ecolor=col, ms=9,
+                                mew=2, capsize=3, clip_on=False, zorder=3)
+                    ax.annotate(f"{r.ligand} {r.complex}\n(no complex cluster)", (0, r.KL_p_w_waterdef),
+                                textcoords="offset points", xytext=(8, -4), fontsize=7.5, color=col)
+                    continue
+                ax.errorbar(r.KL_w_p_complexdef, r.KL_p_w_waterdef, xerr=r.KL_w_p_se, yerr=r.KL_p_w_se, fmt="o",
+                            color=col, ms=9, capsize=3, zorder=3)
+                ax.annotate(f"{r.ligand} {r.complex}", (r.KL_w_p_complexdef, r.KL_p_w_waterdef),
+                            textcoords="offset points", xytext=(7, 4), fontsize=8.5, color=col)
+            ax.set_xlim(-0.03 * top, top)
+            ax.set_ylim(0, top)
+            ax.set_xlabel(r"KL($\pi^{water}\,\|\,\pi^{protein}$)  (k$_B$), clusters defined on the complex")
+            ax.set_ylabel(r"KL($\pi^{protein}\,\|\,\pi^{water}$)  (k$_B$), clusters defined in water")
+            ax.grid(alpha=0.3)
+            ax.legend(loc="upper left", fontsize=8.5)
+            ax.set_title(f"Bound vs free ligand ensemble, clusters of one ensemble, frames of the other assigned\n"
+                         f"{title}, REST2 state 0; bars: block SE over {args.blocks} time blocks"
+                         + ("\nunassigned (noise) frames are dropped before the KL, so regimes are unreliable where "
+                            "most frames are unassigned: use the barrier-cut plot" if regions and method == "hdbscan" else ""),
+                         fontsize=10)
+            path = f"{args.out}/kl_cross_{method}{'_regions' if regions else ''}.png"
+            fig.savefig(path, dpi=150)
+            plt.close(fig)
+            print(f"wrote {path}" + (f" ({'; '.join(missing)})" if missing and not regions else ""))
+        print("  " + "; ".join(f"{g}: {', '.join(f'{r.ligand} {r.complex}' for _, r in d.iterrows())}"
+                               for g, d in df.groupby("regime", sort=False)))
+
+
+REGIMES = {"lock and key": "#2ca25f", "conformational selection": "#3182bd", "induced fit": "#e6550d"}
+
+
+def regime(x, y, args):
+    """Binding regime from the two KL (k_B): y = KL(p||w) ~ -ln(population of the bound conformer in
+    water) when the complex sits in one cluster; x = KL(w||p) = how differently the free ligand fills
+    the complex's clusters.
+      induced fit               y >= --induced-fit-min: the bound conformer is (nearly) absent in water
+      lock and key              x and y < --lock-key-max: free and bound ensembles nearly the same
+      conformational selection  otherwise: the bound conformer is a populated state of the free
+                                ligand, the protein shifts the populations towards it
+    With no complex cluster (x undefined) a y below --lock-key-max cannot be classified."""
+    if y >= args.induced_fit_min:
+        return "induced fit"
+    if pd.isna(x):
+        return "conformational selection" if y >= args.lock_key_max else "unclassified"
+    if max(x, y) < args.lock_key_max:
+        return "lock and key"
+    return "conformational selection"
+
+
+def draw_regions(ax, top, args):
+    """Background of the three regimes (regime()) and a right axis e^-y: the bound conformer's
+    approximate population in water."""
+    from matplotlib.patches import Patch, Rectangle
+    lk, fit = args.lock_key_max, args.induced_fit_min
+    ax.add_patch(Rectangle((-1, fit), top + 2, top, color=REGIMES["induced fit"], alpha=0.13, lw=0, zorder=0))
+    ax.add_patch(Rectangle((-1, 0), top + 2, fit, color=REGIMES["conformational selection"], alpha=0.13, lw=0, zorder=0))
+    ax.add_patch(Rectangle((-1, 0), lk + 1, lk, color="white", lw=0, zorder=0))
+    ax.add_patch(Rectangle((-1, 0), lk + 1, lk, color=REGIMES["lock and key"], alpha=0.22, lw=0, zorder=0))
+    rules = {"lock and key": f"KL(w||p), KL(p||w) < {lk:g}: free ≈ bound ensemble",
+             "conformational selection": f"bound conformer populated in water (KL(p||w) < {fit:g}, e$^{{-{fit:g}}}$ ≈ "
+                                         f"{100 * np.exp(-fit):.0f} %), protein shifts populations",
+             "induced fit": f"KL(p||w) ≥ {fit:g}: bound conformer ≲ {100 * np.exp(-fit):.0f} % of the free ensemble"}
+    for name, (x, y) in {"lock and key": (0.52 * lk, 0.01 * top), "conformational selection": (0.97 * top, 0.04 * top),
+                         "induced fit": (0.97 * top, fit + 0.04 * top)}.items():
+        ax.text(x, y, name, color=REGIMES[name], fontsize=11 if name == "lock and key" else 13, fontweight="bold",
+                alpha=0.75,
+                ha="left" if name == "lock and key" else "right", va="bottom", zorder=1)
+    leg = ax.legend(handles=[Patch(color=REGIMES[n], alpha=0.35, label=f"{n}: {rules[n]}") for n in REGIMES],
+                    loc="upper right", bbox_to_anchor=(0.99, 0.82), fontsize=8, title="rules", title_fontsize=8.5,
+                    framealpha=0.9)
+    ax.add_artist(leg)
+    right = ax.twinx()
+    pcts = [p for p in (50, 20, 10, 5, 2, 1, 0.5, 0.2, 0.1, 0.05, 0.02, 0.01) if -np.log(p / 100) <= top]
+    right.set_ylim(0, top)
+    right.set_yticks([-np.log(p / 100) for p in pcts], [f"{p:g} %" for p in pcts])
+    right.set_ylabel("≈ population of the bound conformer in water, e$^{-KL(p||w)}$\n"
+                     "(when the complex sits mostly in one cluster)", fontsize=9)
 
 
 def main():
@@ -272,6 +335,10 @@ def main():
     ap.add_argument("--compounds", nargs="+", default=DEFAULT)
     ap.add_argument("--blocks", type=int, default=5)
     ap.add_argument("--out", default=OUT)
+    ap.add_argument("--lock-key-max", type=float, default=1.0,
+                    help="regions plot: lock and key below this KL (k_B) on both axes")
+    ap.add_argument("--induced-fit-min", type=float, default=3.0,
+                    help="regions plot: induced fit from this KL(p||w) (k_B) up (e^-3 = 5 %% in water)")
     args = ap.parse_args()
     if args.plot:
         plot(args)

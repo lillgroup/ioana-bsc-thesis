@@ -67,3 +67,13 @@ Barrier cuts: a frame is walked down the reference's cut tree (MD-tools has no a
 method). HDBSCAN: THDBSCAN.predict; its unassigned fraction is in the CSV (very large for water frames
 on complex clusters, so the HDBSCAN x values rest on few frames). This replaces the pooled version
 above (`kl_divergence.py`, one clustering of water + complex together).
+
+`kl_cross_{cut,hdbscan}_regions.png`: the same scatter with the binding regimes as background
+(`regime()` in `kl_cross.py`; the CSV's `regime` column), y = KL(p||w) ~ -ln(population of the bound
+conformer in water) when the complex sits mostly in one cluster (right axis):
+- lock and key: both KL < 1 k_B (`--lock-key-max`): free and bound ensembles nearly the same;
+- induced fit: KL(p||w) >= 3 k_B (`--induced-fit-min`): bound conformer <= ~5 % of the free ensemble;
+- conformational selection: the rest: the bound conformer is a populated state in water, binding shifts
+  the populations towards it.
+Thresholds are our choice, not a standard; KL measures populations, not the binding mechanism's order of
+events. The HDBSCAN version drops unassigned frames, so its regimes are unreliable (use the cut one).
