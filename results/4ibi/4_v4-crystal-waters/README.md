@@ -27,3 +27,7 @@ MD-tools defaults (kT_cut 1, mass_floor 0.001, min_p2p pi/3), every frame, same 
 |---|---|---|
 | water | 25 clusters | 22.76, 11.13, 10.46, 8.71, 8.19, 7.71, 7.08, 6.31, 5.83, 2.86 ... (+15 more, 9.0 % together) |
 | 4IBI | 2 clusters | 99.8, 0.19 |
+
+`*_cut_intercluster_rmsd.png`, `*_cut_cluster_network.png`: symmetry-corrected heavy-atom RMSD between /
+within the barrier-cut clusters >= 1 % of the frames (smaller ones left out, see the title),
+`analysis/report/report_cut_rmsd.sbatch` (`shuyu_clustering/cluster_cut_rmsd.py`).
