@@ -13,8 +13,13 @@
 # Figures -> results/<compound>/<version>/<compound>_<system>_clusters_cut.png (+ _cut_split_tree.png,
 # _cut_free_energy.png, _cut_groups.csv); a section is added to that folder's README.
 #   sbatch -J report-cut-4ibi analysis/report/report_cut.sbatch 4ibi
+# Optional 2nd argument: the lowest barrier cut kT_cut (E*, MD-tools default 1). Any other value runs
+# into <system>-cut-kT<X>/ and names the figures *_clusters_cut_kT<X>.png etc., next to the default ones:
+#   sbatch -J report-cut-kT2-4ibi analysis/report/report_cut.sbatch 4ibi 2
 set -uo pipefail
 NAME=${1:?compound name from compounds.csv}
+KT=${2:-1}
+if [ "$KT" = 1 ]; then SUF=""; KTARG=(); else SUF="_kT$KT"; KTARG=(--kT-cut "$KT"); fi
 T=/scicore/home/lill0000/popa0002/thesis
 REPO=$T/bsc-thesis
 HERE=$REPO/analysis/report
@@ -56,29 +61,33 @@ if s.get("rest2_config") and os.path.exists(s["rest2_config"]):
 print("\n".join(args))
 EOF
 )
-  L=${A[0]}; OUT=$WORK/$L-cut
-  python "$REPO/analysis/shuyu_clustering/cluster_cut.py" "${A[@]:1}" --out "$OUT" > "$OUT.log" 2>&1 \
+  L=${A[0]}; OUT=$WORK/$L-cut${SUF/_/-}
+  python "$REPO/analysis/shuyu_clustering/cluster_cut.py" "${A[@]:1}" "${KTARG[@]}" --out "$OUT" > "$OUT.log" 2>&1 \
     || { tail -20 "$OUT.log"; fail "cluster_cut $L"; }
   line=$(grep -E '^[0-9]+ clusters; masses' "$OUT.log")
   short=$(python -I -c "import ast,sys; m=ast.literal_eval(sys.argv[1].split(': ',1)[1]); print(', '.join(map(str, m[:10])) + (f' ... (+{len(m) - 10} more, {sum(m[10:]):.1f} % together)' if len(m) > 10 else ''))" "$line")
   echo "   $L: ${line%%;*}: $short"; summary+=("| $L | ${line%%;*} | $short |")
-  cp "$OUT/clusters_overview.png" "$OUTDIR/${NAME}_${L}_clusters_cut.png"
-  cp "$OUT/groups.csv" "$OUTDIR/${NAME}_${L}_cut_groups.csv"
-  [ -s "$OUT/split_tree.png" ] && cp "$OUT/split_tree.png" "$OUTDIR/${NAME}_${L}_cut_split_tree.png"
-  cp "$OUT/clusters_free_energy.png" "$OUTDIR/${NAME}_${L}_cut_free_energy.png"
+  cp "$OUT/clusters_overview.png" "$OUTDIR/${NAME}_${L}_clusters_cut$SUF.png"
+  cp "$OUT/groups.csv" "$OUTDIR/${NAME}_${L}_cut${SUF}_groups.csv"
+  [ -s "$OUT/split_tree.png" ] && cp "$OUT/split_tree.png" "$OUTDIR/${NAME}_${L}_cut${SUF}_split_tree.png"
+  cp "$OUT/clusters_free_energy.png" "$OUTDIR/${NAME}_${L}_cut${SUF}_free_energy.png"
 done
 README=$OUTDIR/README.md
-[ -s "$README" ] && python -I - "$README" <<'EOF'
+if [ "$KT" = 1 ]; then HEAD="## Torsion partitioning (barrier cuts)"; else HEAD="## Torsion partitioning (barrier cuts, kT_cut $KT)"; fi
+[ -s "$README" ] && python -I - "$README" "$HEAD" <<'EOF'
 import sys
-p = sys.argv[1]; s = open(p).read()
-i = s.find("\n## Torsion partitioning")
-open(p, "w").write(s if i < 0 else s[:i + 1])
+p, head = sys.argv[1], sys.argv[2]; s = open(p).read()
+i = s.find("\n" + head + "\n")                     # this kT's section only, up to the next section
+if i >= 0:
+    j = s.find("\n## ", i + 1)
+    s = s[:i] + (s[j:] if j >= 0 else "\n")
+open(p, "w").write(s)
 EOF
 {
-  echo; echo "## Torsion partitioning (barrier cuts)"; echo
-  echo "\`*_clusters_cut.png\` (+ \`_cut_split_tree.png\`, \`_cut_free_energy.png\`, \`_cut_groups.csv\`): Shu-Yu's"
+  echo; echo "$HEAD"; echo
+  echo "\`*_clusters_cut$SUF.png\` (+ \`_cut${SUF}_split_tree.png\`, \`_cut${SUF}_free_energy.png\`, \`_cut${SUF}_groups.csv\`): Shu-Yu's"
   echo "\`cut_clustering\` (MD-tools main $(git -C /scicore/home/lill0000/popa0002/software/MD-tools-cut log --oneline -1 | cut -c1-7)), \`analysis/report/report_cut.sbatch\` (Slurm job ${SLURM_JOB_ID:-}, $(date +%F));"
-  echo "MD-tools defaults (kT_cut 1, mass_floor 0.001, min_p2p pi/3), every frame, same torsions t0.. as above."
+  echo "MD-tools defaults (mass_floor 0.001, min_p2p pi/3) with kT_cut $KT (lowest barrier cut E*; default 1), every frame, same torsions t0.. as above."
   echo; echo "| system | clusters | masses (%) |"; echo "|---|---|---|"
   printf '%s\n' "${summary[@]}"
 } >> "$README"

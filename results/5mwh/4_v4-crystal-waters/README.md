@@ -32,3 +32,25 @@ MD-tools defaults (kT_cut 1, mass_floor 0.001, min_p2p pi/3), every frame, same 
 `*_cut_intercluster_rmsd.png`, `*_cut_cluster_network.png`: symmetry-corrected heavy-atom RMSD between /
 within the barrier-cut clusters >= 1 % of the frames (smaller ones left out, see the title),
 `analysis/report/report_cut_rmsd.sbatch` (`shuyu_clustering/cluster_cut_rmsd.py`).
+
+## Torsion partitioning (barrier cuts, kT_cut 2)
+
+`*_clusters_cut_kT2.png` (+ `_cut_kT2_split_tree.png`, `_cut_kT2_free_energy.png`, `_cut_kT2_groups.csv`): Shu-Yu's
+`cut_clustering` (MD-tools main 306b109), `analysis/report/report_cut.sbatch` (Slurm job 30857808, 2026-11-10);
+MD-tools defaults (mass_floor 0.001, min_p2p pi/3) with kT_cut 2 (lowest barrier cut E*; default 1), every frame, same torsions t0.. as above.
+
+| system | clusters | masses (%) |
+|---|---|---|
+| water | 15 clusters | 15.06, 14.57, 12.89, 10.28, 10.14, 10.07, 7.91, 6.89, 3.97, 3.69 ... (+5 more, 4.5 % together) |
+| 5MWH | 13 clusters | 31.4, 15.43, 10.6, 10.19, 9.03, 8.01, 7.7, 6.52, 0.57, 0.23 ... (+3 more, 0.3 % together) |
+
+## Torsion partitioning (barrier cuts, kT_cut 3)
+
+`*_clusters_cut_kT3.png` (+ `_cut_kT3_split_tree.png`, `_cut_kT3_free_energy.png`, `_cut_kT3_groups.csv`): Shu-Yu's
+`cut_clustering` (MD-tools main 306b109), `analysis/report/report_cut.sbatch` (Slurm job 30857814, 2026-11-10);
+MD-tools defaults (mass_floor 0.001, min_p2p pi/3) with kT_cut 3 (lowest barrier cut E*; default 1), every frame, same torsions t0.. as above.
+
+| system | clusters | masses (%) |
+|---|---|---|
+| water | 5 clusters | 26.19, 24.86, 23.75, 15.06, 10.14 |
+| 5MWH | 11 clusters | 31.4, 26.04, 19.21, 8.01, 7.7, 6.52, 0.57, 0.23, 0.11, 0.11 ... (+1 more, 0.1 % together) |
