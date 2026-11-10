@@ -1,7 +1,7 @@
 """Conformational entropy vs the barrier-cut resolution: S_c = -sum pi_c ln pi_c (k_B) of the torsion-
 partitioning clusters (cut_clustering, MD-tools 306b109) over a grid of the two settings,
   pi_min = mass_floor (smallest piece, fraction of all frames)   and   E* = kT_cut (lowest barrier cut),
-for the water run and every complex of one compound, plus Delta S = S_complex - S_water. Same inputs as
+for the water run and every complex of one compound (two panels: water, complexes). Same inputs as
 report_cut.sbatch (prepare.py's trajectories and torsions, every frame); the molecule's symmetry is
 enumerated once per system and reused for every setting. Shaded: pi_min below 10 frames of that run
 (clusters that small are sampling noise). Error bars: block SE over --blocks time blocks of the labels.
@@ -72,43 +72,39 @@ def main():
     out = os.path.join(REPO, "results", args.name, man["version"], f"{args.name}_entropy_scan")
     df.to_csv(out + ".csv", index=False)
 
+    from matplotlib.lines import Line2D
     cplx = [c["label"] for c in man["complexes"]]
-    styles = ["-", "--", ":", "-."]
-    fig, axes = plt.subplots(1, 3, figsize=(16, 5.2), layout="constrained")
-    panels = [("water", ["water"]), (" / ".join(cplx) + " complex", cplx), ("ΔS = S$_{complex}$ − S$_{water}$", cplx)]
-    for ax, (title, systems) in zip(axes, panels):
+    styles = [("-", "o"), ("--", "s"), (":", "^"), ("-.", "D")]       # one line style + marker per complex
+    fig, axes = plt.subplots(1, 2, figsize=(12.5, 5.2), layout="constrained")
+    for ax, (title, systems) in zip(axes, [("water", ["water"]), ("complex", cplx)]):
         for k, s in enumerate(systems):
-            ls = styles[k % len(styles)] if len(systems) > 1 else "-"
+            ls, mk = styles[k % len(styles)] if s != "water" else ("-", "o")
             for kt in KTS:
                 d = res[s][res[s].E_star == kt].sort_values("pi_min")
-                if ax is axes[2]:
-                    w = res["water"][res["water"].E_star == kt].sort_values("pi_min")
-                    y, e = d.S.to_numpy() - w.S.to_numpy(), np.hypot(d.S_se.to_numpy(), w.S_se.to_numpy())
-                else:
-                    y, e = d.S.to_numpy(), d.S_se.to_numpy()
-                ax.errorbar(d.pi_min, y, yerr=e, color=COLOURS[kt], ls=ls, marker="o", ms=4, capsize=2, lw=1.6,
-                            label=f"E* = {kt:g} k$_B$T" + (f", {s}" if len(systems) > 1 else ""))
+                ax.errorbar(d.pi_min, d.S, yerr=d.S_se, color=COLOURS[kt], ls=ls, marker=mk, ms=5, capsize=2, lw=1.6)
                 if kt == 1.0:                       # the default setting used everywhere else
                     i = int(np.argmin(np.abs(np.log(d.pi_min.to_numpy()) - np.log(1e-3))))
-                    ax.plot(d.pi_min.iloc[i], y[i], "*", color="k", ms=13, zorder=5)
-            if ax is not axes[2]:
-                n = int(res[s].frames.iloc[0])
-                ax.axvspan(1e-4 * 0.8, 10.0 / n, color="0.85", zorder=0, lw=0)
+                    ax.plot(d.pi_min.iloc[i], d.S.iloc[i], "*", color="k", ms=14, zorder=5)
+            n = int(res[s].frames.iloc[0])
+            ax.axvspan(1e-4 * 0.8, 10.0 / n, color="0.88", zorder=0, lw=0)
+        handles = [Line2D([], [], color=COLOURS[kt], lw=2.5, label=f"E* = {kt:g} k$_B$T") for kt in KTS]
+        if len(systems) > 1:
+            handles += [Line2D([], [], color="k", ls=styles[k][0], marker=styles[k][1], ms=5, lw=1.6,
+                               label=f"{s} complex") for k, s in enumerate(systems)]
+        handles.append(Line2D([], [], color="k", marker="*", ls="", ms=12, label="default (E* 1, π$_{min}$ 10$^{-3}$)"))
+        ax.legend(handles=handles, fontsize=8.5, handlelength=3.2, loc="lower right" if len(systems) == 1 else "upper right")
         ax.set_xscale("log")
         ax.set_xlim(1.25e-2, 0.8e-4)                # coarse (left) -> fine (right)
         ax.set_xlabel("π$_{min}$ (mass floor, fraction of all frames)")
-        ax.set_title(title, fontsize=11)
+        ax.set_title(title if len(systems) == 1 else f"complex ({' / '.join(systems)})", fontsize=11)
         ax.grid(alpha=0.3, which="both")
-        ax.legend(fontsize=8)
-    axes[0].set_ylabel("S$_c$  (k$_B$)")
-    top = max(axes[0].get_ylim()[1], axes[1].get_ylim()[1])
-    for ax in axes[:2]:
+    axes[0].set_ylabel("S$_c$ = −Σ π$_c$ ln π$_c$  (k$_B$)")
+    top = max(ax.get_ylim()[1] for ax in axes)
+    for ax in axes:
         ax.set_ylim(0, top)
-    axes[2].set_ylabel("ΔS$_c$  (k$_B$)")
-    axes[2].axhline(0, color="0.5", lw=0.8)
     fig.suptitle(f"{args.name}: conformational entropy vs barrier-cut resolution (torsion partitioning, REST2 state 0, every frame)\n"
-                 "★ = default (E* 1 k$_B$T, π$_{min}$ 10$^{-3}$); grey = π$_{min}$ below 10 frames of that run; bars: block SE "
-                 f"over {args.blocks} time blocks", fontsize=11)
+                 "π$_c$ = fraction of the run's frames in cluster c; grey = π$_{min}$ below 10 frames of that run; "
+                 f"bars: block SE over {args.blocks} time blocks", fontsize=11)
     fig.savefig(out + ".png", dpi=150)
     print(f"wrote {out}.png / .csv")
 
