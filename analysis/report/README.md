@@ -42,12 +42,12 @@ worktree at 306b109), so `analysis-env-main` and the symmetry-first results stay
 
 ## Conformational entropy across ligands
 
-`conformational_entropy.py` (`sbatch conformational_entropy.sbatch`): S_c = -sum pi_c ln pi_c (k_B) and
-e^S_c, the effective number of equally populated conformers, for every ligand in water and complex,
+`conformational_entropy.py` (`sbatch conformational_entropy.sbatch`): S_c = -sum pi_c ln pi_c (k_B) for
+every ligand in water and complex,
 from the populations of each clustering method -> `results/overview/conformational-entropy/`
 (`_hdbscan.png`, `_cut.png`, `.csv`). Each figure uses one method with one set of settings; the script
 checks every run's own record and stops if they differ. HDBSCAN: populations over the assigned frames
-(the unassigned fraction is in the CSV); a run with no cluster is drawn at e^S = 1, hollow. Error bars:
+(the unassigned fraction is in the CSV); a run with no cluster is drawn at S_c = 0, hollow. Error bars:
 block standard error over 5 time blocks. x: rotatable bonds, RDKit on the heavy-atom graph.
 
 ## KL divergence: bound vs free ensemble

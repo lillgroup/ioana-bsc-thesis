@@ -1,7 +1,6 @@
 """Conformational entropy from cluster populations, as a flexibility measure comparable across ligands.
 
-  S_c = - sum_c pi_c ln pi_c   (units of k_B),   e^S_c = the effective number of equally populated
-                                                conformers ("behaves as if it had 1.84 conformers")
+  S_c = - sum_c pi_c ln pi_c   (units of k_B; 0 = one conformer)
 
 for every ligand in water and in each complex, from the clustering outputs written by report.sbatch
 (symmetry-first HDBSCAN, --no-single-cluster, MD-tools c30c1c0) and report_cut.sbatch (torsion
@@ -12,9 +11,9 @@ record (summary.json) and stops if route, settings or md-tools version differ be
   pi_c   HDBSCAN: the final clusters (leaves of the recursive split, merged_groups.json), masses
          renormalised over the frames assigned to a cluster (noise and
          ambiguous frames are left out; their fraction is in the CSV). A run where no cluster is found
-         (NO_CLUSTER.txt: one basin, e.g. 4ibi bound) is drawn at e^S = 1 with a hollow marker.
+         (NO_CLUSTER.txt: one basin, e.g. 4ibi bound) is drawn at S_c = 0 with a hollow marker.
          Barrier cuts: every frame is labelled; all clusters.
-  error  block standard error of e^S over --blocks consecutive time blocks of the state-0 labels
+  error  block standard error of S_c over --blocks consecutive time blocks of the state-0 labels
   x      rotatable bonds, RDKit on the heavy-atom graph (the definition used to select the ligands)
 
   python -I conformational_entropy.py [--compounds folic-acid paracetamol 4ibi ...] [--out DIR]
@@ -58,20 +57,20 @@ def letters(i):
 
 
 def block_se(labels, clusters, blocks):
-    """Standard error of e^S over consecutive blocks of the per-frame labels (unassigned dropped)."""
+    """Standard error of S_c over consecutive blocks of the per-frame labels (unassigned dropped)."""
     vals = []
     for b in np.array_split(np.asarray(labels), blocks):
         b = b[np.isin(b, clusters)]
         if len(b):
             _, counts = np.unique(b, return_counts=True)
-            vals.append(np.exp(entropy(counts)))
+            vals.append(entropy(counts))
     return float(np.std(vals, ddof=1) / np.sqrt(len(vals))) if len(vals) > 1 else float("nan")
 
 
 def read_run(d, method, blocks):
-    """(populations, unassigned fraction, e^S block SE, algorithm record, note) of one clustering output."""
+    """(populations, unassigned fraction, S_c block SE, algorithm record, note) of one clustering output."""
     if method == "hdbscan" and os.path.exists(f"{d}/NO_CLUSTER.txt"):
-        return [1.0], 1.0, 0.0, None, "no cluster found (one basin): drawn at e^S = 1"
+        return [1.0], 1.0, 0.0, None, "no cluster found (one basin): drawn at S_c = 0"
     s = json.load(open(f"{d}/summary.json"))
     lab = pd.read_csv(f"{d}/labels.csv").iloc[:, 2].astype(str).to_numpy()
     if method == "hdbscan":
@@ -116,7 +115,7 @@ def main():
                 S = entropy(p)
                 rows.append({"method": method, "ligand": name, "system": system, "rot_bonds": rb,
                              "n_clusters": len(p) if not note else 0, "S_kB": round(S, 4),
-                             "exp_S": round(float(np.exp(S)), 3), "exp_S_block_se": round(se, 3),
+                             "S_block_se": round(se, 4),
                              "unassigned_fraction": round(unassigned, 4), "note": note,
                              "algorithm": json.dumps(rec, sort_keys=True) if rec else ""})
     df = pd.DataFrame(rows)
@@ -149,26 +148,26 @@ def main():
             w = g[g.system == "water"].iloc[0]
             cpx = g[g.system != "water"]
             for k, (_, c) in enumerate(cpx.iterrows()):
-                ax.plot([x0 - 0.05, x0 + 0.05], [w.exp_S, c.exp_S], color=col, lw=0.8, ls=":", alpha=0.7)
-            ax.errorbar(x0 - 0.05, w.exp_S, yerr=w.exp_S_block_se, fmt="o", mfc="white", mec=col, ecolor=col,
+                ax.plot([x0 - 0.05, x0 + 0.05], [w.S_kB, c.S_kB], color=col, lw=0.8, ls=":", alpha=0.7)
+            ax.errorbar(x0 - 0.05, w.S_kB, yerr=w.S_block_se, fmt="o", mfc="white", mec=col, ecolor=col,
                         ms=9, mew=2, capsize=3, label=f"{name} ({int(w.rot_bonds)} rot. bonds)")
             for k, (_, c) in enumerate(cpx.iterrows()):
                 hollow = bool(c.note)
-                ax.errorbar(x0 + 0.05, c.exp_S, yerr=None if hollow else c.exp_S_block_se,
+                ax.errorbar(x0 + 0.05, c.S_kB, yerr=None if hollow else c.S_block_se,
                             fmt=markers[k % len(markers)], mfc="white" if hollow else col, mec=col, ecolor=col,
                             ms=9, mew=2, capsize=3)
-                ax.annotate(c.system.replace(" complex", ""), (x0 + 0.05, c.exp_S), textcoords="offset points",
+                ax.annotate(c.system.replace(" complex", ""), (x0 + 0.05, c.S_kB), textcoords="offset points",
                             xytext=(7, -3), fontsize=7.5, color=col)
-        ax.set_yscale("log")
+        ax.set_ylim(bottom=0)
         ax.set_xlabel("rotatable bonds (heavy-atom graph)")
-        ax.set_ylabel(r"$e^{S_c}$  (effective number of equally populated conformers)")
+        ax.set_ylabel(r"$S_c$  (k$_B$)")
         ax.set_xticks(sorted(df.rot_bonds.unique()))
         ax.grid(alpha=0.3, which="both")
         h = [plt.Line2D([], [], marker="o", ls="", mfc="white", mec="0.3", mew=2, ms=8, label="in water"),
              plt.Line2D([], [], marker="s", ls="", color="0.3", ms=8, label="in its complex (PDB id at the point)")]
         if (sub.note != "").any():
             h.append(plt.Line2D([], [], marker="s", ls="", mfc="white", mec="0.3", mew=2, ms=8,
-                                label="complex, no cluster found: one basin, e^S = 1"))
+                                label="complex, no cluster found: one basin, S_c = 0"))
         leg1 = ax.legend(handles=h, loc="upper left", fontsize=8.5)
         ax.add_artist(leg1)
         ax.legend(loc="center left", bbox_to_anchor=(1.01, 0.5), fontsize=8, title="ligand",
