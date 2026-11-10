@@ -53,7 +53,7 @@ def main():
     masses = summary["cluster_mass"]                                 # name -> fraction, by mass
     shown = [c for c, m in masses.items() if m >= args.min_mass]
     index = {c: i for i, c in enumerate(shown)}
-    labels_csv = pd.read_csv(P("labels.csv"))
+    labels_csv = pd.read_csv(P("labels.csv"), keep_default_na=False, dtype={"cluster": str})
     labels = np.array([index.get(c, -1) for c in labels_csv["cluster"]], dtype=np.int64)
 
     cmd = md.load(args.traj, top=args.top, stride=int(summary["stride"]))

@@ -98,3 +98,11 @@ through the joint cut tree. KL(p||w), KL(w||p) with a 0.5-frame pseudocount per 
 ensemble visits; `*` in the figure where they hold > 1 % of one ensemble) and JS = (KL(w||m) + KL(p||m))/2,
 each half in [0, ln 2] -> `results/overview/kl-divergence/kl_joint_cut.png`, `js_joint_halves_cut.png`,
 `js_joint_ranked_cut.png` (CSVs in `data/`). Folate: one joint clustering per complex.
+
+## Cluster-by-cluster RMSD, complex clusters x water clusters (Shu-Yu)
+
+`cross_cluster_rmsd.py` (`sbatch cross_cluster_rmsd.sbatch`, one task per compound): rows = the complex's own
+barrier-cut clusters, columns = the water run's own barrier-cut clusters (two clusterings), each sorted
+largest first, clusters >= 1 % of their run; cell = mean symmetry-corrected heavy-atom RMSD between complex
+frames of the row cluster and water frames of the column cluster (<= 400 random frames per cluster); gold =
+cluster the crystal falls in -> `results/<compound>/<version>/<compound>_<PDB>_cut_cross_rmsd.{png,csv}`.

@@ -1,0 +1,5 @@
+complex_cluster,complex_mass,water_cluster,water_mass,rmsd_mean,rmsd_std
+A,0.9812,A,0.2991,1.8652,0.1922
+A,0.9812,B,0.23923,2.4348,0.2711
+A,0.9812,C,0.2214,2.5015,0.3413
+A,0.9812,D,0.2008,1.72,0.2471

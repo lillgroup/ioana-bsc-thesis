@@ -72,7 +72,7 @@ def read_run(d, method, blocks):
     if method == "hdbscan" and os.path.exists(f"{d}/NO_CLUSTER.txt"):
         return [1.0], 1.0, 0.0, None, "no cluster found (one basin): drawn at S_c = 0"
     s = json.load(open(f"{d}/summary.json"))
-    lab = pd.read_csv(f"{d}/labels.csv").iloc[:, 2].astype(str).to_numpy()
+    lab = pd.read_csv(f"{d}/labels.csv", keep_default_na=False, dtype={"cluster": str}).iloc[:, 2].astype(str).to_numpy()
     if method == "hdbscan":
         # the FINAL clusters: with recursive splitting these are the leaves of the split tree, which
         # merged_groups.json holds (masses as fractions of all frames) and labels.csv names

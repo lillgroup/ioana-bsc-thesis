@@ -90,7 +90,7 @@ def compute(name, blocks, reg):
     man = json.load(open(f"{WORK}/{name}/manifest.json"))
     wdir = f"{WORK}/{name}/water-cut"
     summary = json.load(open(f"{wdir}/summary.json"))
-    labels = pd.read_csv(f"{wdir}/labels.csv")["cluster"].to_numpy()
+    labels = pd.read_csv(f"{wdir}/labels.csv", keep_default_na=False, dtype={"cluster": str})["cluster"].to_numpy()
     masses = summary["cluster_mass"]
     top = max(masses, key=masses.get)
     w = man["water"]
