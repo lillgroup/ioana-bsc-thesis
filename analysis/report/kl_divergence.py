@@ -148,8 +148,9 @@ def run_method(args):
     if len(set(df.settings)) != 1:
         sys.exit(f"settings differ between compounds: {set(df.settings)}")
     os.makedirs(args.out, exist_ok=True)
-    df.to_csv(f"{args.out}/kl_{args.method}.csv", index=False)
-    print(f"wrote {args.out}/kl_{args.method}.csv")
+    os.makedirs(f"{args.out}/data", exist_ok=True)
+    df.to_csv(f"{args.out}/data/kl_{args.method}.csv", index=False)
+    print(f"wrote {args.out}/data/kl_{args.method}.csv")
 
 
 def plot(args):
@@ -158,7 +159,7 @@ def plot(args):
     import matplotlib.pyplot as plt
     titles = {"cut": "torsion partitioning (barrier cuts)", "hdbscan": "symmetry-first HDBSCAN (no single cluster)"}
     for method, title in titles.items():
-        f = f"{args.out}/kl_{method}.csv"
+        f = f"{args.out}/data/kl_{method}.csv"
         if not os.path.exists(f):
             print(f"skip {method}: no {f}")
             continue
@@ -186,9 +187,10 @@ def plot(args):
                      f"KL >> S_w or\nmass in clusters unseen in water: it binds conformers water rarely or never visits "
                      f"(induced fit). Pseudocount {df.pseudocount.iloc[0]:g} frames/cluster; bars: block SE",
                      fontsize=9.5)
-        fig.savefig(f"{args.out}/kl_divergence_{method}.png", dpi=150)
+        os.makedirs(f"{args.out}/other", exist_ok=True)
+        fig.savefig(f"{args.out}/other/kl_divergence_{method}.png", dpi=150)
         plt.close(fig)
-        print(f"wrote {args.out}/kl_divergence_{method}.png")
+        print(f"wrote {args.out}/other/kl_divergence_{method}.png")
 
 
 def main():

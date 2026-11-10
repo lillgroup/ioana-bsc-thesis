@@ -54,7 +54,7 @@ block standard error over 5 time blocks. x: rotatable bonds, RDKit on the heavy-
 
 `kl_divergence.py` (`sbatch kl_divergence.sbatch`): KL(pi^complex || pi^water) on ONE shared clustering
 of water + complex frames (equal numbers from each) per (ligand, complex), for both methods, each in its
-own environment -> `results/overview/kl-divergence/` (`kl_divergence_{cut,hdbscan}.png`, `kl_{cut,hdbscan}.csv`).
+own environment -> `results/overview/kl-divergence/` (`other/kl_divergence_{cut,hdbscan}.png`, `data/kl_{cut,hdbscan}.csv`).
 Next to KL: S_w (KL of selecting a typical water conformer) and the fraction of the bound ensemble in
 clusters with no water frame (induced fit). Pseudocount 0.5 frames per cluster; block-SE error bars.
 
@@ -62,7 +62,7 @@ clusters with no water frame (induced fit). Pseudocount 0.5 frames per cluster; 
 
 `kl_cross.py` (`bash kl_cross_submit.sh`: one 30-min task per compound and method, then the figures):
 water clusters + complex frames assigned -> KL(pi^p || pi^w) (y); complex clusters + water frames
-assigned -> KL(pi^w || pi^p) (x) -> `results/overview/kl-divergence/kl_cross_{cut,hdbscan}.{png,csv}`.
+assigned -> KL(pi^w || pi^p) (x) -> `results/overview/kl-divergence/kl_cross_cut*.png` (HDBSCAN: `other/`), CSVs in `data/`.
 Barrier cuts: a frame is walked down the reference's cut tree (MD-tools has no assignment for this
 method). HDBSCAN: THDBSCAN.predict; its unassigned fraction is in the CSV (very large for water frames
 on complex clusters, so the HDBSCAN x values rest on few frames). This replaces the pooled version
@@ -97,4 +97,4 @@ count (equal weight: the clustered ensemble is m = (pi^w + pi^p)/2); every frame
 through the joint cut tree. KL(p||w), KL(w||p) with a 0.5-frame pseudocount per cluster (clusters only one
 ensemble visits; `*` in the figure where they hold > 1 % of one ensemble) and JS = (KL(w||m) + KL(p||m))/2,
 each half in [0, ln 2] -> `results/overview/kl-divergence/kl_joint_cut.png`, `js_joint_halves_cut.png`,
-`js_joint_ranked_cut.png`, `kl_joint_cut.csv`. Folate: one joint clustering per complex.
+`js_joint_ranked_cut.png` (CSVs in `data/`). Folate: one joint clustering per complex.

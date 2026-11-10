@@ -115,8 +115,9 @@ def run(args):
                   f"(w {res['JS_w_m']:.3f}, p {res['JS_p_m']:.3f}) | complex-only clusters {int(only_p.sum())} "
                   f"({100 * row['complex_mass_in_them']:.1f} % of the complex), water-only {int(only_w.sum())} "
                   f"({100 * row['water_mass_in_them']:.1f} % of water)", flush=True)
-        pd.DataFrame(rows).to_csv(f"{args.out}/kl_joint_cut_{name}.csv", index=False)
-        print(f"wrote {args.out}/kl_joint_cut_{name}.csv", flush=True)
+        os.makedirs(f"{args.out}/data", exist_ok=True)
+        pd.DataFrame(rows).to_csv(f"{args.out}/data/kl_joint_cut_{name}.csv", index=False)
+        print(f"wrote {args.out}/data/kl_joint_cut_{name}.csv", flush=True)
 
 
 def plot(args):
@@ -124,13 +125,13 @@ def plot(args):
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
     from matplotlib.colors import BoundaryNorm
-    files = sorted(f for f in glob.glob(f"{args.out}/kl_joint_cut_*.csv"))
+    files = sorted(f for f in glob.glob(f"{args.out}/data/kl_joint_cut_*.csv"))
     df = pd.concat([pd.read_csv(f) for f in files], ignore_index=True)
     if len(set(df.settings)) != 1:
         sys.exit(f"settings differ between compounds: {set(df.settings)}")
     info = ligand_info()
     df["rot_bonds"] = [info[l][0] for l in df.ligand]
-    df.drop(columns="settings").to_csv(f"{args.out}/kl_joint_cut.csv", index=False)
+    df.drop(columns="settings").to_csv(f"{args.out}/data/kl_joint_cut.csv", index=False)
     lo, hi = int(df.rot_bonds.min()), int(df.rot_bonds.max())
     cmap = plt.get_cmap("viridis", hi - lo + 1)
     norm = BoundaryNorm(np.arange(lo - 0.5, hi + 1.5), cmap.N)
@@ -195,7 +196,7 @@ def plot(args):
     colourbar(fig, ax)
     fig.savefig(f"{args.out}/js_joint_ranked_cut.png", dpi=150)
     plt.close(fig)
-    print(f"wrote {args.out}/kl_joint_cut.png, js_joint_halves_cut.png, js_joint_ranked_cut.png, kl_joint_cut.csv")
+    print(f"wrote {args.out}/kl_joint_cut.png, js_joint_halves_cut.png, js_joint_ranked_cut.png, data/kl_joint_cut.csv")
 
 
 def main():

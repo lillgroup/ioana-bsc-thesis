@@ -217,8 +217,9 @@ def run(args):
                   + ("-- no cluster" if pdef is None else
                      f"{pdef['k']:3d} clusters  KL(w||p) {pdef['KL']:.2f} +- {pdef['se']:.2f} (water unassigned "
                      f"{100 * pdef['unassigned']:.1f} %)"), flush=True)
-        pd.DataFrame(rows).to_csv(f"{args.out}/kl_cross_{args.method}_{name}.csv", index=False)
-        print(f"wrote {args.out}/kl_cross_{args.method}_{name}.csv", flush=True)
+        os.makedirs(f"{args.out}/data", exist_ok=True)
+        pd.DataFrame(rows).to_csv(f"{args.out}/data/kl_cross_{args.method}_{name}.csv", index=False)
+        print(f"wrote {args.out}/data/kl_cross_{args.method}_{name}.csv", flush=True)
 
 
 EXAMPLES = ("4j7d", "4crf", "4ase", "1l8g")     # the four corners of the cut plot (Shu-Yu: explain the equation with them)
@@ -284,7 +285,7 @@ def plot(args):
     info = ligand_info()
     for method, title in titles.items():
         import glob
-        files = sorted(glob.glob(f"{args.out}/kl_cross_{method}_*.csv"))
+        files = sorted(glob.glob(f"{args.out}/data/kl_cross_{method}_*.csv"))
         files = [f for f in files if not f.endswith(("_regions.csv", "_examples.csv"))]
         if not files:
             print(f"skip {method}: no kl_cross_{method}_*.csv")
@@ -295,7 +296,7 @@ def plot(args):
         df["regime"] = [regime(x, y, args) for x, y in zip(df.KL_w_p_complexdef, df.KL_p_w_waterdef)]
         df["rot_bonds"] = [info[l][0] for l in df.ligand]
         df["compound_set"] = [info[l][1] for l in df.ligand]
-        df.drop(columns="settings").to_csv(f"{args.out}/kl_cross_{method}.csv", index=False)
+        df.drop(columns="settings").to_csv(f"{args.out}/data/kl_cross_{method}.csv", index=False)
         top = np.nanmax(np.r_[df.KL_p_w_waterdef + df.KL_p_w_se, (df.KL_w_p_complexdef + df.KL_w_p_se).dropna()]) * 1.12
         lo, hi = int(df.rot_bonds.min()), int(df.rot_bonds.max())
         cmap = plt.get_cmap("viridis", hi - lo + 1)
@@ -316,7 +317,9 @@ def plot(args):
                          + ("\nunassigned (noise) frames are dropped before the KL, so regimes are unreliable where "
                             "most frames are unassigned: use the barrier-cut plot" if regions and method == "hdbscan" else ""),
                          fontsize=10)
-            path = f"{args.out}/kl_cross_{method}{suffix}.png"
+            sub_dir = "" if method == "cut" else "other/"           # HDBSCAN: not for interpretation
+            os.makedirs(f"{args.out}/{sub_dir}", exist_ok=True)
+            path = f"{args.out}/{sub_dir}kl_cross_{method}{suffix}.png"
             fig.savefig(path, dpi=150)
             plt.close(fig)
             print(f"wrote {path}")

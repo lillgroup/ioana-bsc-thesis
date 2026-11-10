@@ -79,7 +79,7 @@ def block_pop(mask, blocks):
 
 
 def regimes():
-    path = os.path.join(REPO, "results", "overview", "kl-divergence", "kl_cross_cut.csv")
+    path = os.path.join(REPO, "results", "overview", "kl-divergence", "data", "kl_cross_cut.csv")
     if not os.path.exists(path):
         return {}
     df = pd.read_csv(path)
