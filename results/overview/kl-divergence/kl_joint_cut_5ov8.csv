@@ -1,0 +1,2 @@
+method,ligand,complex,n_joint_clusters,frames_water,frames_complex,frames_each_in_clustering,tree_walk_agreement,complex_only_clusters,complex_mass_in_them,water_only_clusters,water_mass_in_them,KL_p_w,KL_p_w_se,KL_w_p,KL_w_p_se,JS_w_m,JS_w_m_se,JS_p_m,JS_p_m_se,JS,JS_se,md_tools,settings
+cut,5ov8,5OV8,74,30000,20000,20000,1.0,0,0.0,29,0.3096,0.816,0.0992,2.7776,0.1924,0.1746,0.02,0.3097,0.0238,0.2422,0.0216,0.6.5.2,"{""gauge"": null, ""kT_cut"": 1.0, ""kT_step"": 0.5, ""mass_floor"": 0.001, ""min_p2p"": 1.0471975511965976, ""n_bins"": 72, ""z_min"": 0.5}"

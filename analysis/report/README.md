@@ -88,3 +88,13 @@ heavy-atom RMSD of the crystal -> `results/overview/bioactive-cost/` (`bioactive
 `bioactive_cost_cumulative.png` (dG_dist only), `bioactive_cost.csv`). Crystals cluster_cut
 cannot place (cut through a polar H; symmetric assignments in different clusters) are left out of the
 figures but keep their RMSD-based values in the CSV.
+
+## KL and Jensen-Shannon on ONE joint clustering
+
+`kl_joint.py` (`bash kl_joint_submit.sh`: one 30-min task per compound, then the figures): barrier cuts
+(defaults) on the water and complex frames together, the longer run subsampled to the shorter one's frame
+count (equal weight: the clustered ensemble is m = (pi^w + pi^p)/2); every frame of both runs then labelled
+through the joint cut tree. KL(p||w), KL(w||p) with a 0.5-frame pseudocount per cluster (clusters only one
+ensemble visits; `*` in the figure where they hold > 1 % of one ensemble) and JS = (KL(w||m) + KL(p||m))/2,
+each half in [0, ln 2] -> `results/overview/kl-divergence/kl_joint_cut.png`, `js_joint_halves_cut.png`,
+`js_joint_ranked_cut.png`, `kl_joint_cut.csv`. Folate: one joint clustering per complex.
