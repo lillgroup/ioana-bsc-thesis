@@ -20,3 +20,4 @@ paracetamol,2_v4,water-runs/PARA-REST2-v4,,,,1,,0
 1rd4,4_v4-crystal-waters,REST2-rotbonds/1rd4-water,,1RD4=REST2-rotbonds/1rd4-complex=runs/REST2-rotbonds/packages/1rd4.input.sdf,runs/REST2-rotbonds/packages/1rd4.input.sdf,5,,2
 4crf,4_v4-crystal-waters,REST2-rotbonds/4crf-water,,4CRF=REST2-rotbonds/4crf-complex=runs/REST2-rotbonds/packages/4crf.input.sdf,runs/REST2-rotbonds/packages/4crf.input.sdf,5,,
 1eld,4_v4-crystal-waters,REST2-rotbonds/1eld-water,,1ELD=REST2-rotbonds/1eld-complex=runs/REST2-rotbonds/packages/1eld.input.sdf,runs/REST2-rotbonds/packages/1eld.input.sdf,5,,
+4erf-reduce,5_v4-reduce,REST2-rotbonds/4erf-water,,4ERF=REST2-rotbonds-reduce/4erf-complex=runs/REST2-rotbonds/packages/4erf.input.sdf,runs/REST2-rotbonds/packages/4erf.input.sdf,5,,

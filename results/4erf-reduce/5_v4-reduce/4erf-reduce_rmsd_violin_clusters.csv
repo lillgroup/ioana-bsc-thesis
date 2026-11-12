@@ -1,0 +1,8 @@
+complex,cluster,mass,median_rmsd,q25,q75,crystal_cluster,central_frame
+4ERF,A,0.4288,0.632,0.596,0.668,False,6512
+4ERF,B,0.3398,0.36,0.32,0.405,False,462
+4ERF,C,0.1095,0.395,0.349,0.447,False,18133
+4ERF,D,0.0486,0.388,0.345,0.441,False,16442
+4ERF,E,0.0362,0.366,0.316,0.423,False,655
+4ERF,F,0.0106,0.383,0.329,0.432,False,15342
+4ERF,G,0.0102,0.894,0.846,0.936,False,17898

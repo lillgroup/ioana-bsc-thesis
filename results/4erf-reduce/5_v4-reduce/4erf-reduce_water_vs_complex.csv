@@ -1,0 +1,9 @@
+torsion,atoms,complex,complex_peak_deg,complex_mass_at_peak,water_mass_at_complex_peak,crystal_deg,complex_mass_at_crystal,water_mass_at_crystal
+t0,C8-C7-C6-C0,4ERF complex,132.5,0.997,0.36,128.8,0.995,0.369
+t1,C8-C9-C10-C11,4ERF complex,72.5,0.971,0.102,62.1,0.944,0.114
+t2,O12-C11-C10-C9,4ERF complex,-87.5,0.901,0.895,-78.8,0.915,0.826
+t3,C19-C18-N17-C15,4ERF complex,-67.5,1.0,1.0,-58.7,0.998,1.0
+t4,C20-C19-C18-N17,4ERF complex,-142.5,0.745,0.728,-116.2,0.405,0.13
+t5,O22-C21-C18-N17,4ERF complex,52.5,0.544,0.13,32.6,0.458,0.112
+t6,C26-C25-C24-C7,4ERF complex,-107.5,0.999,0.982,-109.1,0.999,0.977
+t7,C18-C21-O22-H51,4ERF complex,57.5,0.734,0.671,n/a,,
