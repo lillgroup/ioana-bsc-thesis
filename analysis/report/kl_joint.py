@@ -120,6 +120,42 @@ def run(args):
         print(f"wrote {args.out}/data/kl_joint_cut_{name}.csv", flush=True)
 
 
+def js_threshold(kl):
+    """The JS-half value y = KL(pi^p || m) = ln(2 / (1 + w)) of a bound ensemble in ONE cluster that holds a
+    fraction w = e^-kl of water: the cross-KL thresholds (KL(p||w) = -ln w) in JS-half units."""
+    return float(np.log(2.0 / (1.0 + np.exp(-kl))))
+
+
+def draw_js_regions(ax, top, args):
+    """Lock and key / conformational selection / induced fit, the rules of kl_cross.regime() translated:
+    induced fit y >= js(--induced-fit-min) (bound conformer <= e^-3 = 5 % of water), lock and key x, y <
+    js(--lock-key-max) (>= e^-1 = 37 %), conformational selection the rest. Right axis: w = 2 e^-y - 1."""
+    from matplotlib.patches import Patch, Rectangle
+    from kl_cross import REGIMES
+    lk, fit = js_threshold(args.lock_key_max), js_threshold(args.induced_fit_min)
+    ax.add_patch(Rectangle((-1, fit), top + 2, top, color=REGIMES["induced fit"], alpha=0.13, lw=0, zorder=0))
+    ax.add_patch(Rectangle((-1, 0), top + 2, fit, color=REGIMES["conformational selection"], alpha=0.13, lw=0, zorder=0))
+    ax.add_patch(Rectangle((-1, 0), lk + 1, lk, color="white", lw=0, zorder=0))
+    ax.add_patch(Rectangle((-1, 0), lk + 1, lk, color=REGIMES["lock and key"], alpha=0.22, lw=0, zorder=0))
+    for name, (x, y, ha) in {"lock and key": (0.02 * top, 0.01 * top, "left"),
+                             "conformational selection": (0.97 * top, 0.03 * top, "right"),
+                             "induced fit": (0.6 * top, fit + 0.01 * top, "right")}.items():
+        ax.text(x, y, name, color=REGIMES[name], fontsize=13, fontweight="bold", alpha=0.75, ha=ha, va="bottom", zorder=1)
+    rules = {"lock and key": f"x, y < {lk:.3f}  (bound conformer ≥ {100 * np.exp(-args.lock_key_max):.0f} % of water)",
+             "conformational selection": f"y < {fit:.3f}  (bound conformer populated in water)",
+             "induced fit": f"y ≥ {fit:.3f}  (bound conformer ≤ {100 * np.exp(-args.induced_fit_min):.0f} % of water)"}
+    leg = ax.legend(handles=[Patch(color=REGIMES[n], alpha=0.35, label=f"{n}: {rules[n]}") for n in REGIMES],
+                    loc="lower right", bbox_to_anchor=(0.99, 0.08), fontsize=8, title="rules (as the cross-KL regions)",
+                    title_fontsize=8.5, framealpha=0.9)
+    ax.add_artist(leg)
+    right = ax.twinx()
+    right.set_ylim(0, top)
+    pcts = [p for p in (100, 50, 30, 20, 10, 5, 2, 1) if np.log(2 / (1 + p / 100)) <= top]
+    right.set_yticks([np.log(2 / (1 + p / 100)) for p in pcts], [f"{p:g} %" for p in pcts])
+    right.set_ylabel("≈ population of the bound conformer in water, w = 2e$^{-y}$ − 1\n"
+                     "(when the complex sits mostly in one cluster)", fontsize=9)
+
+
 def plot(args):
     import matplotlib
     matplotlib.use("Agg")
@@ -127,6 +163,8 @@ def plot(args):
     from matplotlib.colors import BoundaryNorm
     files = sorted(f for f in glob.glob(f"{args.out}/data/kl_joint_cut_*.csv"))
     df = pd.concat([pd.read_csv(f) for f in files], ignore_index=True)
+    if not args.with_variants:                       # rebuilt variants (e.g. 4erf-reduce) only on request
+        df = df[~df.ligand.str.endswith("-reduce")]
     if len(set(df.settings)) != 1:
         sys.exit(f"settings differ between compounds: {set(df.settings)}")
     info = ligand_info()
@@ -168,18 +206,21 @@ def plot(args):
     fig.savefig(f"{args.out}/kl_joint_cut.png", dpi=150)
     plt.close(fig)
 
-    # 2. JS halves: KL(w||m) vs KL(p||m), both in [0, ln 2]
-    fig, ax = plt.subplots(figsize=(10.5, 8.5), layout="constrained")
-    scatter(ax, "JS_w_m", "JS_p_m", LN2 * 1.06)
-    for f in (ax.axhline, ax.axvline):
-        f(LN2, color="0.3", ls=":", lw=1.2)
-    ax.text(0.01, LN2, " ln 2: no cluster shared", va="bottom", fontsize=8, color="0.3")
-    ax.set_xlabel(r"KL($\pi^{water}\,\|\,m$)  (k$_B$),  m = ($\pi^{water}$ + $\pi^{protein}$)/2")
-    ax.set_ylabel(r"KL($\pi^{protein}\,\|\,m$)  (k$_B$)")
-    ax.set_title("Jensen-Shannon divergence in its two halves, JS = (x + y)/2\n" + sub, fontsize=10)
-    colourbar(fig, ax)
-    fig.savefig(f"{args.out}/js_joint_halves_cut.png", dpi=150)
-    plt.close(fig)
+    # 2. JS halves: KL(w||m) vs KL(p||m), both in [0, ln 2]; plain and with the regime regions
+    for regions in (False, True):
+        fig, ax = plt.subplots(figsize=(10.5 + 1.2 * regions, 8.5), layout="constrained")
+        if regions:
+            draw_js_regions(ax, LN2 * 1.06, args)
+        scatter(ax, "JS_w_m", "JS_p_m", LN2 * 1.06)
+        for f in (ax.axhline, ax.axvline):
+            f(LN2, color="0.3", ls=":", lw=1.2)
+        ax.text(0.01, LN2, " ln 2: no cluster shared", va="bottom", fontsize=8, color="0.3")
+        ax.set_xlabel(r"KL($\pi^{water}\,\|\,m$)  (k$_B$),  m = ($\pi^{water}$ + $\pi^{protein}$)/2")
+        ax.set_ylabel(r"KL($\pi^{protein}\,\|\,m$)  (k$_B$)")
+        ax.set_title("Jensen-Shannon divergence in its two halves, JS = (x + y)/2\n" + sub, fontsize=10)
+        colourbar(fig, ax)
+        fig.savefig(f"{args.out}/js_joint_halves_cut{'_regions' if regions else ''}.png", dpi=150)
+        plt.close(fig)
 
     # 3. JS ranked
     d = df.sort_values("JS").reset_index(drop=True)
@@ -205,6 +246,9 @@ def main():
     ap.add_argument("--compounds", nargs="+", default=DEFAULT)
     ap.add_argument("--blocks", type=int, default=5)
     ap.add_argument("--out", default=OUT)
+    ap.add_argument("--with-variants", action="store_true", help="also plot rebuilt variants such as 4erf-reduce")
+    ap.add_argument("--lock-key-max", type=float, default=1.0, help="regions: cross-KL lock-and-key threshold (k_B)")
+    ap.add_argument("--induced-fit-min", type=float, default=3.0, help="regions: cross-KL induced-fit threshold (k_B)")
     args = ap.parse_args()
     plot(args) if args.plot else run(args)
 
