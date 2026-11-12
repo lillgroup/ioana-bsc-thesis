@@ -30,6 +30,7 @@ from cluster_prune import load_torsions  # noqa: E402
 FLOORS = (1e-2, 5e-3, 2e-3, 1e-3, 5e-4, 2e-4, 1e-4)
 KTS = (1.0, 2.0, 3.0)
 COLOURS = {1.0: "#1b9e77", 2.0: "#d95f02", 3.0: "#7570b3"}
+DODGE = {1.0: 0.93, 2.0: 1.0, 3.0: 1.075}     # small x offset per E* (log axis), so equal values stay visible
 
 
 def entropy(labels):
@@ -81,10 +82,11 @@ def main():
             ls, mk = styles[k % len(styles)] if s != "water" else ("-", "o")
             for kt in KTS:
                 d = res[s][res[s].E_star == kt].sort_values("pi_min")
-                ax.errorbar(d.pi_min, d.S, yerr=d.S_se, color=COLOURS[kt], ls=ls, marker=mk, ms=5, capsize=2, lw=1.6)
+                ax.errorbar(d.pi_min * DODGE[kt], d.S, yerr=d.S_se, color=COLOURS[kt], ls=ls, marker=mk, ms=5, capsize=2,
+                            lw=1.6, alpha=0.85)
                 if kt == 1.0:                       # the default setting used everywhere else
                     i = int(np.argmin(np.abs(np.log(d.pi_min.to_numpy()) - np.log(1e-3))))
-                    ax.plot(d.pi_min.iloc[i], d.S.iloc[i], "*", color="k", ms=14, zorder=5)
+                    ax.plot(d.pi_min.iloc[i] * DODGE[kt], d.S.iloc[i], "*", color="k", ms=14, zorder=5)
             n = int(res[s].frames.iloc[0])
             ax.axvspan(1e-4 * 0.8, 10.0 / n, color="0.88", zorder=0, lw=0)
         handles = [Line2D([], [], color=COLOURS[kt], lw=2.5, label=f"E* = {kt:g} k$_B$T") for kt in KTS]
@@ -103,7 +105,7 @@ def main():
     for ax in axes:
         ax.set_ylim(0, top)
     fig.suptitle(f"{args.name}: conformational entropy vs barrier-cut resolution (torsion partitioning, REST2 state 0, every frame)\n"
-                 "π$_c$ = fraction of the run's frames in cluster c; grey = π$_{min}$ below 10 frames of that run; "
+                 "π$_c$ = fraction of the run's frames in cluster c; E* lines shifted slightly sideways so equal values stay visible; grey = π$_{min}$ below 10 frames of that run; "
                  f"bars: block SE over {args.blocks} time blocks", fontsize=11)
     fig.savefig(out + ".png", dpi=150)
     print(f"wrote {out}.png / .csv")
