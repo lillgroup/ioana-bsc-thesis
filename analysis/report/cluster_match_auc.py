@@ -124,7 +124,8 @@ def plot(args):
     import matplotlib.pyplot as plt
     from matplotlib.colors import BoundaryNorm
     from kl_cross import ligand_info
-    df = pd.concat([pd.read_csv(f) for f in sorted(glob.glob(f"{args.out}/data/cluster_match_*.csv"))], ignore_index=True)
+    files = [f for f in sorted(glob.glob(f"{args.out}/data/cluster_match_*.csv")) if not f.endswith("_all.csv")]
+    df = pd.concat([pd.read_csv(f) for f in files], ignore_index=True)     # per compound, not the combined table
     df = df[~df.ligand.str.endswith("-reduce")]
     info = ligand_info()
     df["rot_bonds"] = [info[l][0] for l in df.ligand]
