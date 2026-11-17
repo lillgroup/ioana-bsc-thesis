@@ -1,0 +1,14 @@
+torsion,atoms,complex,complex_peak_deg,complex_mass_at_peak,water_mass_at_complex_peak,crystal_deg,complex_mass_at_crystal,water_mass_at_crystal
+t0,O12-C4-C3-O8,5H9R complex,62.5,0.999,0.779,61.2,0.999,0.777
+t1,C1-C6-S0-C7,5H9R complex,177.5,1.0,0.691,178.3,1.0,0.684
+t2,O9-C7-S0-C6,5H9R complex,-112.5,0.993,0.254,-99.1,0.939,0.446
+t3,O13-C11-C10-O9,5H9R complex,67.5,0.756,0.742,66.7,0.757,0.743
+t4,N24-N23-C2-C1,5H9R complex,-122.5,0.98,0.322,-120.1,0.979,0.303
+t5,C29-C28-C26-N25,5H9R complex,-172.5,0.846,0.368,-161.3,0.815,0.306
+t6,C3-C4-O12-H44,5H9R complex,-72.5,0.99,0.375,n/a,,
+t7,C10-C11-O13-H45,5H9R complex,-57.5,0.388,0.419,n/a,,
+t8,C2-C14-O16-H48,5H9R complex,-92.5,0.829,0.283,n/a,,
+t9,C10-C15-O17-H49,5H9R complex,-52.5,0.385,0.36,n/a,,
+t10,C15-C18-O19-H51,5H9R complex,-67.5,0.501,0.41,n/a,,
+t11,C2-C1-O21-H53,5H9R complex,-177.5,0.425,0.487,n/a,,
+t12,C7-C20-O22-H54,5H9R complex,-72.5,0.99,0.228,n/a,,

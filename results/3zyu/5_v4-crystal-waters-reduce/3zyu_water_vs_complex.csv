@@ -1,0 +1,5 @@
+torsion,atoms,complex,complex_peak_deg,complex_mass_at_peak,water_mass_at_complex_peak,crystal_deg,complex_mass_at_crystal,water_mass_at_crystal
+t0,C4-C3-N2-C1,3ZYU complex,127.5,0.996,0.982,120.4,0.997,0.997
+t1,N5-C4-C3-N2,3ZYU complex,152.5,0.975,0.768,148.4,0.965,0.761
+t2,C23-O22-C21-C18,3ZYU complex,-17.5,0.858,0.499,-7.8,0.808,0.544
+t3,C25-C24-C20-C19,3ZYU complex,127.5,0.998,0.528,125.2,0.999,0.535

@@ -1,0 +1,6 @@
+complex,cluster,mass,median_rmsd,q25,q75,crystal_cluster,central_frame
+4IBB,A,0.532,0.472,0.41,0.543,True,4757
+4IBB,B,0.231,0.873,0.84,0.911,False,13040
+4IBB,C,0.0968,1.173,1.113,1.236,False,6825
+4IBB,D,0.0667,0.939,0.851,1.015,False,1788
+4IBB,E,0.0296,1.551,1.469,1.619,False,17622

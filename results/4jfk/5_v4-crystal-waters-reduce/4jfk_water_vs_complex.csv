@@ -1,0 +1,9 @@
+torsion,atoms,complex,complex_peak_deg,complex_mass_at_peak,water_mass_at_complex_peak,crystal_deg,complex_mass_at_crystal,water_mass_at_crystal
+t0,N35-C20-C17-O25,4JFK complex,62.5,0.71,0.432,70.2,0.708,0.424
+t1,C27-O25-C17-C20,4JFK complex,87.5,0.683,0.096,81.3,0.68,0.097
+t2,C10-C27-O25-C17,4JFK complex,-12.5,0.713,0.418,-9.9,0.706,0.425
+t3,C11-C29-O23-C5,4JFK complex,-2.5,0.703,0.627,-6.8,0.696,0.62
+t4,C14-C30-O24-C6,4JFK complex,-7.5,0.69,0.556,-2.6,0.662,0.565
+t5,C0-N35-C20-C17,4JFK complex,-97.5,0.925,0.453,-115.1,0.704,0.203
+t6,N1-S36-C28-C12,4JFK complex,87.5,0.974,0.296,91.7,0.97,0.296
+t7,O8-S36-N1-C3,4JFK complex,-117.5,0.979,0.058,-105.1,0.962,0.056

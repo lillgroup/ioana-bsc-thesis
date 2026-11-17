@@ -1,21 +1,42 @@
 method,ligand,complex,KL_p_w_waterdef,KL_p_w_se,n_water_clusters,complex_unassigned_on_water_clusters,top_complex_share_on_water_clusters,water_share_of_that_cluster,KL_w_p_complexdef,KL_w_p_se,n_complex_clusters,water_unassigned_on_complex_clusters,note,md_tools,regime,rot_bonds,compound_set
 cut,1eld,1ELD,0.8797,0.0312,44,0.0,0.9708,0.3828,0.8986,0.0464,2,0.0,,0.6.5.2,lock and key,7,rotatable-bond set
+cut,1fkh,1FKH,3.2005,0.1157,342,0.0,0.2755,0.0041,2.7189,0.0934,45,0.0,,0.6.5.2,induced fit,9,rotatable-bond set
+cut,1j17,1J17,1.0222,0.06,24,0.0,0.2602,0.0632,0.2454,0.0149,11,0.0,,0.6.5.2,conformational selection,4,rotatable-bond set
 cut,1l8g,1L8G,1.4236,0.0646,17,0.0,0.6558,0.0973,3.5893,0.1808,7,0.0,,0.6.5.2,conformational selection,4,rotatable-bond set
 cut,1rd4,1RD4,2.8566,0.202,304,0.0,0.2104,0.004,0.8199,0.1097,68,0.0,,0.6.5.2,conformational selection,7,rotatable-bond set
+cut,1xbo,1XBO,4.3242,0.023,671,0.0,0.2551,0.0011,2.7459,0.0877,25,0.0,,0.6.5.2,induced fit,8,rotatable-bond set
 cut,3b67,3B67,2.404,0.0264,105,0.0,0.7519,0.0502,0.115,0.0057,2,0.0,,0.6.5.2,conformational selection,6,rotatable-bond set
+cut,3qxt,3QXT,2.1095,0.2533,271,0.0,0.1883,0.0597,0.5904,0.0713,75,0.0,,0.6.5.2,conformational selection,9,rotatable-bond set
+cut,3r4p,3R4P,1.1706,0.03,95,0.0,0.751,0.1677,1.6052,0.073,12,0.0,,0.6.5.2,conformational selection,7,rotatable-bond set
+cut,3zyu,3ZYU,0.7569,0.0256,4,0.0,0.9799,0.4361,0.3145,0.0835,2,0.0,,0.6.5.2,lock and key,4,rotatable-bond set
 cut,4ase,4ASE,6.7241,0.0669,27,0.0,0.9812,0.0011,4.385,0.0117,5,0.0,,0.6.5.2,induced fit,6,rotatable-bond set
 cut,4crf,4CRF,6.3239,0.0058,150,0.0,0.9874,0.0017,0.0097,0.0018,2,0.0,,0.6.5.2,induced fit,7,rotatable-bond set
 cut,4erf,4ERF,2.1212,0.0914,49,0.0,0.2643,0.0348,0.9794,0.0285,27,0.0,,0.6.5.2,conformational selection,7,rotatable-bond set
+cut,4ibb,4IBB,0.3308,0.0791,29,0.0,0.5419,0.2723,0.7856,0.0377,23,0.0,,0.6.5.2,lock and key,6,rotatable-bond set
 cut,4ibi,4IBI,1.4669,0.0088,25,0.0,0.998,0.2276,1.8932,0.1905,2,0.0,,0.6.5.2,conformational selection,5,original small molecules
+cut,4ibj,4IBJ,2.2459,0.0,18,0.0,1.0,0.1058,0.0,0.0,1,0.0,,0.6.5.2,conformational selection,5,rotatable-bond set
 cut,4ibk,4IBK,2.1731,0.0565,26,0.0,0.9365,0.0889,0.6363,0.1129,2,0.0,,0.6.5.2,conformational selection,5,original small molecules
 cut,4j7d,4J7D,0.2744,0.0974,8,0.0,0.7195,0.3932,0.3784,0.0387,10,0.0,,0.6.5.2,lock and key,5,original small molecules
+cut,4jfk,4JFK,4.7577,0.0849,158,0.0,0.5038,0.0015,3.4315,0.0741,32,0.0,,0.6.5.2,induced fit,8,rotatable-bond set
+cut,4jfm,4JFM,1.7474,0.1422,302,0.0,0.2442,0.04,1.1819,0.0774,134,0.0,,0.6.5.2,conformational selection,9,rotatable-bond set
 cut,4k9y,4K9Y,3.8058,0.0144,74,0.0,0.9938,0.0213,2.0768,0.0608,2,0.0,,0.6.5.2,induced fit,4,rotatable-bond set
+cut,4kn0,4KN0,2.1785,0.0971,320,0.0,0.5103,0.0628,0.7421,0.0588,41,0.0,,0.6.5.2,conformational selection,9,rotatable-bond set
+cut,4luz,4LUZ,4.4353,0.0446,98,0.0,0.4917,0.0016,3.4283,0.0944,31,0.0,,0.6.5.2,induced fit,8,rotatable-bond set
 cut,4p6w,4P6W,0.773,0.0363,11,0.0,0.7932,0.2795,0.8652,0.025,5,0.0,,0.6.5.2,lock and key,4,rotatable-bond set
+cut,4r4o,4R4O,2.2411,0.2418,159,0.0,0.5388,0.0225,1.5045,0.0297,34,0.0,,0.6.5.2,conformational selection,8,rotatable-bond set
+cut,4x5p,4X5P,4.2742,0.0431,661,0.0,0.2278,0.0018,0.9585,0.018,18,0.0,,0.6.5.2,induced fit,6,rotatable-bond set
+cut,5fnt,5FNT,3.506,0.0206,181,0.0,0.9843,0.028,1.9563,0.164,3,0.0,,0.6.5.2,induced fit,8,rotatable-bond set
+cut,5h9r,5H9R,3.1208,0.0848,734,0.0,0.0853,0.0015,2.0991,0.0665,234,0.0,,0.6.5.2,induced fit,6,rotatable-bond set
+cut,5mg2,5MG2,0.0702,0.0166,57,0.0,0.1237,0.0772,0.0845,0.0104,56,0.0,,0.6.5.2,lock and key,4,rotatable-bond set
 cut,5mwh,5MWH,0.9785,0.158,50,0.0,0.2976,0.0293,0.1217,0.0146,19,0.0,,0.6.5.2,lock and key,6,original small molecules
+cut,5nlk,5NLK,2.1079,0.0719,254,0.0,0.2869,0.0494,3.9531,0.1618,46,0.0,,0.6.5.2,conformational selection,8,rotatable-bond set
 cut,5ov8,5OV8,0.8486,0.0631,72,0.0,0.1943,0.0762,0.6557,0.0432,27,0.0,,0.6.5.2,lock and key,6,original small molecules
 cut,6cjr,6CJR,1.8642,0.0418,41,0.0,0.3348,0.0346,0.0602,0.0106,4,0.0,,0.6.5.2,conformational selection,4,rotatable-bond set
 cut,6fo5,6FO5,2.098,0.2125,180,0.0,0.4479,0.018,1.8972,0.1043,52,0.0,,0.6.5.2,conformational selection,7,rotatable-bond set
+cut,6qge,6QGE,4.2753,0.1609,738,0.0,0.2463,0.0013,4.2288,0.0949,86,0.0,,0.6.5.2,induced fit,9,rotatable-bond set
 cut,6qlp,6QLP,3.0683,0.0312,349,0.0,0.1532,0.0017,1.7862,0.0143,8,0.0,,0.6.5.2,induced fit,5,rotatable-bond set
+cut,6qmj,6QMJ,5.3656,0.0118,294,0.0,0.3751,0.0011,0.2648,0.0169,2,0.0,,0.6.5.2,induced fit,9,rotatable-bond set
+cut,6qmk,6QMK,3.0343,0.0445,97,0.0,0.9907,0.0453,0.7519,0.2184,3,0.0,,0.6.5.2,induced fit,7,rotatable-bond set
 cut,6r8o,6R8O,4.0384,0.1025,413,0.0,0.3881,0.002,1.7992,0.0516,12,0.0,,0.6.5.2,induced fit,6,rotatable-bond set
 cut,6s56,6S56,2.079,0.0291,26,0.0,0.9919,0.1192,1.2236,0.0514,3,0.0,,0.6.5.2,conformational selection,5,rotatable-bond set
 cut,folic-acid,4LRH,3.5215,0.133,308,0.0,0.44,0.0227,1.3321,0.0402,30,0.0,,0.6.5.2,induced fit,9,folate

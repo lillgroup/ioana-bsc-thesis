@@ -35,7 +35,7 @@ from rdkit.Chem import rdMolDescriptors
 WORK = "/scicore/home/lill0000/popa0002/thesis/analysis-report"
 REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import csv as _csv
-DEFAULT = [r["name"] for r in _csv.DictReader(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "compounds.csv")))]
+DEFAULT = [r["name"] for r in _csv.DictReader(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "compounds.csv"))) if not r["name"].endswith("-reduce")]   # rebuilt variants (4erf-reduce) only on request
 METHODS = {"hdbscan": ("clustering", "symmetry-first HDBSCAN (no single cluster)"),
            "cut": ("cut", "torsion partitioning (barrier cuts)")}
 
@@ -130,8 +130,10 @@ def main():
     with pd.option_context("display.width", 200):
         print(df.drop(columns="algorithm").to_string(index=False))
 
-    palette = list(plt.get_cmap("tab20").colors[::2]) + list(plt.get_cmap("tab20").colors[1::2]) + list(plt.get_cmap("Dark2").colors)
-    colours = dict(zip(args.compounds, palette))
+    import itertools
+    palette = (list(plt.get_cmap("tab20").colors[::2]) + list(plt.get_cmap("tab20").colors[1::2])
+               + list(plt.get_cmap("tab20b").colors) + list(plt.get_cmap("tab20c").colors))   # 60 colours, then repeated
+    colours = dict(zip(args.compounds, itertools.cycle(palette)))
     markers = ["s", "D", "^", "v"]
     for method, (_, title) in METHODS.items():
         sub = df[df.method == method]

@@ -1,0 +1,2 @@
+run,ligand,ns,pocket_residues,native_pairs,com_crystal,frac_unbound,max_closest_contact,rmsd_mean,rmsd_last10pct,com_mean,com_last10pct,contacts_mean,contacts_last10pct,Q_mean,Q_last10pct,verdict
+REST2-rotbonds2/1fkh-complex,SBX,40.0,14,61,3.23,0.0,3.32,1.61,1.58,3.61,3.58,55.83,56.81,0.73,0.74,"bound, crystal pose"

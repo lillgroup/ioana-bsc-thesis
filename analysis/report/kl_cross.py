@@ -291,6 +291,7 @@ def plot(args):
             print(f"skip {method}: no kl_cross_{method}_*.csv")
             continue
         df = pd.concat([pd.read_csv(f) for f in files], ignore_index=True)
+        df = df[~df.ligand.str.endswith("-reduce")]       # rebuilt variants (4erf-reduce) only in their own folder
         if len(set(df.settings)) != 1:
             sys.exit(f"{method}: settings differ between compounds: {set(df.settings)}")
         df["regime"] = [regime(x, y, args) for x, y in zip(df.KL_w_p_complexdef, df.KL_p_w_waterdef)]

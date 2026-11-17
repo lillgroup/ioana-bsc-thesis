@@ -1,0 +1,14 @@
+torsion,atoms,complex,complex_peak_deg,complex_mass_at_peak,water_mass_at_complex_peak,crystal_deg,complex_mass_at_crystal,water_mass_at_crystal
+t0,C15-C14-C9-C8,6QGE complex,7.5,0.989,0.385,20.6,0.916,0.307
+t1,O31-C19-C16-C0,6QGE complex,-177.5,0.999,0.713,-176.3,0.999,0.714
+t2,C2-C20-C3-N26,6QGE complex,167.5,0.799,0.502,-167.2,0.55,0.438
+t3,C3-C20-C2-S34,6QGE complex,62.5,0.91,0.298,175.1,0.073,0.493
+t4,C15-N25-C17-C0,6QGE complex,-72.5,0.988,0.391,-78.5,0.972,0.403
+t5,C21-N26-C3-C20,6QGE complex,82.5,0.399,0.393,89.1,0.407,0.409
+t6,C1-S34-C2-C20,6QGE complex,132.5,0.903,0.14,69.5,0.048,0.063
+t7,C2-S34-C1-C18,6QGE complex,177.5,0.974,0.678,165.9,0.978,0.675
+t8,C21-C35-C4-C5,6QGE complex,-177.5,0.56,0.619,0.4,0.396,0.348
+t9,C16-C0-O30-H59,6QGE complex,157.5,0.666,0.245,n/a,,
+t10,C16-C19-O31-H60,6QGE complex,-67.5,0.989,0.339,n/a,,
+t11,C1-C18-O32-H61,6QGE complex,-57.5,0.443,0.414,n/a,,
+t12,C2-C20-O33-H62,6QGE complex,-72.5,0.9,0.309,n/a,,

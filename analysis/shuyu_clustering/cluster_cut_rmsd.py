@@ -5,7 +5,7 @@ figures cluster_prune.py + cluster_network.py make for the symmetry-first HDBSCA
 clusters of a finished cluster_cut.py run (its labels.csv and summary.json; nothing is re-clustered).
 
 Barrier cuts label every frame and can give hundreds of small cells, so only clusters holding
->= --min-mass of all frames (default 1 %, as the clusters drawn in clusters_overview.png) become rows
+>= --min-mass of all frames (if fewer than 2 do: the --top-if-none largest) (default 1 %, as the clusters drawn in clusters_overview.png) become rows
 of the matrix / nodes of the network; the frames of smaller clusters are left out, and the title says
 how much that is. RMSD: symmetry-corrected heavy-atom RMSD (md_tools intercluster_rmsd, at most
 --rmsd-max-per-cluster frames per cluster, as cluster_prune.py), diagonal = within-cluster spread.
@@ -41,6 +41,7 @@ def main():
     ap.add_argument("--sdf", required=True)
     ap.add_argument("--max-matches", type=int, default=None)
     ap.add_argument("--min-mass", type=float, default=0.01, help="smallest cluster shown, fraction of all frames")
+    ap.add_argument("--top-if-none", type=int, default=15, help="if fewer than 2 clusters reach --min-mass: show this many largest")
     ap.add_argument("--rmsd-max-per-cluster", type=int, default=1500, help="0 = every frame")
     ap.add_argument("--rmsd-workers", type=int, default=os.cpu_count() or 1)
     ap.add_argument("--name", default=None)
@@ -52,6 +53,9 @@ def main():
     summary = json.load(open(P("summary.json")))
     masses = summary["cluster_mass"]                                 # name -> fraction, by mass
     shown = [c for c, m in masses.items() if m >= args.min_mass]
+    fallback = len(shown) < 2                        # a very broad ensemble: no (or one) cluster reaches min-mass
+    if fallback:
+        shown = sorted(masses, key=masses.get, reverse=True)[:args.top_if_none]
     index = {c: i for i, c in enumerate(shown)}
     labels_csv = pd.read_csv(P("labels.csv"), keep_default_na=False, dtype={"cluster": str})
     labels = np.array([index.get(c, -1) for c in labels_csv["cluster"]], dtype=np.int64)
@@ -69,7 +73,9 @@ def main():
 
     rest = 1.0 - sum(masses[c] for c in shown)
     n_small = len(masses) - len(shown)
-    left_out = f"{n_small} clusters < {100 * args.min_mass:g} % left out ({100 * rest:.1f} % of frames)" if n_small else ""
+    left_out = (f"no cluster reaches {100 * args.min_mass:g} %: the {len(shown)} largest shown, {n_small} others hold "
+                f"{100 * rest:.1f} % of frames" if fallback else
+                f"{n_small} clusters < {100 * args.min_mass:g} % left out ({100 * rest:.1f} % of frames)" if n_small else "")
     print(f"{name}: {len(shown)} of {len(masses)} barrier-cut clusters >= {100 * args.min_mass:g} %; {left_out}")
     write_intercluster_rmsd(P, f"{name} (barrier cuts{', ' + left_out if left_out else ''}): ", X, labels,
                             lambda c: shown[c], operations, args.rmsd_max_per_cluster or None, args.rmsd_workers)

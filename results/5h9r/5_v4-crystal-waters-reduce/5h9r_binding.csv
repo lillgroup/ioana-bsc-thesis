@@ -1,0 +1,2 @@
+run,ligand,ns,pocket_residues,native_pairs,com_crystal,frac_unbound,max_closest_contact,rmsd_mean,rmsd_last10pct,com_mean,com_last10pct,contacts_mean,contacts_last10pct,Q_mean,Q_last10pct,verdict
+REST2-rotbonds2/5h9r-complex,TGZ,40.0,14,83,5.1,0.0,2.8,0.9,0.87,4.9,4.93,77.45,73.96,0.83,0.82,"bound, crystal pose"

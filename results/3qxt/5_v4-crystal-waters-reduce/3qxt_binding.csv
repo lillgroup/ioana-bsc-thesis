@@ -1,0 +1,2 @@
+run,ligand,ns,pocket_residues,native_pairs,com_crystal,frac_unbound,max_closest_contact,rmsd_mean,rmsd_last10pct,com_mean,com_last10pct,contacts_mean,contacts_last10pct,Q_mean,Q_last10pct,verdict
+REST2-rotbonds2/3qxt-complex,MTX,40.0,20,107,4.2,0.0,3.03,2.21,3.44,4.57,5.06,107.68,114.22,0.69,0.5,"bound, rearranged"

@@ -1,0 +1,9 @@
+torsion,atoms,complex,complex_peak_deg,complex_mass_at_peak,water_mass_at_complex_peak,crystal_deg,complex_mass_at_crystal,water_mass_at_crystal
+t0,C4-C3-C0-O1,4LUZ complex,167.5,0.868,0.664,-172.4,0.721,0.708
+t1,C9-C8-C6-C5,4LUZ complex,172.5,0.97,0.871,-167.9,0.828,0.841
+t2,O15-C14-C11-C10,4LUZ complex,12.5,0.785,0.048,-47.2,0.134,0.256
+t3,C16-O15-C14-C11,4LUZ complex,92.5,0.887,0.05,112.9,0.681,0.026
+t4,C17-C16-O15-C14,4LUZ complex,157.5,0.874,0.355,-124.7,0.02,0.168
+t5,C23-C22-C19-C18,4LUZ complex,22.5,0.841,0.272,-45.4,0.112,0.454
+t6,C28-C27-N26-C22,4LUZ complex,62.5,0.793,0.168,88.1,0.62,0.011
+t7,O35-C34-C24-C23,4LUZ complex,2.5,0.984,0.97,-50.6,0.032,0.059

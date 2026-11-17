@@ -1,0 +1,16 @@
+cluster,parent,depth,frames,mass_of_ensemble,internal_rmsd_A,outcome
+A,,1,2308,0.38467,1.82,leaf
+B,,1,1115,0.18583,2.484,split (mass floor 0.0179)
+C,,1,379,0.06317,1.382,leaf
+D,,1,217,0.03617,1.561,leaf
+E,,1,140,0.02333,2.202,split (mass floor 0.1429)
+B.A,B,2,138,0.023,0.878,leaf
+B.B,B,2,158,0.02633,1.201,leaf
+B.C,B,2,75,0.0125,1.078,leaf
+B.D,B,2,67,0.01117,2.23,split (mass floor 0.2985)
+B.E,B,2,46,0.00767,1.246,leaf
+B.F,B,2,22,0.00367,0.82,leaf
+E.A,E,2,66,0.011,1.005,leaf
+E.B,E,2,21,0.0035,1.086,leaf
+B.D.A,B.D,3,31,0.00517,1.15,leaf
+B.D.B,B.D,3,1,0.00017,,leaf

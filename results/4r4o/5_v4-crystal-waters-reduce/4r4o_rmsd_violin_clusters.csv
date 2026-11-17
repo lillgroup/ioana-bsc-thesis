@@ -1,0 +1,7 @@
+complex,cluster,mass,median_rmsd,q25,q75,crystal_cluster,central_frame
+4R4O,A,0.6696,0.55,0.473,0.657,True,1692
+4R4O,B,0.2163,3.836,3.744,3.917,False,10250
+4R4O,C,0.0226,1.153,1.092,1.21,False,11830
+4R4O,D,0.0186,3.398,3.313,3.488,False,19113
+4R4O,E,0.0174,3.544,3.446,3.622,False,18317
+4R4O,F,0.012,0.929,0.886,1.033,False,16420

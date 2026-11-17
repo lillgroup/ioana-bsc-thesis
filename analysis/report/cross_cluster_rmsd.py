@@ -7,7 +7,7 @@ report_cut.sbatch runs <work>/<c>/<system>-cut), each axis sorted by population,
 A low cell: that bound conformer family is, in 3D, one the free ligand also visits; a row with no low cell:
 the bound conformers are far from everything water samples. Two clusterings, so the matrix is not
 symmetric and its diagonal is not special. Clusters below --min-mass (default 1 %) of their own run are
-left out (titles say how much); at most --max-per-cluster random frames per cluster (seeded). The cluster
+left out (titles say how much; if fewer than 2 reach it, the 15 largest are shown); at most --max-per-cluster random frames per cluster (seeded). The cluster
 each crystal falls in is marked gold on both axes (cluster_cut's crystal assignment).
 Both ensembles in the water ligand's atom order (kl_cross.ensembles), so the RMSD compares the same atoms.
 
@@ -42,6 +42,8 @@ def clusters(cut_dir, n_frames, min_mass):
     names, cnt = np.unique(lab, return_counts=True)
     order = [(str(n), c / len(lab)) for n, c in sorted(zip(names, cnt), key=lambda t: -t[1])]
     shown = [(n, m) for n, m in order if m >= min_mass]
+    if len(shown) < 2:                               # a very broad ensemble: the 15 largest clusters instead
+        shown = order[:15]
     crystal = {v["cluster"] for v in s.get("crystal_assignment", {}).values() if v.get("cluster")}
     return lab, shown, 1.0 - sum(m for _, m in shown), len(order), crystal
 

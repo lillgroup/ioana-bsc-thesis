@@ -1,0 +1,5 @@
+complex,water_cluster,water_mass,dmin_rmsd,best_complex_cluster,best_complex_mass
+3ZYU,A,0.436067,0.4785,A,0.9803
+3ZYU,B,0.3584,0.749,A,0.9803
+3ZYU,C,0.111367,0.39,B,0.0197
+3ZYU,D,0.094167,0.7768,B,0.0197

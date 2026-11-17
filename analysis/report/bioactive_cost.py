@@ -47,7 +47,7 @@ from md_tools.analysis import (verify_atom_mapping, enumerate_symmetry, heavy_at
 WORK = "/scicore/home/lill0000/popa0002/thesis/analysis-report"
 REPO = os.path.dirname(os.path.dirname(HERE))
 OUT = os.path.join(REPO, "results", "overview", "bioactive-cost")
-DEFAULT = [r["name"] for r in csv.DictReader(open(os.path.join(HERE, "compounds.csv")))]
+DEFAULT = [r["name"] for r in csv.DictReader(open(os.path.join(HERE, "compounds.csv"))) if not r["name"].endswith("-reduce")]   # rebuilt variants (4erf-reduce) only on request
 CUTOFFS = (1.0, 1.5, 2.0)
 REGIMES = {"lock and key": "#2ca25f", "conformational selection": "#3182bd", "induced fit": "#e6550d"}
 

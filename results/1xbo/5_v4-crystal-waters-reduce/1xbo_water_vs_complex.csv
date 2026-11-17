@@ -1,0 +1,13 @@
+torsion,atoms,complex,complex_peak_deg,complex_mass_at_peak,water_mass_at_complex_peak,crystal_deg,complex_mass_at_crystal,water_mass_at_crystal
+t0,O7-C6-C1-C0,1XBO complex,162.5,0.983,0.21,173.0,0.945,0.172
+t1,O12-C11-C9-N8,1XBO complex,-142.5,0.99,0.32,-138.1,0.973,0.23
+t2,C28-C14-C3-C2,1XBO complex,-7.5,0.871,0.426,68.0,0.011,0.007
+t3,O22-C21-C20-C15,1XBO complex,132.5,0.851,0.239,128.5,0.847,0.239
+t4,C27-O26-C15-C16,1XBO complex,-62.5,0.616,0.261,-0.2,0.249,0.39
+t5,C28-C27-O26-C15,1XBO complex,177.5,0.966,0.734,-179.9,0.952,0.741
+t6,C14-C28-C27-O26,1XBO complex,-142.5,0.482,0.249,63.5,0.001,0.056
+t7,O30-C29-C10-C6,1XBO complex,-57.5,0.867,0.02,-58.4,0.868,0.021
+t8,C24-O23-C21-C20,1XBO complex,-177.5,0.921,0.963,-179.6,0.914,0.966
+t9,C27-C28-C14-C3,1XBO complex,172.5,1.0,0.998,-179.6,0.999,1.0
+t10,C18-C19-O25-H42,1XBO complex,2.5,0.906,0.59,n/a,,
+t11,C10-C29-O30-H48,1XBO complex,-157.5,0.512,0.111,n/a,,

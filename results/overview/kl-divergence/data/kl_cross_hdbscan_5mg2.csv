@@ -1,0 +1,2 @@
+method,ligand,complex,KL_p_w_waterdef,KL_p_w_se,n_water_clusters,complex_unassigned_on_water_clusters,top_complex_share_on_water_clusters,water_share_of_that_cluster,KL_w_p_complexdef,KL_w_p_se,n_complex_clusters,water_unassigned_on_complex_clusters,note,md_tools,settings
+hdbscan,5mg2,5MG2,0.0558,0.0132,25,0.1085,0.1346,0.0871,0.0342,0.0023,22,0.178,,0.6.5.2,"{""allow_single_cluster"": false, ""mass_floor"": 0.01, ""route"": ""symmetry-first""}"

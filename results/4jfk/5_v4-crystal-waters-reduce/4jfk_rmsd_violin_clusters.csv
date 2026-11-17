@@ -1,0 +1,5 @@
+complex,cluster,mass,median_rmsd,q25,q75,crystal_cluster,central_frame
+4JFK,A,0.6849,0.448,0.372,0.545,True,19283
+4JFK,B,0.1646,0.677,0.587,0.796,False,10703
+4JFK,C,0.0801,1.746,1.708,1.785,False,4497
+4JFK,D,0.0112,2.623,2.541,2.702,False,18169

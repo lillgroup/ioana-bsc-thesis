@@ -1,0 +1,3 @@
+complex,cluster,mass,median_rmsd,q25,q75,crystal_cluster,central_frame
+3ZYU,A,0.9803,0.262,0.224,0.306,True,922
+3ZYU,B,0.0197,0.891,0.879,0.905,False,5002

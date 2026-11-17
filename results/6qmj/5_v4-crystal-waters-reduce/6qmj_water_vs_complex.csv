@@ -1,0 +1,10 @@
+torsion,atoms,complex,complex_peak_deg,complex_mass_at_peak,water_mass_at_complex_peak,crystal_deg,complex_mass_at_crystal,water_mass_at_crystal
+t0,C8-C7-C2-C3,6QMJ complex,172.5,0.992,0.174,170.9,0.992,0.187
+t1,C9-C8-C7-C2,6QMJ complex,-62.5,1.0,0.517,-60.3,1.0,0.516
+t2,O10-C9-C8-C7,6QMJ complex,-47.5,0.956,0.381,-45.9,0.952,0.382
+t3,N28-C15-C14-C12,6QMJ complex,-77.5,0.999,0.207,-78.1,0.999,0.211
+t4,C0-O20-C1-C6,6QMJ complex,-162.5,0.618,0.496,-173.2,0.564,0.547
+t5,C11-C26-C7-C2,6QMJ complex,137.5,1.0,0.247,136.9,1.0,0.253
+t6,C16-N28-C15-C14,6QMJ complex,-62.5,0.999,0.389,-61.9,0.999,0.388
+t7,O30-S29-N28-C15,6QMJ complex,-167.5,0.997,0.71,-169.5,0.996,0.729
+t8,C17-C32-S29-N28,6QMJ complex,-102.5,0.962,0.67,-90.9,0.955,0.726
